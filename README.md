@@ -35,8 +35,8 @@ We're simulating a high-stakes legal compliance firm called **"Innocenti & Assoc
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/jeffvestal/tom_innocenti_risk_management.git
-cd tom_innocenti_risk_management
+git clone https://github.com/jeffvestal/Tom-Innocenti-Risk-Management.git
+cd Tom-Innocenti-Risk-Management
 ```
 
 ### 2. Install dependencies
