@@ -61,13 +61,17 @@ def get_credentials(
     Offers to save to .env for persistence across sessions.
     On subsequent runs, loads from .env automatically.
     
+    Supports both:
+    - Elastic Cloud (uses ELASTIC_CLOUD_ID)
+    - Elastic Serverless (uses ELASTIC_URL)
+    
     Args:
         require_elastic: Whether to require Elastic credentials
         require_jina: Whether to require Jina API key
         save_prompt: Whether to offer saving credentials to .env
     
     Returns:
-        dict with keys: ELASTIC_CLOUD_ID, ELASTIC_API_KEY, JINA_API_KEY, USER_SUFFIX
+        dict with keys: ELASTIC_URL or ELASTIC_CLOUD_ID, ELASTIC_API_KEY, JINA_API_KEY, USER_SUFFIX
     """
     # Try loading existing .env
     if ENV_FILE.exists():
@@ -79,13 +83,28 @@ def get_credentials(
     
     # --- Elastic Credentials ---
     if require_elastic:
-        # Cloud ID
+        # Check for URL first (Serverless), then Cloud ID (traditional Cloud)
+        elastic_url = os.getenv("ELASTIC_URL")
         cloud_id = os.getenv("ELASTIC_CLOUD_ID")
-        if not cloud_id:
-            print("\n─── Elastic Cloud Credentials ───")
-            cloud_id = getpass.getpass("Enter your Elastic Cloud ID: ")
+        
+        if not elastic_url and not cloud_id:
+            print("\n─── Elastic Credentials ───")
+            print("Enter your Elasticsearch endpoint.")
+            print("  - For Serverless: paste the full URL (https://...elastic.cloud:443)")
+            print("  - For Cloud: paste your Cloud ID")
+            endpoint = getpass.getpass("Elastic URL or Cloud ID: ")
+            
+            # Detect if it's a URL or Cloud ID
+            if endpoint.startswith("http"):
+                elastic_url = endpoint
+            else:
+                cloud_id = endpoint
             needs_save = True
-        credentials["ELASTIC_CLOUD_ID"] = cloud_id
+        
+        if elastic_url:
+            credentials["ELASTIC_URL"] = elastic_url
+        if cloud_id:
+            credentials["ELASTIC_CLOUD_ID"] = cloud_id
         
         # API Key
         api_key = os.getenv("ELASTIC_API_KEY")
@@ -134,6 +153,8 @@ def _save_to_env(credentials: dict) -> None:
         "",
     ]
     
+    if "ELASTIC_URL" in credentials:
+        lines.append(f"ELASTIC_URL={credentials['ELASTIC_URL']}")
     if "ELASTIC_CLOUD_ID" in credentials:
         lines.append(f"ELASTIC_CLOUD_ID={credentials['ELASTIC_CLOUD_ID']}")
     if "ELASTIC_API_KEY" in credentials:
@@ -185,6 +206,40 @@ def get_inference_id(model_type: str) -> str:
         return f"jina-reranker-v3-{suffix}"
     else:
         raise ValueError(f"Unknown model_type: {model_type}. Use 'embeddings' or 'reranker'.")
+
+
+def get_elasticsearch_client(credentials: dict):
+    """
+    Create an Elasticsearch client from credentials.
+    
+    Handles both:
+    - Elastic Cloud (uses cloud_id parameter)
+    - Elastic Serverless (uses hosts parameter with URL)
+    
+    Args:
+        credentials: Dict from get_credentials() containing ELASTIC_URL or ELASTIC_CLOUD_ID
+    
+    Returns:
+        Elasticsearch client instance
+    """
+    from elasticsearch import Elasticsearch
+    
+    api_key = credentials.get("ELASTIC_API_KEY")
+    
+    if "ELASTIC_URL" in credentials:
+        # Serverless - use URL
+        return Elasticsearch(
+            hosts=[credentials["ELASTIC_URL"]],
+            api_key=api_key
+        )
+    elif "ELASTIC_CLOUD_ID" in credentials:
+        # Traditional Cloud - use cloud_id
+        return Elasticsearch(
+            cloud_id=credentials["ELASTIC_CLOUD_ID"],
+            api_key=api_key
+        )
+    else:
+        raise ValueError("No ELASTIC_URL or ELASTIC_CLOUD_ID found in credentials")
 
 
 # Convenience function for quick setup
