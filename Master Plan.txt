@@ -1,0 +1,58 @@
+# Project Context: "Innocenti Risk Management" Enablement Kit
+
+## 1. Project Overview
+We are building a technical enablement kit for Elastic Field Engineers. The goal is to demonstrate the **"Full Chain" search pipeline** using **Jina AI models** on **Elastic Inference Service (EIS)**.
+
+**The Theme:**
+We are simulating a high-stakes legal compliance firm called **"Innocenti & Associates"** (a subtle nod to *Bob's Burgers*). They need to search the **EU AI Act** with extreme precision. The tone is "High-End Enterprise Legal" (Dark mode, Slate Grey, Gold accents).
+
+## 2. Architecture & Components
+The project consists of two distinct layers. We will build Layer A first, then Layer B.
+
+### Layer A: The Enablement Notebooks (Python)
+*Target Audience: Field Engineers learning the code.*
+These are isolated Jupyter notebooks that run sequentially.
+* **`01_ingest.ipynb`**:
+    * **Goal:** Demonstrate "Garbage In, Gold Out" using Jina Reader.
+    * **Source:** EU AI Act PDF (`https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32024R1689`).
+    * **Action:** Call Jina Reader API (`https://r.jina.ai/`) with `x-respond-with: markdown`.
+    * **Logic:** Use Regex to split the markdown by `^Article \d+` to create clean, legal-clause chunks.
+    * **Output:** `eu_ai_act_clean.json`.
+* **`02_index.ipynb`**:
+    * **Goal:** Demonstrate "Zero-Config" Semantic Search.
+    * **Action:** Connect to Elastic Cloud. Create index `search-eu-ai-act-v1` using the `semantic_text` field type.
+    * **Model:** `jina-embeddings-v3` (via EIS).
+    * **Action:** Bulk index the JSON data.
+* **`03_rerank.ipynb`**:
+    * **Goal:** Demonstrate "Precision" via Reranking.
+    * **Action:** Query for a nuanced topic (e.g., "biometric exceptions").
+    * **Comparison:** Show raw vector results vs. results reranked by `jina-reranker-v3`.
+    * **Key Concept:** Highlight "Listwise" reranking (documents attending to each other).
+
+### Layer B: The "Slick" Demo UI (Next.js/React)
+*Target Audience: Customers (C-Level/VP).*
+A polished web application that connects to the *same* Elastic index created in Layer A.
+* **Stack:** Next.js 14 (App Router), Tailwind CSS, Lucide React icons.
+* **Visuals:** Professional, "Risk Dashboard" aesthetic.
+* **Key Features:**
+    * **Search Bar:** Global search across the EU AI Act.
+    * **Language Toggle:** [🇺🇸 EN] [🇩🇪 DE] (Prepare UI for multilingual, even if data is EN first).
+    * **"Deep Analysis" Button:** A prominent button that triggers the Reranker.
+    * **Visual Feedback:** When "Deep Analysis" is clicked, results physically shuffle/reorder, and a "Precision Score" badge glows.
+
+## 3. Technical Specs & Constraints
+* **Elastic Models:**
+    * Embedding: `.multilingual-e5-small` (or standard `semantic_text` default if Jina is not yet default) -> **CORRECTION:** Explicitly use `jina-embeddings-v3` endpoint ID.
+    * Reranking: `jina-reranker-v3`.
+* **Jina Reader:**
+    * Must use the **PDF** source URL to avoid HTML frame issues.
+    * Must use `x-respond-with: markdown`.
+* **Data Structure:**
+    * Each document represents one **Article** of the law.
+    * Fields: `article_title`, `text`, `article_number`, `url`.
+
+## 4. Development Instructions for Agent
+* **Step 1:** Build the Python notebooks (Layer A) to generate the data and index.
+* **Step 2:** Scaffold the Next.js app (Layer B).
+* **Step 3:** Create the API route in Next.js to proxy requests to Elastic.
+* **Style Guide:** Ensure all code is modular, commented for educational purposes, and uses Environment Variables for API Keys (`ELASTIC_API_KEY`, `JINA_API_KEY`).
