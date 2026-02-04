@@ -1,5 +1,20 @@
 # Project Context: "Innocenti Risk Management" Enablement Kit
 
+## 0. Current Status
+
+### ✅ COMPLETED: Layer A (Notebooks)
+- `01_ingest.ipynb` - Jina Reader PDF fetch + Article chunking (with retry logic)
+- `02_index.ipynb` - Elastic `semantic_text` indexing with EIS
+- `03_rerank.ipynb` - Reranking demo using `retrievers` API
+- `utils/credentials.py` - Shared credential helper with USER_SUFFIX for unique naming
+- All notebooks have Google Colab compatibility
+
+### 🔲 TODO: Layer B (UI Demo App)
+- Next.js app with search + reranking visualization
+- See Section 2 "Layer B" for full spec
+
+---
+
 ## 1. Project Overview
 We are building a technical enablement kit for Elastic Field Engineers. The goal is to demonstrate the **"Full Chain" search pipeline** using **Jina AI models** on **Elastic Inference Service (EIS)**.
 
