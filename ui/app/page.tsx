@@ -5,7 +5,8 @@ import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { ResultsList } from '@/components/ResultsList';
 import { DeepAnalysisButton } from '@/components/DeepAnalysisButton';
-import type { SearchResult, SearchState } from '@/types';
+import { VlmAuditPanel } from '@/components/VlmAuditPanel';
+import type { SearchState, VisionErrorResponse } from '@/types';
 
 const initialState: SearchState = {
   query: '',
@@ -15,6 +16,9 @@ const initialState: SearchState = {
   isReranking: false,
   hasSearched: false,
   showComparison: false,
+  isAuditing: false,
+  vlmAnalysis: null,
+  auditError: null,
 };
 
 export default function Home() {
@@ -61,6 +65,61 @@ export default function Home() {
       }));
     }
   }, []);
+
+  const handleImageUpload = useCallback(async (file: File) => {
+    setState(prev => ({
+      ...prev,
+      isAuditing: true,
+      vlmAnalysis: null,
+      auditError: null,
+      hasSearched: false,
+      naiveResults: [],
+      rerankedResults: [],
+      showComparison: false,
+    }));
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const visionResponse = await fetch('/api/vision', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!visionResponse.ok) {
+        const errorData: VisionErrorResponse = await visionResponse.json().catch(() => ({
+          error: 'Vision analysis failed.',
+        }));
+
+        setState(prev => ({
+          ...prev,
+          isAuditing: false,
+          auditError: errorData.coldStart
+            ? 'The Vision AI service is warming up. Please try again in about 30 seconds.'
+            : errorData.error || 'Vision analysis failed.',
+        }));
+        return;
+      }
+
+      const { analysis } = await visionResponse.json();
+
+      setState(prev => ({
+        ...prev,
+        isAuditing: false,
+        vlmAnalysis: analysis,
+      }));
+
+      await handleSearch(analysis);
+    } catch (error) {
+      console.error('Image upload error:', error);
+      setState(prev => ({
+        ...prev,
+        isAuditing: false,
+        auditError: 'An unexpected error occurred. Please try again.',
+      }));
+    }
+  }, [handleSearch]);
 
   const handleDeepAnalysis = useCallback(async () => {
     if (!state.query.trim() || state.naiveResults.length === 0) return;
@@ -112,10 +171,27 @@ export default function Home() {
         <div className="mb-8">
           <SearchBar
             onSearch={handleSearch}
+            onImageUpload={handleImageUpload}
             isLoading={state.isSearching}
+            isAuditing={state.isAuditing}
             initialQuery={state.query}
           />
         </div>
+
+        {/* Audit Error */}
+        {state.auditError && (
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl
+                          text-amber-300 text-sm text-center animate-slide-in">
+            {state.auditError}
+          </div>
+        )}
+
+        {/* VLM Audit Report */}
+        {state.vlmAnalysis && (
+          <div className="mb-6">
+            <VlmAuditPanel analysis={state.vlmAnalysis} />
+          </div>
+        )}
 
         {/* Results Section */}
         {state.hasSearched && (
@@ -154,7 +230,7 @@ export default function Home() {
         )}
 
         {/* Empty State */}
-        {!state.hasSearched && !state.isSearching && (
+        {!state.hasSearched && !state.isSearching && !state.isAuditing && (
           <div className="text-center py-20">
             <p className="text-slate-500 text-lg">
               Search the EU AI Act for compliance guidance

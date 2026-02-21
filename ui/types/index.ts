@@ -36,6 +36,16 @@ export interface RankMovement {
   indicator: 'up' | 'down' | 'same' | 'new';
 }
 
+// Vision API response
+export interface VisionResponse {
+  analysis: string;
+}
+
+export interface VisionErrorResponse {
+  error: string;
+  coldStart?: boolean;
+}
+
 // Search state for the main page
 export interface SearchState {
   query: string;
@@ -45,4 +55,7 @@ export interface SearchState {
   isReranking: boolean;
   hasSearched: boolean;
   showComparison: boolean;
+  isAuditing: boolean;
+  vlmAnalysis: string | null;
+  auditError: string | null;
 }
