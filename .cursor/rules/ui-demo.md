@@ -25,12 +25,17 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 │   ├── utils/
 │   │   ├── credentials.py      # Shared credential management (loads ui/.env.local as primary)
 │   │   ├── parsing.py          # parse_articles() — extracted from NB 01 for testability
-│   │   └── comparison.py       # build_comparison() — extracted from NB 03 for testability
-│   └── tests/                  # pytest suite (34 unit + 3 smoke + 4 integration)
+│   │   ├── comparison.py       # build_comparison() — extracted from NB 03 for testability
+│   │   ├── inference.py        # create_embedding_inference / create_reranker_inference
+│   │   ├── reader.py           # fetch_with_jina_reader() — Jina Reader API with retry
+│   │   └── colab_setup.py      # setup_environment() — shared Colab/local detection
+│   └── tests/                  # pytest suite (46 unit + 3 smoke + 4 integration)
 │       ├── conftest.py         # Shared fixtures, sample data, mock helpers
 │       ├── fixtures/           # sample_jina_response.md, sample_articles.json
 │       ├── test_credentials.py # Credential fallback chain, naming, ES client
 │       ├── test_parsing.py     # Article parsing + ranking comparison
+│       ├── test_inference.py   # Inference endpoint creation + error handling
+│       ├── test_reader.py      # Jina Reader retry logic
 │       ├── test_notebooks_smoke.py       # Notebook execution with mocked services
 │       └── test_notebooks_integration.py # Full pipeline against real services
 ├── data/
@@ -81,6 +86,8 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 │   ├── .env.local.example      # Template for credentials
 │   └── package.json
 │
+├── .github/workflows/
+│   └── test-notebooks.yml      # CI: runs notebook unit + smoke tests on push/PR
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Consolidated project documentation
 ```
@@ -180,7 +187,7 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 
 | Target | Description |
 |--------|-------------|
-| `make test-nb-unit` | Notebook unit tests only (34 tests, <1s) |
+| `make test-nb-unit` | Notebook unit tests only (46 tests, <1s) |
 | `make test-nb-smoke` | Notebook smoke tests with mocked services (3 tests, ~4s) |
 | `make test-nb-integration` | Notebook integration tests against real services (opt-in, ~3-5 min) |
 | `make test-nb-all` | All notebook tests except integration |
@@ -204,18 +211,22 @@ Located in `notebooks/tests/`. Config in `pytest.ini` (project root). Run with `
 4. `ELASTICSEARCH_URL` (UI key) is auto-mapped to `ELASTIC_URL` (notebook key)
 5. Interactive `getpass` prompt — last resort (Colab, first-time users)
 
-**Unit tests** (34 tests) — `test_credentials.py` + `test_parsing.py`:
+**Unit tests** (46 tests) — `test_credentials.py` + `test_parsing.py` + `test_inference.py` + `test_reader.py`:
 - Credential fallback chain: UI env as base, notebook env as override, key name bridging
-- `get_index_name()`, `get_inference_id()`, `_get_user_suffix()` naming logic
+- `get_index_name()`, `get_inference_id()`, `_get_user_suffix()` naming logic (including PermissionError)
 - `get_elasticsearch_client()` routing (URL vs Cloud ID)
-- `parse_articles()` on fixture markdown: count, IDs, titles, body text, edge cases
-- `build_comparison()` ranking movement: up/down/same/NEW, title truncation
+- `parse_articles()` on fixture markdown: count, IDs, titles, body text, edge cases, language parameter
+- `build_comparison()` ranking movement: up/down/same/NEW, title truncation, empty-input guard, dynamic label
+- `create_embedding_inference()` / `create_reranker_inference()`: success, already-exists, re-raise
+- `fetch_with_jina_reader()`: success, retry on empty, exhaustion, HTTP errors, auth headers
 
 **Smoke tests** (3 tests) — `test_notebooks_smoke.py`:
 - Executes each notebook via `nbclient` with injected mock cells
 - Mocks `requests.get` (Jina Reader) and `elasticsearch.Elasticsearch`
 - Sets credential env vars to skip interactive prompts
 - Catches: import errors, broken cell ordering, Colab/local path logic regressions
+- Uses content-pattern lookup (`_find_cell_index`) instead of hardcoded cell indices
+- Path replacement includes assertion that at least one substitution occurred
 
 **Integration tests** (4 tests) — `test_notebooks_integration.py`:
 - Runs NB 01 → 02 → 03 sequentially via `papermill` against real services
@@ -280,3 +291,25 @@ Located in `ui/__tests__/e2e/`. Run with `npm run test:e2e`. Requires the dev se
 6. **Kibana URL derivation** — Only works when the ES URL contains `.es.` (standard for Elastic Cloud / Serverless). For non-standard deployments, set `KIBANA_URL` explicitly.
 
 7. **Jina API key in EIS** — Must be in `service_settings.api_key`, not `secret_settings`, when creating inference endpoints via the ES `_inference` API.
+
+## Maintaining This File
+
+When completing a task that changes any of the following, update this file before finishing:
+
+- Project structure (new files, directories, or major renames)
+- Environment variables or credential handling
+- Test infrastructure (new test files, changed test counts, new test commands)
+- Naming conventions (index names, inference IDs, agent IDs)
+- Architectural patterns or key integration details
+- npm scripts, Makefile targets, or other developer commands
+- New gotchas discovered during development
+
+Keep entries concise and factual. Match the style of existing sections.
+
+At the end of each major work session, add a "Current Status" section at the top of this file summarizing:
+
+1. Recent accomplishments (what was just completed)
+2. Any open issues or known bugs (what's still broken/pending)
+3. Clear next step(s) to pick up in the following session (so it's immediately obvious what to tackle next)
+
+Keep this section up to date to make it easy for anyone to see progress and know what's next at a glance.

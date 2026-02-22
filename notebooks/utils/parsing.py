@@ -7,7 +7,13 @@ Extracted from Notebook 01 for testability and reuse.
 import re
 
 
-def parse_articles(markdown_text: str) -> list[dict]:
+_EUR_LEX_URLS = {
+    "en": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689",
+    "de": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689",
+}
+
+
+def parse_articles(markdown_text: str, language: str = "en") -> list[dict]:
     """
     Parse EU AI Act markdown into structured article chunks.
 
@@ -16,11 +22,13 @@ def parse_articles(markdown_text: str) -> list[dict]:
 
     Args:
         markdown_text: Raw markdown from Jina Reader
+        language: ISO 639-1 language code (default "en")
 
     Returns:
         List of article dicts with keys: id, article_number, title, text, language, url
     """
     articles = []
+    base_url = _EUR_LEX_URLS.get(language, _EUR_LEX_URLS["en"])
 
     article_pattern = r'^(?:#+ )?Article\s+(\d+)\s*\n+([^\n]+)?'
 
@@ -44,12 +52,12 @@ def parse_articles(markdown_text: str) -> list[dict]:
 
             if body:
                 articles.append({
-                    "id": f"en_art_{article_num}",
+                    "id": f"{language}_art_{article_num}",
                     "article_number": article_num,
                     "title": title,
                     "text": body,
-                    "language": "en",
-                    "url": f"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#Art{article_num}"
+                    "language": language,
+                    "url": f"{base_url}#Art{article_num}"
                 })
 
     return articles

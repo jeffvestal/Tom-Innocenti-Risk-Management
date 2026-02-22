@@ -64,6 +64,20 @@ class TestParseArticles:
         assert len(articles) == 1
         assert "\n\n\n" not in articles[0]["text"]
 
+    def test_german_language(self):
+        md = "Article 42\nTest Title\n\nSome body text here."
+        articles = parse_articles(md, language="de")
+        assert len(articles) == 1
+        assert articles[0]["id"] == "de_art_42"
+        assert articles[0]["language"] == "de"
+        assert "/DE/" in articles[0]["url"]
+
+    def test_default_language_is_english(self):
+        md = "Article 1\nTitle\n\nBody text."
+        articles = parse_articles(md)
+        assert articles[0]["language"] == "en"
+        assert articles[0]["id"].startswith("en_")
+
 
 class TestBuildComparison:
     def test_basic_comparison(self, make_es_hit):
@@ -106,7 +120,13 @@ class TestBuildComparison:
         reranked = [make_es_hit("99", "A99")]
         df = build_comparison(naive, reranked)
         assert df.iloc[0]["Movement"] == "NEW"
-        assert df.iloc[0]["Was Rank"] == ">10"
+        assert df.iloc[0]["Was Rank"] == ">1"
+
+    def test_new_entry_label_scales_with_naive_size(self, make_es_hit):
+        naive = [make_es_hit(str(i), f"A{i}") for i in range(1, 21)]
+        reranked = [make_es_hit("99", "A99")]
+        df = build_comparison(naive, reranked)
+        assert df.iloc[0]["Was Rank"] == ">20"
 
     def test_title_truncation(self, make_es_hit):
         long_title = "A" * 60
@@ -115,3 +135,22 @@ class TestBuildComparison:
         df = build_comparison(naive, reranked)
         assert df.iloc[0]["Title"].endswith("...")
         assert len(df.iloc[0]["Title"]) == 43  # 40 chars + "..."
+
+    def test_short_title_no_ellipsis(self, make_es_hit):
+        naive = [make_es_hit("1", "Short")]
+        reranked = [make_es_hit("1", "Short")]
+        df = build_comparison(naive, reranked)
+        assert df.iloc[0]["Title"] == "Short"
+        assert not df.iloc[0]["Title"].endswith("...")
+
+    def test_empty_reranked_raises(self, make_es_hit):
+        naive = [make_es_hit("1", "A1")]
+        with pytest.raises(ValueError, match="reranked_hits must not be empty"):
+            build_comparison(naive, [])
+
+    def test_empty_naive_still_works(self, make_es_hit):
+        reranked = [make_es_hit("1", "A1")]
+        df = build_comparison([], reranked)
+        assert len(df) == 1
+        assert df.iloc[0]["Movement"] == "NEW"
+        assert df.iloc[0]["Was Rank"] == ">0"

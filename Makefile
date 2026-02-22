@@ -1,7 +1,7 @@
 # ─── Notebook Tests ───────────────────────────────────────
 # Unit tests only (fast, no external services)
 test-nb-unit:
-	python -m pytest notebooks/tests/test_credentials.py notebooks/tests/test_parsing.py -v
+	python -m pytest notebooks/tests/test_credentials.py notebooks/tests/test_parsing.py notebooks/tests/test_inference.py notebooks/tests/test_reader.py -v
 
 # Smoke tests (mocked services, verifies notebooks execute)
 test-nb-smoke:

@@ -5,8 +5,8 @@ These tests verify that notebooks run without errors — import ordering,
 cell dependencies, Colab/local path logic — without hitting real APIs.
 """
 
-import os
 import json
+import re
 from pathlib import Path
 
 import nbformat
@@ -19,6 +19,10 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 pytestmark = pytest.mark.smoke
 
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def _get_kernel_name() -> str:
     """Find a usable Python kernel, preferring 'python3'."""
@@ -37,6 +41,19 @@ def _load_notebook(name: str) -> nbformat.NotebookNode:
     return nbformat.read(str(path), as_version=4)
 
 
+def _find_cell_index(nb: nbformat.NotebookNode, pattern: str) -> int:
+    """Return the index of the first cell whose source matches *pattern*.
+
+    Raises ``LookupError`` if no cell matches, which makes smoke-test
+    failures easy to diagnose when notebook layout changes.
+    """
+    regex = re.compile(pattern)
+    for idx, cell in enumerate(nb.cells):
+        if regex.search(cell.source):
+            return idx
+    raise LookupError(f"No cell matching pattern {pattern!r}")
+
+
 def _make_env_setup_cell() -> nbformat.NotebookNode:
     """Cell that sets credential env vars and ensures utils is importable."""
     notebooks_dir_str = str(NOTEBOOKS_DIR).replace("\\", "\\\\")
@@ -50,6 +67,39 @@ def _make_env_setup_cell() -> nbformat.NotebookNode:
     ))
 
 
+_SKIP_INSTALL_CELL = nbformat.v4.new_code_cell(source=(
+    "import os\n"
+    "IN_COLAB = False\n"
+    "print('Smoke test: skipping install + Colab setup')\n"
+))
+
+
+def _replace_install_cell(nb: nbformat.NotebookNode) -> None:
+    """Replace the pip-install / Colab-setup cell with a no-op."""
+    idx = _find_cell_index(nb, r"!pip install")
+    nb.cells[idx] = nbformat.v4.new_code_cell(source=_SKIP_INSTALL_CELL.source)
+
+
+def _inject_before_install(
+    nb: nbformat.NotebookNode,
+    *cells: nbformat.NotebookNode,
+) -> None:
+    """Insert *cells* immediately before the pip-install cell."""
+    idx = _find_cell_index(nb, r"!pip install")
+    for offset, cell in enumerate(cells):
+        nb.cells.insert(idx + offset, cell)
+
+
+def _replace_paths(nb: nbformat.NotebookNode, old: str, new: str) -> int:
+    """Replace *old* with *new* across all cells, returning replacement count."""
+    count = 0
+    for cell in nb.cells:
+        if hasattr(cell, "source") and old in cell.source:
+            cell.source = cell.source.replace(old, new)
+            count += 1
+    return count
+
+
 def _execute(nb: nbformat.NotebookNode, cwd: str) -> nbformat.NotebookNode:
     client = NotebookClient(
         nb,
@@ -59,6 +109,10 @@ def _execute(nb: nbformat.NotebookNode, cwd: str) -> nbformat.NotebookNode:
     )
     return client.execute()
 
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
 
 class TestNotebook01Ingest:
     """Smoke test for 01_ingest.ipynb with mocked Jina Reader."""
@@ -77,32 +131,18 @@ class TestNotebook01Ingest:
             "_req.get = _mock.Mock(return_value=_resp)\n"
         ))
 
-        # Insert env setup and mock before the first code cell
-        # Cell 0 = markdown, Cell 1 = markdown, Cell 2 = first code (setup/install)
-        nb.cells.insert(2, _make_env_setup_cell())
-        nb.cells.insert(3, mock_cell)
+        _inject_before_install(nb, _make_env_setup_cell(), mock_cell)
+        _replace_install_cell(nb)
 
-        # Replace pip install cell (now at index 4 after inserts) to skip
-        # the Colab clone and pip install
-        nb.cells[4] = nbformat.v4.new_code_cell(source=(
-            "import os\n"
-            "IN_COLAB = False\n"
-            "print('Smoke test: skipping install + Colab setup')\n"
-        ))
-
-        # Create the data output directory
         data_dir = tmp_path / "data"
         data_dir.mkdir()
         nb_dir = tmp_path / "notebooks"
         nb_dir.mkdir()
 
-        # Patch output path to use tmp_path
-        for cell in nb.cells:
-            if hasattr(cell, "source"):
-                cell.source = cell.source.replace(
-                    'Path.cwd().parent / "data"',
-                    f'Path("{data_dir}")',
-                )
+        replaced = _replace_paths(
+            nb, 'Path.cwd().parent / "data"', f'Path("{data_dir}")'
+        )
+        assert replaced >= 1, "Expected at least one data-path replacement in NB 01"
 
         _execute(nb, str(nb_dir))
 
@@ -120,7 +160,6 @@ class TestNotebook02Index:
     def test_executes_without_error(self, tmp_path, sample_articles):
         nb = _load_notebook("02_index.ipynb")
 
-        # Write sample data for the notebook to load
         data_dir = tmp_path / "data"
         data_dir.mkdir()
         (data_dir / "eu_ai_act_clean.json").write_text(json.dumps(sample_articles))
@@ -152,23 +191,15 @@ class TestNotebook02Index:
             "_es_helpers.bulk = _mock.Mock(return_value=(3, []))\n"
         ))
 
-        nb.cells.insert(2, _make_env_setup_cell())
-        nb.cells.insert(3, mock_cell)
+        _inject_before_install(nb, _make_env_setup_cell(), mock_cell)
+        _replace_install_cell(nb)
 
-        # Skip pip install and Colab setup
-        nb.cells[4] = nbformat.v4.new_code_cell(source=(
-            "import os\n"
-            "IN_COLAB = False\n"
-            "print('Smoke test: skipping install + Colab setup')\n"
-        ))
-
-        # Patch the data file path
-        for cell in nb.cells:
-            if hasattr(cell, "source"):
-                cell.source = cell.source.replace(
-                    'Path.cwd().parent / "data" / "eu_ai_act_clean.json"',
-                    f'Path("{data_dir / "eu_ai_act_clean.json"}")',
-                )
+        replaced = _replace_paths(
+            nb,
+            'Path.cwd().parent / "data" / "eu_ai_act_clean.json"',
+            f'Path("{data_dir / "eu_ai_act_clean.json"}")',
+        )
+        assert replaced >= 1, "Expected at least one data-path replacement in NB 02"
 
         nb_dir = tmp_path / "notebooks"
         nb_dir.mkdir()
@@ -200,8 +231,7 @@ class TestNotebook03Rerank:
             "\n"
             "_call_count = [0]\n"
             "def _search_side_effect(**kwargs):\n"
-            "    body = kwargs.get('body', {})\n"
-            "    if 'retriever' in body:\n"
+            "    if 'retriever' in kwargs or 'retriever' in kwargs.get('body', {}):\n"
             "        hits = _hits_reranked\n"
             "    else:\n"
             "        hits = _hits_naive\n"
@@ -219,15 +249,8 @@ class TestNotebook03Rerank:
             "_es_mod.Elasticsearch = _mock.Mock(return_value=_mock_es)\n"
         ))
 
-        nb.cells.insert(2, _make_env_setup_cell())
-        nb.cells.insert(3, mock_cell)
-
-        # Skip pip install and Colab setup
-        nb.cells[4] = nbformat.v4.new_code_cell(source=(
-            "import os\n"
-            "IN_COLAB = False\n"
-            "print('Smoke test: skipping install + Colab setup')\n"
-        ))
+        _inject_before_install(nb, _make_env_setup_cell(), mock_cell)
+        _replace_install_cell(nb)
 
         nb_dir = tmp_path / "notebooks"
         nb_dir.mkdir()

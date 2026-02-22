@@ -58,6 +58,14 @@ class TestGetUserSuffix:
             assert len(result) == 4
             assert result.isalnum()
 
+    def test_generates_random_on_permission_error(self, clean_env, monkeypatch):
+        monkeypatch.delenv("USER_SUFFIX", raising=False)
+        with patch("os.getlogin", side_effect=PermissionError("no tty")):
+            from utils.credentials import _get_user_suffix
+            result = _get_user_suffix()
+            assert len(result) == 4
+            assert result.isalnum()
+
 
 class TestCredentialFallbackChain:
     """Test that ui/.env.local is loaded as primary, .env as override."""
