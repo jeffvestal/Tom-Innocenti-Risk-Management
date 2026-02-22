@@ -4,7 +4,7 @@ import { FileText, ExternalLink, Globe } from 'lucide-react';
 
 export function DataSourceCard() {
   return (
-    <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/50 p-6">
+    <div className="rounded-xl border border-stone-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 shadow-sm dark:shadow-none p-6">
       <div className="flex items-start gap-4">
         <div className="flex items-center justify-center w-12 h-12 rounded-lg
                         bg-amber-500/15 border border-amber-500/30 shrink-0">
@@ -24,15 +24,15 @@ export function DataSourceCard() {
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-                             text-xs font-medium bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
+                             text-xs font-medium bg-stone-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
               <FileText className="w-3 h-3" /> PDF Document
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-                             text-xs font-medium bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
+                             text-xs font-medium bg-stone-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
               <Globe className="w-3 h-3" /> EN + DE
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-                             text-xs font-medium bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
+                             text-xs font-medium bg-stone-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
               113 articles per language
             </span>
           </div>

@@ -22,11 +22,11 @@ export function DataPreview({
 }: DataPreviewProps) {
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/50 p-6">
+      <div className="rounded-xl border border-stone-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 shadow-sm dark:shadow-none p-6">
         <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-slate-200 dark:bg-slate-700/50 rounded w-1/3" />
-          <div className="h-20 bg-slate-100 dark:bg-slate-700/30 rounded" />
-          <div className="h-20 bg-slate-100 dark:bg-slate-700/30 rounded" />
+          <div className="h-4 bg-stone-200 dark:bg-slate-700/50 rounded w-1/3" />
+          <div className="h-20 bg-stone-100 dark:bg-slate-700/30 rounded" />
+          <div className="h-20 bg-stone-100 dark:bg-slate-700/30 rounded" />
         </div>
       </div>
     );
@@ -34,7 +34,7 @@ export function DataPreview({
 
   if (totalDocs === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-300/60 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/30 p-8 text-center">
+      <div className="rounded-xl border border-dashed border-stone-300/60 dark:border-slate-700/50 bg-stone-50 dark:bg-slate-800/30 p-8 text-center">
         <Database className="w-8 h-8 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
         <p className="text-sm text-slate-500">
           No data indexed yet. Run the pipeline above to load the EU AI Act.
@@ -44,7 +44,7 @@ export function DataPreview({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/50 p-6">
+    <div className="rounded-xl border border-stone-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 shadow-sm dark:shadow-none p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
           Indexed Data
@@ -72,9 +72,9 @@ export function DataPreview({
           {samples.map(article => (
             <div
               key={article.id}
-              className="rounded-lg border border-slate-200/60 dark:border-slate-700/40
-                         bg-slate-50/50 dark:bg-slate-900/40 p-4
-                         hover:border-slate-300/80 dark:hover:border-slate-600/60 transition-colors"
+              className="rounded-lg border border-stone-200/60 dark:border-slate-700/40
+                         bg-stone-50/50 dark:bg-slate-900/40 p-4
+                         hover:border-stone-300/80 dark:hover:border-slate-600/60 transition-colors"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -120,7 +120,7 @@ export function DataPreview({
 
 function StatBadge({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-slate-200/60 dark:border-slate-700/40 bg-slate-50/50 dark:bg-slate-900/40 px-4 py-3 text-center">
+    <div className="rounded-lg border border-stone-200/60 dark:border-slate-700/40 bg-stone-50/50 dark:bg-slate-900/40 px-4 py-3 text-center">
       <p className="text-xl font-bold text-slate-800 dark:text-slate-100 tabular-nums">
         {value.toLocaleString()}
       </p>

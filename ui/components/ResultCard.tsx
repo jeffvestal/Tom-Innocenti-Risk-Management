@@ -23,8 +23,21 @@ export function ResultCard({ result, rank, movement, animationDelay = 0 }: Resul
     ? (result.text as { text?: string }).text || JSON.stringify(result.text)
     : result.text;
 
-  const previewText = textContent.slice(0, 300);
-  const hasMore = textContent.length > 300;
+  const paragraphs = textContent.split(/\n\n+/).filter(Boolean);
+
+  const getPreviewParagraphs = () => {
+    let charCount = 0;
+    const preview: string[] = [];
+    for (const p of paragraphs) {
+      if (charCount + p.length > 300 && preview.length > 0) break;
+      preview.push(p);
+      charCount += p.length;
+    }
+    return preview;
+  };
+
+  const previewParagraphs = getPreviewParagraphs();
+  const hasMore = paragraphs.length > previewParagraphs.length;
 
   const getMovementIcon = () => {
     if (!movement) return null;
@@ -81,7 +94,7 @@ export function ResultCard({ result, rank, movement, animationDelay = 0 }: Resul
         <div className="flex items-center gap-3">
           {/* Rank Badge */}
           <div className="flex items-center justify-center w-8 h-8 rounded-full 
-                          bg-slate-700 text-slate-300 font-semibold text-sm">
+                          bg-stone-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold text-sm">
             {rank}
           </div>
           
@@ -107,29 +120,31 @@ export function ResultCard({ result, rank, movement, animationDelay = 0 }: Resul
         {/* Score Badge */}
         <div className="score-badge">
           <span>Score:</span>
-          <span className="text-slate-300">{result.score.toFixed(4)}</span>
+          <span className="text-slate-700 dark:text-slate-300">{result.score.toFixed(4)}</span>
         </div>
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-medium text-slate-200 mb-3">
+      <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-3">
         {result.title}
       </h3>
 
       {/* Text Preview */}
-      <div className="text-slate-400 text-sm leading-relaxed">
-        <p>
-          {isExpanded ? textContent : previewText}
-          {!isExpanded && hasMore && '...'}
-        </p>
+      <div className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed space-y-2">
+        {(isExpanded ? paragraphs : previewParagraphs).map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+        {!isExpanded && hasMore && (
+          <p className="text-slate-400 dark:text-slate-500">...</p>
+        )}
       </div>
 
       {/* Expand/Collapse & Link */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700/50">
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-stone-200/60 dark:border-slate-700/50">
         {hasMore && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-400 transition-colors"
+            className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-400 transition-colors"
           >
             {isExpanded ? (
               <>

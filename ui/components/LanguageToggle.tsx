@@ -9,7 +9,7 @@ interface LanguageToggleProps {
 
 export function LanguageToggle({ language, onChange }: LanguageToggleProps) {
   return (
-    <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-800 rounded-lg p-1">
+    <div className="flex items-center gap-1 bg-stone-200 dark:bg-slate-800 rounded-lg p-1">
       <button
         onClick={() => onChange('en')}
         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200

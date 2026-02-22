@@ -23,14 +23,14 @@ const STEP_ICONS: Record<PipelineStepId, typeof FileDown> = {
 };
 
 const STATUS_STYLES = {
-  idle: 'border-slate-300/60 dark:border-slate-600/50 bg-slate-100/50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500',
+  idle: 'border-stone-300/60 dark:border-slate-600/50 bg-stone-100/50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500',
   running: 'border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400 shadow-lg shadow-amber-500/5',
   done: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
   error: 'border-red-500/40 bg-red-500/10 text-red-500 dark:text-red-400',
 } as const;
 
 const CONNECTOR_STYLES = {
-  idle: 'bg-slate-300/60 dark:bg-slate-700/40',
+  idle: 'bg-stone-300/60 dark:bg-slate-700/40',
   running: 'bg-amber-500/40 animate-pulse',
   done: 'bg-emerald-500/30',
   error: 'bg-red-500/30',
@@ -73,7 +73,7 @@ export function PipelineVisualizer({
   const allDone = steps.every(s => s.status === 'done');
 
   return (
-    <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/50 p-6">
+    <div className="rounded-xl border border-stone-200 dark:border-slate-700/50 bg-white dark:bg-slate-800/50 shadow-sm dark:shadow-none p-6">
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
           Ingestion Pipeline
@@ -84,7 +84,7 @@ export function PipelineVisualizer({
           className={`inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium
                       transition-all duration-200
                       ${isRunning
-                        ? 'bg-slate-200/50 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                        ? 'bg-stone-200/50 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500 cursor-not-allowed'
                         : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 hover:border-amber-500/50'
                       }`}
         >
@@ -167,7 +167,7 @@ export function PipelineVisualizer({
       </div>
 
       {allDone && !isRunning && (
-        <div className="mt-4 pt-4 border-t border-slate-200/60 dark:border-slate-700/40 text-center">
+        <div className="mt-4 pt-4 border-t border-stone-200/60 dark:border-slate-700/40 text-center">
           <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
             Pipeline complete — data is ready for search
           </p>

@@ -66,8 +66,9 @@ export function SearchBar({
               onClick={() => setShowImageModal(true)}
               disabled={busy}
               title="Upload architecture diagram for VLM audit"
-              className="p-2 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-700/50
-                         disabled:text-slate-600 disabled:hover:bg-transparent
+              className="p-2 rounded-lg text-slate-400 hover:text-amber-500 dark:hover:text-amber-400
+                         hover:bg-slate-200/50 dark:hover:bg-slate-700/50
+                         disabled:text-slate-400 dark:disabled:text-slate-600 disabled:hover:bg-transparent
                          transition-all duration-200 disabled:cursor-not-allowed"
             >
               <ImagePlus className="w-5 h-5" />
@@ -76,8 +77,8 @@ export function SearchBar({
           <button
             type="submit"
             disabled={busy || !query.trim()}
-            className="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 
-                       text-slate-900 disabled:text-slate-500 
+            className="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-300 dark:disabled:bg-slate-700
+                       text-white disabled:text-slate-500
                        px-5 py-2 rounded-lg font-medium text-sm
                        transition-all duration-200
                        disabled:cursor-not-allowed"
@@ -93,7 +94,7 @@ export function SearchBar({
         </p>
       )}
       {!isAuditing && (
-        <p className="mt-3 text-center text-slate-600 text-sm">
+        <p className="mt-3 text-center text-slate-500 dark:text-slate-600 text-sm">
           Powered by Jina AI embeddings & Elasticsearch semantic search
         </p>
       )}

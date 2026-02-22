@@ -355,7 +355,7 @@ export default function Home() {
                       onClick={() => handleSearch(pair[language])}
                       title={language === 'de' ? pair.en : undefined}
                       className="px-4 py-2 rounded-full text-sm
-                                 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700
+                                 bg-white dark:bg-slate-800 border border-stone-300 dark:border-slate-700
                                  text-slate-600 dark:text-slate-300
                                  hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-300
                                  transition-all duration-200"

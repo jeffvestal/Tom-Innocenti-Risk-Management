@@ -18,7 +18,7 @@ const modes: { id: AppMode; label: string; icon: typeof Search }[] = [
 export function ModeToggle({ mode, onChange }: ModeToggleProps) {
   return (
     <div className="flex justify-center mb-6">
-      <div className="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-800/70 border border-slate-300/50 dark:border-slate-700/50 p-1">
+      <div className="inline-flex rounded-xl bg-stone-200/70 dark:bg-slate-800/70 border border-stone-300/50 dark:border-slate-700/50 p-1">
         {modes.map(({ id, label, icon: Icon }) => (
           <button
             key={id}

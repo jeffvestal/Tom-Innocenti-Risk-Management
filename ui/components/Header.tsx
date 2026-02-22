@@ -19,7 +19,7 @@ export function Header({ onReset, language, onLanguageChange }: HeaderProps) {
 
   return (
     <>
-      <header className="border-b border-slate-200 bg-white/80 dark:border-slate-800 dark:bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-stone-200 bg-white/80 dark:border-slate-800 dark:bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo & Brand */}
