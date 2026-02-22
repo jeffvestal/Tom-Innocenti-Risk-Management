@@ -51,5 +51,9 @@ node_modules/
 .vercel
 *.local
 
+# Test artifacts
+test-results/
+playwright-report/
+
 # Generated data (optional - uncomment to track)
 # data/*.json

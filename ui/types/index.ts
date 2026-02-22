@@ -17,6 +17,7 @@ export interface SearchResult {
 export interface SearchRequest {
   query: string;
   rerank: boolean;
+  language?: string;
 }
 
 // API response

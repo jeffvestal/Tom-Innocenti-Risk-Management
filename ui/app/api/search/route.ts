@@ -16,7 +16,7 @@ import type { SearchRequest, SearchResponse } from '@/types';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as SearchRequest;
-    const { query, rerank } = body;
+    const { query, rerank, language = 'en' } = body;
 
     // Validate request
     if (!query || typeof query !== 'string') {
@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now();
     
     const results = rerank
-      ? await searchWithReranker(trimmedQuery)
-      : await searchNaive(trimmedQuery);
+      ? await searchWithReranker(trimmedQuery, language)
+      : await searchNaive(trimmedQuery, language);
 
     const took = Date.now() - startTime;
 

@@ -24,7 +24,30 @@ config({ path: resolve(process.cwd(), '.env.local') });
 const INDEX_NAME = 'search-eu-ai-act-demo';
 const EMBEDDING_ID = 'jina-embeddings-v3-demo';
 const RERANKER_ID = 'jina-reranker-v3-demo';
-const PDF_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32024R1689';
+
+const PDF_URLS: Record<string, string> = {
+  en: 'https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32024R1689',
+  de: 'https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:32024R1689',
+};
+
+type SupportedLang = 'en' | 'de';
+
+function parseCLIFlags(): { langs: SupportedLang[]; force: boolean } {
+  const args = process.argv.slice(2);
+  const langArg = args.find(a => a.startsWith('--lang='));
+  const force = args.includes('--force');
+
+  if (langArg) {
+    const val = langArg.split('=')[1] as SupportedLang;
+    if (val !== 'en' && val !== 'de') {
+      console.error(`❌ Invalid --lang value: "${val}". Use "en" or "de".`);
+      process.exit(1);
+    }
+    return { langs: [val], force };
+  }
+
+  return { langs: ['en', 'de'], force };
+}
 
 // Article structure
 interface Article {
@@ -41,21 +64,21 @@ interface Article {
 // ============================================================================
 
 function getElasticsearchClient(): Client {
-  const cloudId = process.env.ELASTIC_CLOUD_ID;
   const apiKey = process.env.ELASTIC_API_KEY;
+  const url = process.env.ELASTICSEARCH_URL;
+  const cloudId = process.env.ELASTIC_CLOUD_ID;
 
-  if (!cloudId || !apiKey) {
+  if (!apiKey || (!url && !cloudId)) {
     console.error('❌ Missing required environment variables:');
-    if (!cloudId) console.error('   - ELASTIC_CLOUD_ID');
     if (!apiKey) console.error('   - ELASTIC_API_KEY');
+    if (!url && !cloudId) console.error('   - ELASTICSEARCH_URL (or ELASTIC_CLOUD_ID)');
     console.error('\nPlease copy .env.local.example to .env.local and fill in your credentials.');
     process.exit(1);
   }
 
-  return new Client({
-    cloud: { id: cloudId },
-    auth: { apiKey },
-  });
+  return url
+    ? new Client({ node: url, auth: { apiKey } })
+    : new Client({ cloud: { id: cloudId! }, auth: { apiKey } });
 }
 
 // ============================================================================
@@ -122,14 +145,15 @@ async function fetchWithJinaReader(url: string, maxRetries = 3): Promise<string>
 // Parse Markdown into Articles
 // ============================================================================
 
-function parseArticles(markdown: string): Article[] {
+function parseArticles(markdown: string, language: SupportedLang): Article[] {
   const articles: Article[] = [];
 
-  // Pattern to match article headers: "Article 1", "## Article 10", etc.
-  const articlePattern = /^(?:#+ )?Article\s+(\d+)\s*\n+([^\n]+)?/m;
+  const keyword = language === 'de' ? 'Artikel' : 'Article';
+  const articlePattern = new RegExp(`^(?:#+ )?${keyword}\\s+(\\d+)\\s*\\n+([^\\n]+)?`, 'm');
+  const splitPattern = new RegExp(`(?=^(?:#+ )?${keyword}\\s+\\d+)`, 'm');
 
-  // Split by article boundaries
-  const chunks = markdown.split(/(?=^(?:#+ )?Article\s+\d+)/m);
+  const langUpper = language.toUpperCase();
+  const chunks = markdown.split(splitPattern);
 
   for (const chunk of chunks) {
     if (!chunk.trim()) continue;
@@ -139,23 +163,20 @@ function parseArticles(markdown: string): Article[] {
 
     const articleNum = match[1];
     const titleCandidate = match[2]?.trim() || '';
-    const title = titleCandidate || `Article ${articleNum}`;
+    const title = titleCandidate || `${keyword} ${articleNum}`;
 
-    // Get body text (everything after the header)
     const bodyStart = match.index! + match[0].length;
     let body = chunk.slice(bodyStart).trim();
-
-    // Clean up: collapse multiple newlines
     body = body.replace(/\n{3,}/g, '\n\n').trim();
 
     if (body) {
       articles.push({
-        id: `en_art_${articleNum}`,
+        id: `${language}_art_${articleNum}`,
         article_number: articleNum,
         title,
         text: body,
-        language: 'en',
-        url: `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#Art${articleNum}`,
+        language,
+        url: `https://eur-lex.europa.eu/legal-content/${langUpper}/TXT/?uri=CELEX:32024R1689#Art${articleNum}`,
       });
     }
   }
@@ -167,53 +188,51 @@ function parseArticles(markdown: string): Article[] {
 // Create Inference Endpoints (Idempotent)
 // ============================================================================
 
-async function createEmbeddingInference(es: Client, inferenceId: string): Promise<void> {
+async function inferenceExists(es: Client, inferenceId: string): Promise<boolean> {
   try {
-    await es.inference.put({
-      inference_id: inferenceId,
-      task_type: 'text_embedding',
-      inference_config: {
-        service: 'jinaai',
-        service_settings: {
-          model_id: 'jina-embeddings-v3',
-        },
-        task_settings: {
-          task: 'retrieval.passage',
-        },
-      },
-    });
-    console.log(`✓ Created embedding endpoint: ${inferenceId}`);
-  } catch (error: unknown) {
-    const errorStr = String(error).toLowerCase();
-    if (errorStr.includes('resource_already_exists') || errorStr.includes('already exists')) {
-      console.log(`✓ Embedding endpoint already exists: ${inferenceId}`);
-    } else {
-      throw error;
-    }
+    await es.inference.get({ inference_id: inferenceId });
+    return true;
+  } catch {
+    return false;
   }
 }
 
-async function createRerankerInference(es: Client, inferenceId: string): Promise<void> {
-  try {
-    await es.inference.put({
-      inference_id: inferenceId,
-      task_type: 'rerank',
-      inference_config: {
-        service: 'jinaai',
-        service_settings: {
-          model_id: 'jina-reranker-v2-base-multilingual',
-        },
-      },
-    });
-    console.log(`✓ Created reranker endpoint: ${inferenceId}`);
-  } catch (error: unknown) {
-    const errorStr = String(error).toLowerCase();
-    if (errorStr.includes('resource_already_exists') || errorStr.includes('already exists')) {
-      console.log(`✓ Reranker endpoint already exists: ${inferenceId}`);
-    } else {
-      throw error;
-    }
+async function createEmbeddingInference(es: Client, inferenceId: string): Promise<void> {
+  if (await inferenceExists(es, inferenceId)) {
+    console.log(`✓ Embedding endpoint already exists: ${inferenceId}`);
+    return;
   }
+  await es.inference.put({
+    inference_id: inferenceId,
+    task_type: 'text_embedding',
+    inference_config: {
+      service: 'jinaai',
+      service_settings: {
+        model_id: 'jina-embeddings-v3',
+        api_key: process.env.JINA_API_KEY!,
+      },
+    },
+  });
+  console.log(`✓ Created embedding endpoint: ${inferenceId}`);
+}
+
+async function createRerankerInference(es: Client, inferenceId: string): Promise<void> {
+  if (await inferenceExists(es, inferenceId)) {
+    console.log(`✓ Reranker endpoint already exists: ${inferenceId}`);
+    return;
+  }
+  await es.inference.put({
+    inference_id: inferenceId,
+    task_type: 'rerank',
+    inference_config: {
+      service: 'jinaai',
+      service_settings: {
+        model_id: 'jina-reranker-v2-base-multilingual',
+        api_key: process.env.JINA_API_KEY!,
+      },
+    },
+  });
+  console.log(`✓ Created reranker endpoint: ${inferenceId}`);
 }
 
 // ============================================================================
@@ -301,17 +320,30 @@ function sleep(ms: number): Promise<void> {
 // Main
 // ============================================================================
 
+async function countByLanguage(es: Client, lang: string): Promise<number> {
+  try {
+    const result = await es.count({
+      index: INDEX_NAME,
+      body: { query: { term: { language: lang } } },
+    });
+    return result.count;
+  } catch {
+    return 0;
+  }
+}
+
 async function main(): Promise<void> {
+  const { langs, force } = parseCLIFlags();
+
   console.log('');
   console.log('═'.repeat(60));
   console.log('  Innocenti Risk Management - Demo Setup');
   console.log('═'.repeat(60));
+  console.log(`  Languages: ${langs.map(l => l.toUpperCase()).join(', ')}${force ? ' (force)' : ''}`);
   console.log('');
 
-  // Initialize Elasticsearch client
   const es = getElasticsearchClient();
 
-  // Test connection
   try {
     const info = await es.info();
     console.log(`✓ Connected to Elasticsearch ${info.version.number}`);
@@ -321,51 +353,38 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Check if index already exists and has documents
-  try {
-    const exists = await es.indices.exists({ index: INDEX_NAME });
-    if (exists) {
-      const count = await es.count({ index: INDEX_NAME });
-      if (count.count > 0) {
-        console.log('');
-        console.log(`✓ Index "${INDEX_NAME}" already exists with ${count.count} documents`);
-        console.log('  Setup is complete - no action needed.');
-        console.log('');
-        console.log('  Run "npm run dev" to start the application.');
-        console.log('');
-        return;
-      }
-    }
-  } catch {
-    // Index doesn't exist, continue with setup
-  }
-
-  console.log('');
-  console.log('Setting up demo environment...');
-  console.log('');
-
-  // Step 1: Fetch PDF via Jina Reader
-  const markdown = await fetchWithJinaReader(PDF_URL);
-
-  // Step 2: Parse into articles
-  console.log('');
-  const articles = parseArticles(markdown);
-  console.log(`✓ Parsed ${articles.length} articles from EU AI Act`);
-
-  // Step 3: Create inference endpoints
+  // Create inference endpoints and index (idempotent)
   console.log('');
   await createEmbeddingInference(es, EMBEDDING_ID);
   await createRerankerInference(es, RERANKER_ID);
-
-  // Step 4: Create index
   console.log('');
   await createIndex(es, INDEX_NAME, EMBEDDING_ID);
 
-  // Step 5: Bulk index articles
-  console.log('');
-  await bulkIndexArticles(es, INDEX_NAME, articles);
+  // Process each requested language
+  for (const lang of langs) {
+    console.log('');
+    console.log(`── ${lang.toUpperCase()} ──`);
 
-  // Done!
+    if (!force) {
+      const existing = await countByLanguage(es, lang);
+      if (existing > 0) {
+        console.log(`✓ ${existing} ${lang.toUpperCase()} documents already indexed. Skipping. (use --force to re-index)`);
+        continue;
+      }
+    }
+
+    const pdfUrl = PDF_URLS[lang];
+    console.log(`📄 Fetching ${lang.toUpperCase()} PDF...`);
+    const markdown = await fetchWithJinaReader(pdfUrl);
+
+    console.log('');
+    const articles = parseArticles(markdown, lang);
+    console.log(`✓ Parsed ${articles.length} ${lang.toUpperCase()} articles from EU AI Act`);
+
+    console.log('');
+    await bulkIndexArticles(es, INDEX_NAME, articles);
+  }
+
   console.log('');
   console.log('═'.repeat(60));
   console.log('  Setup Complete!');

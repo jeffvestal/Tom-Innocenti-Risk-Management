@@ -5,26 +5,41 @@
   "private": true,
   "scripts": {
     "setup": "tsx scripts/setup-demo-index.ts",
+    "setup:de": "tsx scripts/setup-demo-index.ts --lang=de",
+    "setup:agent": "tsx scripts/setup-agent.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "test:all": "vitest run && PLAYWRIGHT_BROWSERS_PATH=0 playwright test"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.12.0",
+    "dotenv": "^17.3.1",
     "lucide-react": "^0.400.0",
     "next": "^14.2.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^5.1.4",
     "autoprefixer": "^10.4.0",
+    "jsdom": "^28.1.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vitest": "^4.0.18"
   }
 }

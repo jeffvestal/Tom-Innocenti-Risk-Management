@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+export type Language = 'en' | 'de';
 
-type Language = 'en' | 'de';
+interface LanguageToggleProps {
+  language: Language;
+  onChange: (lang: Language) => void;
+}
 
-export function LanguageToggle() {
-  const [language, setLanguage] = useState<Language>('en');
-
+export function LanguageToggle({ language, onChange }: LanguageToggleProps) {
   return (
     <div className="flex items-center gap-1 bg-slate-800 rounded-lg p-1">
       <button
-        onClick={() => setLanguage('en')}
+        onClick={() => onChange('en')}
         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200
           ${language === 'en' 
             ? 'bg-slate-700 text-amber-400' 
@@ -20,13 +21,12 @@ export function LanguageToggle() {
         EN
       </button>
       <button
-        onClick={() => setLanguage('de')}
+        onClick={() => onChange('de')}
         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200
           ${language === 'de' 
             ? 'bg-slate-700 text-amber-400' 
             : 'text-slate-500 hover:text-slate-400'
           }`}
-        title="Coming soon - German language support"
       >
         DE
       </button>

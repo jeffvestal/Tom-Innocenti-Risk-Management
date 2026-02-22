@@ -58,13 +58,14 @@ The kit has two parts: **Python notebooks** for the data pipeline and a **Next.j
 
 ## Credentials
 
-All three values are used by both the notebooks and the UI:
-
 | Variable | Description |
 |----------|-------------|
-| `ELASTIC_CLOUD_ID` | Your Elastic Cloud deployment ID |
+| `ELASTICSEARCH_URL` | Elasticsearch endpoint URL (standard for Serverless) |
+| `ELASTIC_CLOUD_ID` | Alternative: classic Cloud deployment ID (if not using URL) |
 | `ELASTIC_API_KEY` | API key with index/search permissions |
 | `JINA_API_KEY` | Jina AI API key |
+
+The UI accepts either `ELASTICSEARCH_URL` or `ELASTIC_CLOUD_ID` -- use whichever matches your deployment.
 
 **Notebooks:** Prompted via `getpass` on first run. Optionally save to a root `.env` file for persistence (never committed to git).
 
@@ -168,10 +169,58 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Command | Description |
 |---------|-------------|
-| `npm run setup` | Create index and load data (idempotent) |
+| `npm run setup` | Create index and load EN + DE data (idempotent) |
+| `npm run setup:de` | Ingest only German articles (skips EN) |
+| `npm run setup:agent` | Provision Agent Builder tool + agent |
 | `npm run dev` | Start development server |
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
+| `npm test` | Run unit tests (Vitest) |
+| `npm run test:watch` | Run unit tests in watch mode |
+| `npm run test:e2e` | Run E2E browser tests (Playwright) |
+| `npm run test:all` | Run all tests (unit + E2E) |
+
+### Running Tests
+
+The project includes 148 tests across two layers.
+
+**Unit tests** (123 tests, ~2s) -- test components, API routes, and library functions in isolation with mocked external services:
+
+```bash
+cd ui
+npm test
+```
+
+**E2E browser tests** (25 tests, ~12s) -- test the full application in a real Chromium browser with mocked API responses:
+
+```bash
+cd ui
+npm run test:e2e
+```
+
+The E2E suite auto-starts the dev server if one isn't already running. If you already have `npm run dev` running, it reuses it.
+
+**Run everything:**
+
+```bash
+cd ui
+npm run test:all
+```
+
+#### What the tests cover
+
+| Suite | File | What it verifies |
+|-------|------|-----------------|
+| Unit | `lib/elasticsearch.test.ts` | ES query construction, language filter, semantic_text handling |
+| Unit | `lib/kibana.test.ts` | Kibana URL derivation, auth headers |
+| Unit | `api/search.test.ts` | Validation, naive vs reranked routing, language passthrough |
+| Unit | `api/agent.test.ts` | Validation, German prefix injection, SSE streaming, error handling |
+| Unit | `api/vision.test.ts` | Image validation, Jina VLM calls, retry logic, cold start |
+| Unit | `components/*.test.tsx` | All 11 UI components: rendering, interactions, state changes |
+| E2E | `search-flow.spec.ts` | Search suggestions, results, expand/collapse, Deep Analysis |
+| E2E | `agent-flow.spec.ts` | Agent chat, streaming response, thinking steps |
+| E2E | `language-toggle.spec.ts` | EN/DE toggle, bilingual suggestions, hover tooltips |
+| E2E | `modals.spec.ts` | EU AI Act and Tom Innocenti modals open/close |
 
 ### Sample Queries
 
