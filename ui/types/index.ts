@@ -47,6 +47,11 @@ export interface VisionErrorResponse {
   coldStart?: boolean;
 }
 
+export interface AuditError {
+  message: string;
+  detail?: string;
+}
+
 // Search state for the main page
 export interface SearchState {
   query: string;
@@ -58,5 +63,5 @@ export interface SearchState {
   showComparison: boolean;
   isAuditing: boolean;
   vlmAnalysis: string | null;
-  auditError: string | null;
+  auditError: AuditError | null;
 }

@@ -9,7 +9,7 @@ import { VlmAuditPanel } from '@/components/VlmAuditPanel';
 import { ModeToggle, type AppMode } from '@/components/ModeToggle';
 import { AgentChat } from '@/components/AgentChat';
 import type { Language } from '@/components/LanguageToggle';
-import type { SearchState, VisionErrorResponse } from '@/types';
+import type { SearchState, VisionErrorResponse, AuditError } from '@/types';
 
 const initialState: SearchState = {
   query: '',
@@ -28,6 +28,7 @@ export default function Home() {
   const [mode, setMode] = useState<AppMode>('search');
   const [state, setState] = useState<SearchState>(initialState);
   const [language, setLanguage] = useState<Language>('en');
+  const [errorExpanded, setErrorExpanded] = useState(false);
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) return;
@@ -72,6 +73,7 @@ export default function Home() {
   }, [language]);
 
   const handleImageUpload = useCallback(async (file: File) => {
+    setErrorExpanded(false);
     setState(prev => ({
       ...prev,
       isAuditing: true,
@@ -97,12 +99,17 @@ export default function Home() {
           error: 'Vision analysis failed.',
         }));
 
+        const message = errorData.coldStart
+          ? 'The Vision AI service is warming up. Please try again in about 30 seconds.'
+          : errorData.error || 'Vision analysis failed.';
+
         setState(prev => ({
           ...prev,
           isAuditing: false,
-          auditError: errorData.coldStart
-            ? 'The Vision AI service is warming up. Please try again in about 30 seconds.'
-            : errorData.error || 'Vision analysis failed.',
+          auditError: {
+            message,
+            detail: `Status: ${visionResponse.status}\n${JSON.stringify(errorData, null, 2)}`,
+          },
         }));
         return;
       }
@@ -121,7 +128,10 @@ export default function Home() {
       setState(prev => ({
         ...prev,
         isAuditing: false,
-        auditError: 'An unexpected error occurred. Please try again.',
+        auditError: {
+          message: 'An unexpected error occurred. Please try again.',
+          detail: error instanceof Error ? `${error.name}: ${error.message}\n${error.stack}` : String(error),
+        },
       }));
     }
   }, [handleSearch]);
@@ -194,9 +204,28 @@ export default function Home() {
 
             {/* Audit Error */}
             {state.auditError && (
-              <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl
-                              text-amber-300 text-sm text-center animate-slide-in">
-                {state.auditError}
+              <div className="mb-6 bg-amber-500/10 border border-amber-500/30 rounded-xl
+                              text-sm animate-slide-in overflow-hidden">
+                <div className="p-4 text-amber-300 text-center">
+                  {state.auditError.message}
+                </div>
+                {state.auditError.detail && (
+                  <>
+                    <button
+                      onClick={() => setErrorExpanded(prev => !prev)}
+                      className="w-full py-1.5 text-xs text-red-400 hover:text-red-300
+                                 border-t border-amber-500/20 transition-colors"
+                    >
+                      {errorExpanded ? 'hide details' : 'expand for details'}
+                    </button>
+                    {errorExpanded && (
+                      <pre className="px-4 pb-4 text-xs text-slate-400 font-mono whitespace-pre-wrap break-all
+                                      border-t border-amber-500/20 bg-slate-900/50">
+                        {state.auditError.detail}
+                      </pre>
+                    )}
+                  </>
+                )}
               </div>
             )}
 

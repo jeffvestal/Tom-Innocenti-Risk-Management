@@ -185,7 +185,8 @@ export function AgentChat({ language }: { language: Language }) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
+  const [errorExpanded, setErrorExpanded] = useState(false);
   const [stepsExpanded, setStepsExpanded] = useState<Record<number, boolean>>({});
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -253,6 +254,7 @@ export function AgentChat({ language }: { language: Language }) {
     setImageFile(null);
     setImagePreview(null);
     setError(null);
+    setErrorExpanded(false);
 
     const agentMsgIdx = messages.length + 1;
     setStepsExpanded(prev => ({ ...prev, [agentMsgIdx]: true }));
@@ -397,7 +399,7 @@ export function AgentChat({ language }: { language: Language }) {
             }
 
             if (currentEventType === 'error') {
-              setError(payload.message || 'An error occurred.');
+              setError({ message: payload.message || 'An error occurred.', detail: JSON.stringify(payload, null, 2) });
             }
           } catch {
             // non-JSON line, skip
@@ -421,7 +423,10 @@ export function AgentChat({ language }: { language: Language }) {
       }
     } catch (err) {
       console.error('Agent chat error:', err);
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+      setError({
+        message: err instanceof Error ? err.message : 'An unexpected error occurred.',
+        detail: err instanceof Error ? `${err.name}: ${err.message}\n${err.stack}` : String(err),
+      });
       setMessages(prev => {
         if (prev.length > 0 && prev[prev.length - 1].role === 'agent' && !prev[prev.length - 1].content) {
           return prev.slice(0, -1);
@@ -576,8 +581,27 @@ export function AgentChat({ language }: { language: Language }) {
 
       {/* Error */}
       {error && (
-        <div className="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300 text-sm text-center">
-          {error}
+        <div className="mb-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm overflow-hidden">
+          <div className="p-3 text-red-300 text-center">
+            {error.message}
+          </div>
+          {error.detail && (
+            <>
+              <button
+                onClick={() => setErrorExpanded(prev => !prev)}
+                className="w-full py-1.5 text-xs text-red-400 hover:text-red-300
+                           border-t border-red-500/20 transition-colors"
+              >
+                {errorExpanded ? 'hide details' : 'expand for details'}
+              </button>
+              {errorExpanded && (
+                <pre className="px-3 pb-3 text-xs text-slate-400 font-mono whitespace-pre-wrap break-all
+                                border-t border-red-500/20 bg-slate-900/50">
+                  {error.detail}
+                </pre>
+              )}
+            </>
+          )}
         </div>
       )}
 
