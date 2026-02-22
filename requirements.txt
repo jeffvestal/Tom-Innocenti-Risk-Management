@@ -17,3 +17,10 @@ pandas>=2.0.0
 
 # Progress bars (optional, nice for bulk indexing)
 tqdm>=4.66.0
+
+# Testing
+pytest>=7.0.0
+pytest-timeout>=2.2.0
+nbclient>=0.7.0
+papermill>=2.4.0
+ipykernel>=6.0.0

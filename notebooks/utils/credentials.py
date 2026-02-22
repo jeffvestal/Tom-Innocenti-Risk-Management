@@ -1,10 +1,13 @@
 """
 Innocenti Risk Management - Credential Management Utility
 
-This module provides secure credential handling for the enablement notebooks:
-- First run: Prompts for credentials via getpass (secure, no echo)
-- Optional: Saves credentials to .env for persistence across sessions
-- Subsequent runs: Auto-loads from .env if present
+This module provides secure credential handling for the enablement notebooks.
+
+Credential resolution order:
+  1. ui/.env.local   — primary source (shared with the Next.js UI)
+  2. <project>/.env  — optional override for notebook-specific creds
+  3. Environment vars — for CI / container injection
+  4. Interactive prompt via getpass — last resort (Colab, first-time users)
 
 Also generates a unique USER_SUFFIX for index naming to avoid collisions
 when multiple users run against the same Elastic cluster.
@@ -17,8 +20,13 @@ import string
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Path to .env file (project root)
-ENV_FILE = Path(__file__).parent.parent.parent / ".env"
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
+
+# Primary: ui/.env.local (most users already have this from the UI)
+UI_ENV_FILE = _PROJECT_ROOT / "ui" / ".env.local"
+
+# Override: project-root .env (only needed if notebooks use different creds)
+ENV_FILE = _PROJECT_ROOT / ".env"
 
 
 def _generate_suffix() -> str:
@@ -73,10 +81,20 @@ def get_credentials(
     Returns:
         dict with keys: ELASTIC_URL or ELASTIC_CLOUD_ID, ELASTIC_API_KEY, JINA_API_KEY, USER_SUFFIX
     """
-    # Try loading existing .env
+    # --- Load credentials (ui/.env.local is primary, .env is override) ---
+    if UI_ENV_FILE.exists():
+        load_dotenv(UI_ENV_FILE, override=False)
+        print(f"✓ Loaded credentials from ui/.env.local (primary)")
+
     if ENV_FILE.exists():
-        load_dotenv(ENV_FILE)
-        print(f"✓ Loaded credentials from {ENV_FILE.name}")
+        load_dotenv(ENV_FILE, override=True)
+        print(f"✓ Applied overrides from {ENV_FILE.name}")
+
+    # Bridge key-name difference: UI uses ELASTICSEARCH_URL, notebooks use ELASTIC_URL
+    if not os.getenv("ELASTIC_URL") and not os.getenv("ELASTIC_CLOUD_ID"):
+        ui_url = os.getenv("ELASTICSEARCH_URL")
+        if ui_url:
+            os.environ["ELASTIC_URL"] = ui_url
     
     credentials = {}
     needs_save = False
@@ -146,10 +164,13 @@ def get_credentials(
 
 
 def _save_to_env(credentials: dict) -> None:
-    """Save credentials to .env file."""
+    """Save credentials to the project-root .env file."""
     lines = [
-        "# Innocenti Risk Management - Credentials",
+        "# Innocenti Risk Management - Notebook Credentials",
         "# Auto-generated. This file is gitignored.",
+        "#",
+        "# NOTE: The primary credential source is ui/.env.local.",
+        "# Values here override ui/.env.local for notebook runs only.",
         "",
     ]
     
