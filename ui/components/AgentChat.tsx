@@ -9,6 +9,10 @@ import {
 } from 'lucide-react';
 import type { Language } from './LanguageToggle';
 import { ImageUploadModal } from './ImageUploadModal';
+import { VlmWarmupModal } from './VlmWarmupModal';
+
+const VLM_RETRY_MAX = 5;
+const VLM_RETRY_DELAY_MS = 10_000;
 
 interface AgentStep {
   type: 'reasoning' | 'tool_call' | 'tool_progress' | 'tool_result' | 'vlm_analysis';
@@ -187,6 +191,8 @@ export function AgentChat({ language }: { language: Language }) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
   const [errorExpanded, setErrorExpanded] = useState(false);
+  const [vlmWarming, setVlmWarming] = useState(false);
+  const [vlmAttempt, setVlmAttempt] = useState(0);
   const [stepsExpanded, setStepsExpanded] = useState<Record<number, boolean>>({});
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -275,17 +281,53 @@ export function AgentChat({ language }: { language: Language }) {
         const formData = new FormData();
         formData.append('image', currentImage);
 
-        const visionResp = await fetch('/api/vision', {
+        let visionResp = await fetch('/api/vision', {
           method: 'POST',
           body: formData,
         });
 
-        setIsAnalyzingImage(false);
-
         if (!visionResp.ok) {
           const errData = await visionResp.json().catch(() => ({ error: 'Vision analysis failed.' }));
-          throw new Error(errData.error || `Vision analysis failed (${visionResp.status})`);
+
+          if (errData.coldStart) {
+            setVlmWarming(true);
+
+            for (let attempt = 1; attempt <= VLM_RETRY_MAX; attempt++) {
+              setVlmAttempt(attempt);
+              await new Promise(r => setTimeout(r, VLM_RETRY_DELAY_MS));
+
+              const retryForm = new FormData();
+              retryForm.append('image', currentImage);
+              visionResp = await fetch('/api/vision', {
+                method: 'POST',
+                body: retryForm,
+              });
+
+              if (visionResp.ok) break;
+
+              const retryData = await visionResp.json().catch(() => ({ error: 'Vision analysis failed.' }));
+              if (!retryData.coldStart) {
+                setVlmWarming(false);
+                setIsAnalyzingImage(false);
+                throw new Error(retryData.error || `Vision analysis failed (${visionResp.status})`);
+              }
+            }
+
+            setVlmWarming(false);
+
+            if (!visionResp.ok) {
+              setIsAnalyzingImage(false);
+              throw new Error(
+                `Vision AI service did not respond after ${VLM_RETRY_MAX} retries.`,
+              );
+            }
+          } else {
+            setIsAnalyzingImage(false);
+            throw new Error(errData.error || `Vision analysis failed (${visionResp.status})`);
+          }
         }
+
+        setIsAnalyzingImage(false);
 
         const { analysis } = await visionResp.json();
         if (!analysis) throw new Error('Vision model returned an empty response.');
@@ -698,6 +740,8 @@ export function AgentChat({ language }: { language: Language }) {
           onClose={() => setShowImageModal(false)}
           onFile={handleImageFile}
         />
+
+        <VlmWarmupModal isOpen={vlmWarming} attempt={vlmAttempt} maxAttempts={VLM_RETRY_MAX} />
       </div>
     </div>
   );

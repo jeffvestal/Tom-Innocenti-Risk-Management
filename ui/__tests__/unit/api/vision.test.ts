@@ -70,38 +70,16 @@ describe('POST /api/vision', () => {
     );
   });
 
-  it('retries on 502/503/429 status codes', async () => {
+  it('returns 502 with coldStart on a single 502/503 status', async () => {
     const file = new File(['data'], 'test.png', { type: 'image/png' });
 
-    mockFetch
-      .mockResolvedValueOnce({ ok: false, status: 503 })
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({
-          choices: [{ message: { content: 'Analysis after retry' } }],
-        }),
-      });
-
-    const resp = await POST(makeFormDataRequest(file));
-    expect(resp.status).toBe(200);
-    const data = await resp.json();
-    expect(data.analysis).toBe('Analysis after retry');
-    expect(mockFetch).toHaveBeenCalledTimes(2);
-  });
-
-  it('returns 502 with coldStart after exhausting retries', async () => {
-    const file = new File(['data'], 'test.png', { type: 'image/png' });
-
-    mockFetch
-      .mockResolvedValueOnce({ ok: false, status: 503 })
-      .mockResolvedValueOnce({ ok: false, status: 503 })
-      .mockResolvedValueOnce({ ok: false, status: 503 });
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 503 });
 
     const resp = await POST(makeFormDataRequest(file));
     expect(resp.status).toBe(502);
     const data = await resp.json();
     expect(data.coldStart).toBe(true);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
   });
 
   it('returns 500 when VLM returns unexpected response shape', async () => {

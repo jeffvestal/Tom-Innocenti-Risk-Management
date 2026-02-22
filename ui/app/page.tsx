@@ -8,8 +8,12 @@ import { DeepAnalysisButton } from '@/components/DeepAnalysisButton';
 import { VlmAuditPanel } from '@/components/VlmAuditPanel';
 import { ModeToggle, type AppMode } from '@/components/ModeToggle';
 import { AgentChat } from '@/components/AgentChat';
+import { VlmWarmupModal } from '@/components/VlmWarmupModal';
 import type { Language } from '@/components/LanguageToggle';
 import type { SearchState, VisionErrorResponse, AuditError } from '@/types';
+
+const VLM_RETRY_MAX = 5;
+const VLM_RETRY_DELAY_MS = 10_000;
 
 const initialState: SearchState = {
   query: '',
@@ -29,6 +33,8 @@ export default function Home() {
   const [state, setState] = useState<SearchState>(initialState);
   const [language, setLanguage] = useState<Language>('en');
   const [errorExpanded, setErrorExpanded] = useState(false);
+  const [vlmWarming, setVlmWarming] = useState(false);
+  const [vlmAttempt, setVlmAttempt] = useState(0);
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) return;
@@ -72,8 +78,14 @@ export default function Home() {
     }
   }, [language]);
 
+  const callVisionApi = async (formData: FormData): Promise<Response> => {
+    return fetch('/api/vision', { method: 'POST', body: formData });
+  };
+
   const handleImageUpload = useCallback(async (file: File) => {
     setErrorExpanded(false);
+    setVlmWarming(false);
+    setVlmAttempt(0);
     setState(prev => ({
       ...prev,
       isAuditing: true,
@@ -89,29 +101,68 @@ export default function Home() {
       const formData = new FormData();
       formData.append('image', file);
 
-      const visionResponse = await fetch('/api/vision', {
-        method: 'POST',
-        body: formData,
-      });
+      let visionResponse = await callVisionApi(formData);
 
       if (!visionResponse.ok) {
         const errorData: VisionErrorResponse = await visionResponse.json().catch(() => ({
           error: 'Vision analysis failed.',
         }));
 
-        const message = errorData.coldStart
-          ? 'The Vision AI service is warming up. Please try again in about 30 seconds.'
-          : errorData.error || 'Vision analysis failed.';
+        if (errorData.coldStart) {
+          setVlmWarming(true);
 
-        setState(prev => ({
-          ...prev,
-          isAuditing: false,
-          auditError: {
-            message,
-            detail: `Status: ${visionResponse.status}\n${JSON.stringify(errorData, null, 2)}`,
-          },
-        }));
-        return;
+          for (let attempt = 1; attempt <= VLM_RETRY_MAX; attempt++) {
+            setVlmAttempt(attempt);
+            await new Promise(r => setTimeout(r, VLM_RETRY_DELAY_MS));
+
+            const retryForm = new FormData();
+            retryForm.append('image', file);
+            visionResponse = await callVisionApi(retryForm);
+
+            if (visionResponse.ok) break;
+
+            const retryData: VisionErrorResponse = await visionResponse.json().catch(() => ({
+              error: 'Vision analysis failed.',
+            }));
+
+            if (!retryData.coldStart) {
+              setVlmWarming(false);
+              setState(prev => ({
+                ...prev,
+                isAuditing: false,
+                auditError: {
+                  message: retryData.error || 'Vision analysis failed.',
+                  detail: `Status: ${visionResponse.status}\n${JSON.stringify(retryData, null, 2)}`,
+                },
+              }));
+              return;
+            }
+          }
+
+          setVlmWarming(false);
+
+          if (!visionResponse.ok) {
+            setState(prev => ({
+              ...prev,
+              isAuditing: false,
+              auditError: {
+                message: 'The Vision AI service did not respond after multiple retries. Please try again shortly.',
+                detail: `Exhausted ${VLM_RETRY_MAX} retries over ${(VLM_RETRY_MAX * VLM_RETRY_DELAY_MS) / 1000}s`,
+              },
+            }));
+            return;
+          }
+        } else {
+          setState(prev => ({
+            ...prev,
+            isAuditing: false,
+            auditError: {
+              message: errorData.error || 'Vision analysis failed.',
+              detail: `Status: ${visionResponse.status}\n${JSON.stringify(errorData, null, 2)}`,
+            },
+          }));
+          return;
+        }
       }
 
       const { analysis } = await visionResponse.json();
@@ -125,6 +176,7 @@ export default function Home() {
       await handleSearch(analysis);
     } catch (error) {
       console.error('Image upload error:', error);
+      setVlmWarming(false);
       setState(prev => ({
         ...prev,
         isAuditing: false,
@@ -317,6 +369,8 @@ export default function Home() {
           <AgentChat language={language} />
         )}
       </div>
+
+      <VlmWarmupModal isOpen={vlmWarming} attempt={vlmAttempt} maxAttempts={VLM_RETRY_MAX} />
     </main>
   );
 }
