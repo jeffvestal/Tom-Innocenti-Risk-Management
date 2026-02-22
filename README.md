@@ -37,11 +37,14 @@ The kit has two parts: **Python notebooks** for the data pipeline and a **Next.j
 │   │   ├── page.tsx             #   Main search page
 │   │   └── api/
 │   │       ├── search/          #   Elasticsearch semantic search + reranking
-│   │       └── vision/          #   Jina VLM diagram auditor
-│   ├── components/              #   SearchBar, ResultsList, VlmAuditPanel, etc.
-│   ├── lib/elasticsearch.ts     #   ES client + search functions
+│   │       ├── vision/          #   Jina VLM diagram auditor
+│   │       └── ingest/          #   Data Lab SSE pipeline (GET status, POST ingest)
+│   ├── components/              #   SearchBar, ResultsList, VlmAuditPanel, DataLab, etc.
+│   ├── lib/
+│   │   ├── elasticsearch.ts     #   ES client + search functions
+│   │   └── ingest.ts            #   Shared Jina Reader ingestion logic
 │   └── scripts/
-│       └── setup-demo-index.ts  #   Index creation + data loading
+│       └── setup-demo-index.ts  #   Index creation + data loading (uses lib/ingest)
 │
 └── requirements.txt             # Python dependencies
 ```
@@ -54,6 +57,7 @@ The kit has two parts: **Python notebooks** for the data pipeline and a **Next.j
 | Notebook 02 | Zero-config embeddings | Jina Embeddings v3 via EIS |
 | Notebook 03 | Listwise reranking | Jina Reranker v3 via EIS |
 | UI - Text Search | Semantic search + reranking | Jina Embeddings v3 + Reranker v3 via EIS |
+| UI - Data Lab | Interactive ingestion pipeline visualization | Jina Reader (PDF → markdown → articles) |
 | UI - Diagram Auditor | Architecture diagram analysis | Jina VLM (Vision Language Model) |
 
 ## Prerequisites
@@ -136,6 +140,25 @@ Open [http://localhost:3000](http://localhost:3000).
 3. Click "Deep Analysis" to trigger reranking with Jina Reranker v3
 4. Compare results with movement indicators showing ranking changes
 
+**Data Lab**
+
+The Data Lab tab makes the Jina Reader ingestion pipeline visible and interactive instead of hiding it behind a CLI script. Use it to demonstrate how data flows from raw PDF to searchable index.
+
+1. Switch to the **Data Lab** tab using the mode toggle
+2. The Data Source card shows what's being ingested (EU AI Act, 180+ pages, EN/DE)
+3. Enter a Jina API key or use the server-configured key (green badge)
+4. Choose which language(s) to import: **EN**, **DE**, or **Both**
+5. Click **Process Data** to start the pipeline
+6. Watch the 5-step pipeline visualizer animate in real-time:
+   - **Fetch PDF** → Jina Reader converts each PDF to markdown via `r.jina.ai`
+   - **Parse Articles** → Regex splits markdown into individual articles
+   - **Inference Endpoints** → Creates Jina Embeddings v3 + Reranker v2 in Elasticsearch
+   - **Index Documents** → Bulk indexes articles with automatic semantic embedding
+   - **Complete** → Data is ready for search
+7. After completion, the Data Preview section shows sample indexed articles with stats
+
+> **Tip:** If data already exists, the preview loads immediately and the button shows "Re-process Data".
+
 **Visual Diagram Auditor**
 1. Click the image icon next to the search bar and select an architecture diagram
 2. Jina VLM analyzes the diagram and produces a detailed data-flow summary
@@ -151,7 +174,8 @@ Open [http://localhost:3000](http://localhost:3000).
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Browser                                   │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │  React Components (Search, Results, Comparison View)     │   │
+│  │  Search | Agent | Data Lab  (mode toggle)                │   │
+│  │  SearchBar, ResultsList, AgentChat, DataLab, etc.        │   │
 │  └─────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -159,19 +183,21 @@ Open [http://localhost:3000](http://localhost:3000).
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Next.js Server                               │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │  /api/search  - Proxies to Elasticsearch                 │   │
-│  │  /api/vision  - Calls Jina VLM for diagram analysis     │   │
+│  │  /api/search  - Elasticsearch semantic search + rerank   │   │
+│  │  /api/agent   - Kibana Agent Builder proxy (SSE)        │   │
+│  │  /api/vision  - Jina VLM for diagram analysis           │   │
+│  │  /api/ingest  - Data Lab pipeline (SSE progress stream) │   │
 │  └─────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                               │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Elastic Cloud                               │
-│  ┌──────────────────┐  ┌──────────────┐  ┌─────────────────┐   │
-│  │ search-eu-ai-act │  │ Jina Embed   │  │ Jina Reranker   │   │
-│  │ (semantic_text)  │  │ v3 (EIS)     │  │ v3 (EIS)        │   │
-│  └──────────────────┘  └──────────────┘  └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
+                    ┌─────────┼──────────┐
+                    ▼                    ▼
+┌────────────────────────────┐  ┌────────────────────────────────┐
+│       Elastic Cloud         │  │          Jina AI                │
+│  search-eu-ai-act (index)  │  │  Reader (r.jina.ai)            │
+│  Jina Embeddings v3 (EIS)  │  │  VLM (api-beta-vlm.jina.ai)   │
+│  Jina Reranker v3 (EIS)    │  │                                │
+└────────────────────────────┘  └────────────────────────────────┘
 ```
 
 ### UI Scripts

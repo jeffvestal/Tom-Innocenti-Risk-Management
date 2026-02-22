@@ -8,6 +8,7 @@ import { DeepAnalysisButton } from '@/components/DeepAnalysisButton';
 import { VlmAuditPanel } from '@/components/VlmAuditPanel';
 import { ModeToggle, type AppMode } from '@/components/ModeToggle';
 import { AgentChat } from '@/components/AgentChat';
+import { DataLab } from '@/components/DataLab';
 import { VlmWarmupModal } from '@/components/VlmWarmupModal';
 import type { Language } from '@/components/LanguageToggle';
 import type { SearchState, VisionErrorResponse, AuditError } from '@/types';
@@ -241,7 +242,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-6 py-8">
         <ModeToggle mode={mode} onChange={setMode} />
 
-        {mode === 'search' ? (
+        {mode === 'search' && (
           <>
             {/* Search Section */}
             <div className="mb-8">
@@ -365,9 +366,11 @@ export default function Home() {
               </div>
             )}
           </>
-        ) : (
-          <AgentChat language={language} />
         )}
+
+        {mode === 'agent' && <AgentChat language={language} />}
+
+        {mode === 'data' && <DataLab />}
       </div>
 
       <VlmWarmupModal isOpen={vlmWarming} attempt={vlmAttempt} maxAttempts={VLM_RETRY_MAX} />

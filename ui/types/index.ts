@@ -52,6 +52,48 @@ export interface AuditError {
   detail?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Data Lab / Ingest pipeline types
+// ---------------------------------------------------------------------------
+
+export type PipelineStepId = 'fetch' | 'parse' | 'inference' | 'index' | 'complete';
+export type PipelineStepStatus = 'idle' | 'running' | 'done' | 'error';
+
+export interface PipelineStep {
+  id: PipelineStepId;
+  label: string;
+  description: string;
+  status: PipelineStepStatus;
+  message?: string;
+  detail?: Record<string, unknown>;
+}
+
+export interface IngestStatusResponse {
+  hasServerKey: boolean;
+  indexName: string;
+  indexExists: boolean;
+  totalDocs: number;
+  enCount: number;
+  deCount: number;
+  samples: SampleArticle[];
+}
+
+export interface SampleArticle {
+  id: string;
+  article_number: string;
+  title: string;
+  text: string;
+  language: string;
+  url: string;
+}
+
+export interface IngestProgressEvent {
+  step: PipelineStepId;
+  status: 'start' | 'progress' | 'done' | 'error';
+  message: string;
+  detail?: Record<string, unknown>;
+}
+
 // Search state for the main page
 export interface SearchState {
   query: string;
