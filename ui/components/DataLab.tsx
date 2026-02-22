@@ -168,8 +168,8 @@ export function DataLab() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center mb-2">
-        <h2 className="text-xl font-semibold text-slate-100">Data Lab</h2>
-        <p className="text-sm text-slate-400 mt-1">
+        <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Data Lab</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           See how Jina Reader ingests, parses, and indexes the EU AI Act
         </p>
       </div>

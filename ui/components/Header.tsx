@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Scale, Shield } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 import { LanguageToggle, type Language } from './LanguageToggle';
 import { EuAiActModal } from './EuAiActModal';
 import { TomModal } from './TomModal';
@@ -18,7 +19,7 @@ export function Header({ onReset, language, onLanguageChange }: HeaderProps) {
 
   return (
     <>
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-slate-200 bg-white/80 dark:border-slate-800 dark:bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo & Brand */}
@@ -34,22 +35,23 @@ export function Header({ onReset, language, onLanguageChange }: HeaderProps) {
                 onClick={onReset}
                 className="text-left hover:opacity-80 transition-opacity duration-200"
               >
-                <h1 className="text-xl font-semibold text-slate-100 tracking-tight">
+                <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-100 tracking-tight">
                   Innocenti & Associates
                 </h1>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-slate-500 dark:text-slate-500 font-medium">
                   AI Compliance Intelligence
                 </p>
               </button>
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
               <LanguageToggle language={language} onChange={onLanguageChange} />
               
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-2 text-slate-500 hover:text-amber-400
+                className="flex items-center gap-2 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400
                            transition-colors duration-200"
               >
                 <Shield className="w-4 h-4" />
