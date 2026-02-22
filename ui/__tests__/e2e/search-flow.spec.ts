@@ -114,4 +114,24 @@ test.describe('Search Flow', () => {
     await expect(link).toBeVisible();
     await expect(link.locator('..')).toHaveAttribute('target', '_blank');
   });
+
+  test('image button opens upload modal with two options', async ({ page }) => {
+    const imageBtn = page.getByTitle('Upload architecture diagram for VLM audit');
+    await expect(imageBtn).toBeVisible();
+
+    await imageBtn.click();
+
+    await expect(page.getByText('Upload Architecture Diagram')).toBeVisible();
+    await expect(page.getByText('Upload File')).toBeVisible();
+    await expect(page.getByText('Example Diagram')).toBeVisible();
+    await expect(page.getByAltText('Example architecture diagram')).toBeVisible();
+  });
+
+  test('image upload modal closes on Escape', async ({ page }) => {
+    await page.getByTitle('Upload architecture diagram for VLM audit').click();
+    await expect(page.getByText('Upload Architecture Diagram')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByText('Upload Architecture Diagram')).not.toBeVisible();
+  });
 });

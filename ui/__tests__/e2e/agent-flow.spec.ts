@@ -86,4 +86,40 @@ test.describe('Agent Flow', () => {
   test('renders image upload button', async ({ page }) => {
     await expect(page.getByTitle('Upload architecture diagram for VLM analysis')).toBeVisible();
   });
+
+  test('image button opens modal with two options', async ({ page }) => {
+    await page.getByTitle('Upload architecture diagram for VLM analysis').click();
+
+    await expect(page.getByText('Upload Architecture Diagram')).toBeVisible();
+    await expect(page.getByText('Upload File')).toBeVisible();
+    await expect(page.getByText('Example Diagram')).toBeVisible();
+    await expect(page.getByAltText('Example architecture diagram')).toBeVisible();
+  });
+
+  test('loading example image shows preview and suggestions', async ({ page }) => {
+    await page.route('**/example-architecture.png', async (route) => {
+      const body = Buffer.from('fake-png-data');
+      await route.fulfill({ body, contentType: 'image/png' });
+    });
+    await page.route('**/api/vision', async (route) => {
+      await route.fulfill({
+        json: { analysis: 'This is a machine learning pipeline on AWS with S3, SageMaker, and Lambda.' },
+      });
+    });
+
+    await page.getByTitle('Upload architecture diagram for VLM analysis').click();
+    await page.getByTestId('load-example-btn').click();
+
+    await expect(page.getByAltText('Selected diagram')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Architecture diagram attached')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Are there any prohibited AI' })).toBeVisible();
+  });
+
+  test('image upload modal closes on Escape', async ({ page }) => {
+    await page.getByTitle('Upload architecture diagram for VLM analysis').click();
+    await expect(page.getByText('Upload Architecture Diagram')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByText('Upload Architecture Diagram')).not.toBeVisible();
+  });
 });

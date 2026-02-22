@@ -56,6 +56,17 @@ describe('SearchBar', () => {
     expect(screen.queryByTitle('Upload architecture diagram for VLM audit')).toBeNull();
   });
 
+  it('opens image upload modal when image button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<SearchBar onSearch={() => {}} onImageUpload={() => {}} />);
+
+    await user.click(screen.getByTitle('Upload architecture diagram for VLM audit'));
+
+    expect(screen.getByText('Upload Architecture Diagram')).toBeInTheDocument();
+    expect(screen.getByText('Upload File')).toBeInTheDocument();
+    expect(screen.getByText('Example Diagram')).toBeInTheDocument();
+  });
+
   it('uses initialQuery as starting value', () => {
     render(<SearchBar onSearch={() => {}} initialQuery="pre-filled" />);
     expect(screen.getByDisplayValue('pre-filled')).toBeInTheDocument();

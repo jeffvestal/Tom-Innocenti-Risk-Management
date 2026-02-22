@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import { Search, Loader2, ScanEye, ImagePlus } from 'lucide-react';
+import { ImageUploadModal } from './ImageUploadModal';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -19,7 +20,7 @@ export function SearchBar({
   initialQuery = '',
 }: SearchBarProps) {
   const [query, setQuery] = useState(initialQuery);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   const busy = isLoading || isAuditing;
 
@@ -27,16 +28,6 @@ export function SearchBar({
     e.preventDefault();
     if (query.trim() && !busy) {
       onSearch(query.trim());
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onImageUpload) {
-      onImageUpload(file);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
     }
   };
 
@@ -68,20 +59,11 @@ export function SearchBar({
           disabled={busy}
         />
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="hidden"
-          aria-label="Upload architecture diagram"
-        />
-        
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-2">
           {onImageUpload && (
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => setShowImageModal(true)}
               disabled={busy}
               title="Upload architecture diagram for VLM audit"
               className="p-2 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-700/50
@@ -114,6 +96,17 @@ export function SearchBar({
         <p className="mt-3 text-center text-slate-600 text-sm">
           Powered by Jina AI embeddings & Elasticsearch semantic search
         </p>
+      )}
+
+      {onImageUpload && (
+        <ImageUploadModal
+          isOpen={showImageModal}
+          onClose={() => setShowImageModal(false)}
+          onFile={(file) => {
+            onImageUpload(file);
+            setShowImageModal(false);
+          }}
+        />
       )}
     </form>
   );

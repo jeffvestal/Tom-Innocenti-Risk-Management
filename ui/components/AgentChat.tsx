@@ -8,6 +8,7 @@ import {
   ImagePlus, X, ScanEye,
 } from 'lucide-react';
 import type { Language } from './LanguageToggle';
+import { ImageUploadModal } from './ImageUploadModal';
 
 interface AgentStep {
   type: 'reasoning' | 'tool_call' | 'tool_progress' | 'tool_result' | 'vlm_analysis';
@@ -190,19 +191,14 @@ export function AgentChat({ language }: { language: Language }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const url = URL.createObjectURL(file);
-      setImagePreview(url);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  const handleImageFile = (file: File) => {
+    setImageFile(file);
+    const url = URL.createObjectURL(file);
+    setImagePreview(url);
+    setShowImageModal(false);
   };
 
   const clearImage = () => {
@@ -632,17 +628,9 @@ export function AgentChat({ language }: { language: Language }) {
           </div>
         )}
         <form onSubmit={handleSubmit} className="flex gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-            aria-label="Upload architecture diagram"
-          />
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => setShowImageModal(true)}
             disabled={isLoading}
             title="Upload architecture diagram for VLM analysis"
             className="bg-slate-800 border border-slate-700 hover:border-amber-500/50
@@ -680,6 +668,12 @@ export function AgentChat({ language }: { language: Language }) {
             )}
           </button>
         </form>
+
+        <ImageUploadModal
+          isOpen={showImageModal}
+          onClose={() => setShowImageModal(false)}
+          onFile={handleImageFile}
+        />
       </div>
     </div>
   );

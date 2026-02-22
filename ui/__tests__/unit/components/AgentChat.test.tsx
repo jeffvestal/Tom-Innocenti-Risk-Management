@@ -69,6 +69,17 @@ describe('AgentChat', () => {
       expect(screen.getByTitle('Upload architecture diagram for VLM analysis')).toBeInTheDocument();
     });
 
+    it('opens image upload modal when image button is clicked', async () => {
+      const user = userEvent.setup();
+      render(<AgentChat language="en" />);
+
+      await user.click(screen.getByTitle('Upload architecture diagram for VLM analysis'));
+
+      expect(screen.getByText('Upload Architecture Diagram')).toBeInTheDocument();
+      expect(screen.getByText('Upload File')).toBeInTheDocument();
+      expect(screen.getByText('Example Diagram')).toBeInTheDocument();
+    });
+
     it('submit button is disabled when input is empty', () => {
       render(<AgentChat language="en" />);
       const submitButton = screen.getByRole('button', { name: '' });
@@ -91,16 +102,34 @@ describe('AgentChat', () => {
   });
 
   describe('file upload', () => {
-    it('shows image preview when file is selected', async () => {
+    it('shows image preview when file is selected via modal', async () => {
       const user = userEvent.setup();
       render(<AgentChat language="en" />);
 
+      global.URL.createObjectURL = vi.fn(() => 'blob:http://localhost/fake-url');
+
+      await user.click(screen.getByTitle('Upload architecture diagram for VLM analysis'));
+      expect(screen.getByText('Upload Architecture Diagram')).toBeInTheDocument();
+
       const file = new File(['fake-image'], 'diagram.png', { type: 'image/png' });
       const fileInput = screen.getByLabelText('Upload architecture diagram');
+      await user.upload(fileInput, file);
+
+      expect(screen.getByAltText('Selected diagram')).toBeInTheDocument();
+      expect(screen.getByText('Architecture diagram attached')).toBeInTheDocument();
+    });
+
+    it('shows image preview when example is loaded via modal', async () => {
+      const user = userEvent.setup();
+      const fakeBlob = new Blob(['fake-png'], { type: 'image/png' });
+      mockFetch.mockResolvedValue({ blob: () => Promise.resolve(fakeBlob) });
 
       global.URL.createObjectURL = vi.fn(() => 'blob:http://localhost/fake-url');
 
-      await user.upload(fileInput, file);
+      render(<AgentChat language="en" />);
+
+      await user.click(screen.getByTitle('Upload architecture diagram for VLM analysis'));
+      await user.click(screen.getByTestId('load-example-btn'));
 
       expect(screen.getByAltText('Selected diagram')).toBeInTheDocument();
       expect(screen.getByText('Architecture diagram attached')).toBeInTheDocument();
@@ -110,11 +139,12 @@ describe('AgentChat', () => {
       const user = userEvent.setup();
       render(<AgentChat language="en" />);
 
-      const file = new File(['fake-image'], 'diagram.png', { type: 'image/png' });
-      const fileInput = screen.getByLabelText('Upload architecture diagram');
-
       global.URL.createObjectURL = vi.fn(() => 'blob:http://localhost/fake-url');
 
+      await user.click(screen.getByTitle('Upload architecture diagram for VLM analysis'));
+
+      const file = new File(['fake-image'], 'diagram.png', { type: 'image/png' });
+      const fileInput = screen.getByLabelText('Upload architecture diagram');
       await user.upload(fileInput, file);
 
       expect(screen.getByText('Are there any prohibited AI practices in this architecture?')).toBeInTheDocument();
