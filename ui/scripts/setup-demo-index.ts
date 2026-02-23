@@ -24,7 +24,7 @@ import {
   getElasticsearchClient,
   fetchWithJinaReader,
   parseArticles,
-  createEmbeddingInference,
+  verifyEmbeddingEndpoint,
   createRerankerInference,
   createIndexIfNeeded,
   bulkIndexArticles,
@@ -80,10 +80,10 @@ async function main(): Promise<void> {
   }
 
   console.log('');
-  const embeddingCreated = await createEmbeddingInference(es, EMBEDDING_ID, jinaKey);
-  console.log(embeddingCreated
-    ? `✓ Created embedding endpoint: ${EMBEDDING_ID}`
-    : `✓ Embedding endpoint already exists: ${EMBEDDING_ID}`);
+  const embeddingExists = await verifyEmbeddingEndpoint(es, EMBEDDING_ID);
+  console.log(embeddingExists
+    ? `✓ Built-in embedding endpoint available: ${EMBEDDING_ID}`
+    : `⚠ Built-in embedding endpoint not found: ${EMBEDDING_ID}`);
 
   const rerankerCreated = await createRerankerInference(es, RERANKER_ID, jinaKey);
   console.log(rerankerCreated

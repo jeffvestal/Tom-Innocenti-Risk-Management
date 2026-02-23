@@ -39,17 +39,17 @@ function StepIcon({ step, isActive }: { step: AgentStep; isActive?: boolean }) {
     case 'reasoning':
       return <Brain className="w-3 h-3 text-slate-500 flex-shrink-0" />;
     case 'tool_call':
-      return <Search className="w-3 h-3 text-amber-400 flex-shrink-0" />;
+      return <Search className="w-3 h-3 text-amber-600 dark:text-amber-400 flex-shrink-0" />;
     case 'tool_progress':
       return isActive
         ? <Loader2 className="w-3 h-3 text-slate-500 animate-spin flex-shrink-0" />
-        : <CheckCircle2 className="w-3 h-3 text-slate-600 flex-shrink-0" />;
+        : <CheckCircle2 className="w-3 h-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />;
     case 'tool_result':
       return step.isError
-        ? <AlertCircle className="w-3 h-3 text-red-400 flex-shrink-0" />
-        : <Database className="w-3 h-3 text-green-400 flex-shrink-0" />;
+        ? <AlertCircle className="w-3 h-3 text-red-600 dark:text-red-400 flex-shrink-0" />
+        : <Database className="w-3 h-3 text-green-600 dark:text-green-400 flex-shrink-0" />;
     case 'vlm_analysis':
-      return <ScanEye className="w-3 h-3 text-amber-400 flex-shrink-0" />;
+      return <ScanEye className="w-3 h-3 text-amber-600 dark:text-amber-400 flex-shrink-0" />;
   }
 }
 
@@ -91,16 +91,16 @@ function StepRow({ step, stepKey, isExpanded, isActive, onToggle }: StepRowProps
             className="flex items-center gap-2 w-full text-left group"
           >
             {isExpanded
-              ? <ChevronDown className="w-3 h-3 text-slate-600 flex-shrink-0" />
-              : <ChevronRight className="w-3 h-3 text-slate-600 flex-shrink-0" />
+              ? <ChevronDown className="w-3 h-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />
+              : <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />
             }
             <StepIcon step={step} isActive={isActive} />
-            <span className="text-xs text-amber-400 group-hover:text-amber-300 transition-colors">
-              {step.tool_id}: <span className="text-slate-400">{step.params?.nlQuery as string || 'query'}</span>
+            <span className="text-xs text-amber-600 dark:text-amber-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors">
+              {step.tool_id}: <span className="text-slate-500 dark:text-slate-400">{step.params?.nlQuery as string || 'query'}</span>
             </span>
           </button>
           {isExpanded && (
-            <pre className="mt-1 ml-5 bg-slate-900/50 rounded p-2 text-xs text-slate-400 font-mono overflow-x-auto">
+            <pre className="mt-1 ml-5 bg-stone-100 dark:bg-slate-900/50 rounded p-2 text-xs text-slate-600 dark:text-slate-400 font-mono overflow-x-auto">
               {JSON.stringify(step.params, null, 2)}
             </pre>
           )}
@@ -121,17 +121,17 @@ function StepRow({ step, stepKey, isExpanded, isActive, onToggle }: StepRowProps
             className="flex items-center gap-2 w-full text-left group"
           >
             {isExpanded
-              ? <ChevronDown className="w-3 h-3 text-slate-600 flex-shrink-0" />
-              : <ChevronRight className="w-3 h-3 text-slate-600 flex-shrink-0" />
+              ? <ChevronDown className="w-3 h-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />
+              : <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />
             }
             <StepIcon step={step} isActive={isActive} />
-            <span className={`text-xs group-hover:brightness-125 transition-all ${step.isError ? 'text-red-400' : 'text-green-400'}`}>
+            <span className={`text-xs group-hover:brightness-125 transition-all ${step.isError ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
               {step.isError ? `Error: ${getErrorMessage(step.results)}` : formatResultsSummary(step.results)}
             </span>
           </button>
           {isExpanded && (
             <pre className={`mt-1 ml-5 rounded p-2 text-xs font-mono overflow-x-auto max-h-40 overflow-y-auto scrollbar-dark ${
-              step.isError ? 'bg-red-950/30 text-red-300' : 'bg-slate-900/50 text-slate-400'
+              step.isError ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300' : 'bg-stone-100 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400'
             }`}>
               {JSON.stringify(step.results, null, 2)}
             </pre>
@@ -148,17 +148,17 @@ function StepRow({ step, stepKey, isExpanded, isActive, onToggle }: StepRowProps
             className="flex items-center gap-2 w-full text-left group"
           >
             {isExpanded
-              ? <ChevronDown className="w-3 h-3 text-slate-600 flex-shrink-0" />
-              : <ChevronRight className="w-3 h-3 text-slate-600 flex-shrink-0" />
+              ? <ChevronDown className="w-3 h-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />
+              : <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />
             }
             <StepIcon step={step} isActive={isActive} />
-            <span className="text-xs text-amber-400 group-hover:text-amber-300 transition-colors">
-              VLM Architecture Analysis
+            <span className="text-xs text-teal-700 dark:text-teal-400 group-hover:text-teal-600 dark:group-hover:text-teal-300 transition-colors">
+              Jina VLM Architecture Analysis <span className="text-slate-500 dark:text-slate-600 font-mono">(jina-vlm)</span>
               {!isExpanded && <span className="text-slate-500 ml-1.5">{preview}</span>}
             </span>
           </button>
           {isExpanded && (
-            <div className="mt-1 ml-5 bg-amber-500/5 border border-amber-500/15 rounded p-2 text-xs text-slate-300 leading-relaxed max-h-48 overflow-y-auto scrollbar-dark">
+            <div className="mt-1 ml-5 bg-amber-500/5 border border-amber-500/15 rounded p-2 text-xs text-slate-700 dark:text-slate-300 leading-relaxed max-h-48 overflow-y-auto scrollbar-dark">
               {text}
             </div>
           )}
@@ -176,7 +176,7 @@ function getStatusLabel(steps: AgentStep[], status?: string): string {
   const last = steps[steps.length - 1];
   if (last?.type === 'tool_progress' && last.message) return last.message;
   if (last?.type === 'tool_call') return `Searching: ${last.params?.nlQuery || last.tool_id}`;
-  if (last?.type === 'vlm_analysis') return 'Diagram analyzed by VLM';
+  if (last?.type === 'vlm_analysis') return 'Diagram analyzed by Jina VLM (jina-vlm)';
   if (last?.type === 'reasoning' && last.reasoning) {
     const text = last.reasoning;
     return text.length > 80 ? text.slice(0, 80) + '...' : text;
@@ -199,16 +199,118 @@ export function AgentChat({ language }: { language: Language }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [vlmPreAnalyzing, setVlmPreAnalyzing] = useState(false);
+  const [vlmPreAnalysis, setVlmPreAnalysis] = useState<string | null>(null);
+  const [vlmPreAnalysisError, setVlmPreAnalysisError] = useState<string | null>(null);
+  const [followups, setFollowups] = useState<string[]>([]);
+  const [followupsLoading, setFollowupsLoading] = useState(false);
+  const vlmPreAnalysisPromiseRef = useRef<Promise<string | null> | null>(null);
+  const vlmAbortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const startPreAnalysis = (file: File): Promise<string | null> => {
+    vlmAbortRef.current?.abort();
+    const controller = new AbortController();
+    vlmAbortRef.current = controller;
+
+    setVlmPreAnalysis(null);
+    setVlmPreAnalysisError(null);
+    setVlmPreAnalyzing(true);
+
+    const run = async (): Promise<string | null> => {
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        let resp = await fetch('/api/vision', {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal,
+        });
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({ error: 'Vision analysis failed.' }));
+
+          if (errData.coldStart) {
+            setVlmWarming(true);
+
+            for (let attempt = 1; attempt <= VLM_RETRY_MAX; attempt++) {
+              setVlmAttempt(attempt);
+              await new Promise<void>((resolve, reject) => {
+                const timer = setTimeout(resolve, VLM_RETRY_DELAY_MS);
+                controller.signal.addEventListener('abort', () => {
+                  clearTimeout(timer);
+                  reject(new DOMException('Aborted', 'AbortError'));
+                }, { once: true });
+              });
+
+              const retryForm = new FormData();
+              retryForm.append('image', file);
+              resp = await fetch('/api/vision', {
+                method: 'POST',
+                body: retryForm,
+                signal: controller.signal,
+              });
+
+              if (resp.ok) break;
+
+              const retryData = await resp.json().catch(() => ({ error: 'Vision analysis failed.' }));
+              if (!retryData.coldStart) {
+                setVlmWarming(false);
+                throw new Error(retryData.error || `Vision analysis failed (${resp.status})`);
+              }
+            }
+
+            setVlmWarming(false);
+
+            if (!resp.ok) {
+              throw new Error(`Vision AI service did not respond after ${VLM_RETRY_MAX} retries.`);
+            }
+          } else {
+            throw new Error(errData.error || `Vision analysis failed (${resp.status})`);
+          }
+        }
+
+        const { analysis } = await resp.json();
+        if (!analysis) throw new Error('Vision model returned an empty response.');
+
+        setVlmPreAnalysis(analysis);
+        setVlmPreAnalyzing(false);
+        return analysis;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          setVlmPreAnalyzing(false);
+          return null;
+        }
+        const msg = err instanceof Error ? err.message : 'Pre-analysis failed';
+        setVlmPreAnalysisError(msg);
+        setVlmPreAnalyzing(false);
+        setVlmWarming(false);
+        return null;
+      }
+    };
+
+    const promise = run();
+    vlmPreAnalysisPromiseRef.current = promise;
+    return promise;
+  };
 
   const handleImageFile = (file: File) => {
     setImageFile(file);
     const url = URL.createObjectURL(file);
     setImagePreview(url);
     setShowImageModal(false);
+    startPreAnalysis(file);
   };
 
   const clearImage = () => {
+    vlmAbortRef.current?.abort();
+    vlmAbortRef.current = null;
+    vlmPreAnalysisPromiseRef.current = null;
+    setVlmPreAnalysis(null);
+    setVlmPreAnalyzing(false);
+    setVlmPreAnalysisError(null);
+    setVlmWarming(false);
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImageFile(null);
     setImagePreview(null);
@@ -256,11 +358,19 @@ export function AgentChat({ language }: { language: Language }) {
 
     const currentImage = imageFile;
     const currentPreview = imagePreview;
+    const pendingPreAnalysis = vlmPreAnalysisPromiseRef.current;
+    const cachedAnalysis = vlmPreAnalysis;
+
     setInput('');
     setImageFile(null);
     setImagePreview(null);
+    setVlmPreAnalysis(null);
+    setVlmPreAnalyzing(false);
+    setVlmPreAnalysisError(null);
+    vlmPreAnalysisPromiseRef.current = null;
     setError(null);
     setErrorExpanded(false);
+    setFollowups([]);
 
     const agentMsgIdx = messages.length + 1;
     setStepsExpanded(prev => ({ ...prev, [agentMsgIdx]: true }));
@@ -278,65 +388,87 @@ export function AgentChat({ language }: { language: Language }) {
 
       if (currentImage) {
         setIsAnalyzingImage(true);
-        const formData = new FormData();
-        formData.append('image', currentImage);
 
-        let visionResp = await fetch('/api/vision', {
-          method: 'POST',
-          body: formData,
-        });
+        if (cachedAnalysis) {
+          vlmAnalysisText = cachedAnalysis;
+        } else if (pendingPreAnalysis) {
+          vlmAnalysisText = await pendingPreAnalysis;
+        }
 
-        if (!visionResp.ok) {
-          const errData = await visionResp.json().catch(() => ({ error: 'Vision analysis failed.' }));
+        if (!vlmAnalysisText) {
+          const formData = new FormData();
+          formData.append('image', currentImage);
 
-          if (errData.coldStart) {
-            setVlmWarming(true);
+          let visionResp = await fetch('/api/vision', {
+            method: 'POST',
+            body: formData,
+          });
 
-            for (let attempt = 1; attempt <= VLM_RETRY_MAX; attempt++) {
-              setVlmAttempt(attempt);
-              await new Promise(r => setTimeout(r, VLM_RETRY_DELAY_MS));
+          if (!visionResp.ok) {
+            const errData = await visionResp.json().catch(() => ({ error: 'Vision analysis failed.' }));
 
-              const retryForm = new FormData();
-              retryForm.append('image', currentImage);
-              visionResp = await fetch('/api/vision', {
-                method: 'POST',
-                body: retryForm,
-              });
+            if (errData.coldStart) {
+              setVlmWarming(true);
 
-              if (visionResp.ok) break;
+              for (let attempt = 1; attempt <= VLM_RETRY_MAX; attempt++) {
+                setVlmAttempt(attempt);
+                await new Promise(r => setTimeout(r, VLM_RETRY_DELAY_MS));
 
-              const retryData = await visionResp.json().catch(() => ({ error: 'Vision analysis failed.' }));
-              if (!retryData.coldStart) {
-                setVlmWarming(false);
-                setIsAnalyzingImage(false);
-                throw new Error(retryData.error || `Vision analysis failed (${visionResp.status})`);
+                const retryForm = new FormData();
+                retryForm.append('image', currentImage);
+                visionResp = await fetch('/api/vision', {
+                  method: 'POST',
+                  body: retryForm,
+                });
+
+                if (visionResp.ok) break;
+
+                const retryData = await visionResp.json().catch(() => ({ error: 'Vision analysis failed.' }));
+                if (!retryData.coldStart) {
+                  setVlmWarming(false);
+                  setIsAnalyzingImage(false);
+                  throw new Error(retryData.error || `Vision analysis failed (${visionResp.status})`);
+                }
               }
-            }
 
-            setVlmWarming(false);
+              setVlmWarming(false);
 
-            if (!visionResp.ok) {
+              if (!visionResp.ok) {
+                setIsAnalyzingImage(false);
+                throw new Error(
+                  `Vision AI service did not respond after ${VLM_RETRY_MAX} retries.`,
+                );
+              }
+            } else {
               setIsAnalyzingImage(false);
-              throw new Error(
-                `Vision AI service did not respond after ${VLM_RETRY_MAX} retries.`,
-              );
+              throw new Error(errData.error || `Vision analysis failed (${visionResp.status})`);
             }
-          } else {
-            setIsAnalyzingImage(false);
-            throw new Error(errData.error || `Vision analysis failed (${visionResp.status})`);
           }
+
+          const { analysis } = await visionResp.json();
+          if (!analysis) throw new Error('Vision model returned an empty response.');
+          vlmAnalysisText = analysis;
         }
 
         setIsAnalyzingImage(false);
 
-        const { analysis } = await visionResp.json();
-        if (!analysis) throw new Error('Vision model returned an empty response.');
-
-        vlmAnalysisText = analysis;
+        const analysisInstructions = '[Analysis Instructions]\nFor each AI/ML service identified above, search for relevant EU AI Act articles and classify whether it is prohibited (Art 5), high-risk (Annex III), limited risk (Art 50), or minimal risk. Be specific and definitive. Cite articles with links.';
         agentMessage = trimmed
-          ? `[Architecture Diagram Analysis]\n${analysis}\n\n[User Question]\n${trimmed}`
-          : `[Architecture Diagram Analysis]\n${analysis}\n\nAnalyze this system architecture for EU AI Act compliance risks.`;
+          ? `[Architecture Diagram Analysis]\n${vlmAnalysisText}\n\n${analysisInstructions}\n\n[User Question]\n${trimmed}`
+          : `[Architecture Diagram Analysis]\n${vlmAnalysisText}\n\n${analysisInstructions}\n\nAnalyze this system architecture for EU AI Act compliance risks.`;
       }
+
+      const steps: AgentStep[] = [];
+      if (vlmAnalysisText) {
+        steps.push({ type: 'vlm_analysis', analysis: vlmAnalysisText });
+      }
+
+      setMessages(prev => [...prev, {
+        role: 'agent',
+        content: '',
+        steps: [...steps],
+        status: 'thinking',
+      }]);
 
       const resp = await fetch('/api/agent', {
         method: 'POST',
@@ -358,19 +490,7 @@ export function AgentChat({ language }: { language: Language }) {
       let agentText = '';
       let buffer = '';
       let currentEventType = '';
-      const steps: AgentStep[] = [];
       let currentStatus: ChatMessage['status'] = 'thinking';
-
-      if (vlmAnalysisText) {
-        steps.push({ type: 'vlm_analysis', analysis: vlmAnalysisText });
-      }
-
-      setMessages(prev => [...prev, {
-        role: 'agent',
-        content: '',
-        steps: [...steps],
-        status: 'thinking',
-      }]);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -453,6 +573,23 @@ export function AgentChat({ language }: { language: Language }) {
       updateAgentMessage(agentText, steps, currentStatus);
       setStepsExpanded(prev => ({ ...prev, [agentMsgIdx]: false }));
 
+      if (agentText) {
+        setFollowupsLoading(true);
+        fetch('/api/agent/followups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userMessage: trimmed || 'Analyze this architecture',
+            agentResponse: agentText,
+            language,
+          }),
+        })
+          .then(r => r.ok ? r.json() : { questions: [] })
+          .then(data => setFollowups(data.questions || []))
+          .catch(() => setFollowups([]))
+          .finally(() => setFollowupsLoading(false));
+      }
+
       if (!agentText) {
         setMessages(prev => {
           const updated = [...prev];
@@ -487,11 +624,11 @@ export function AgentChat({ language }: { language: Language }) {
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4 scrollbar-dark">
         {messages.length === 0 && !isLoading && (
           <div className="text-center py-16">
-            <Bot className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-500 text-lg mb-2">
+            <Bot className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-4" />
+            <p className="text-slate-600 dark:text-slate-500 text-lg mb-2">
               {language === 'de' ? 'EU-KI-Gesetz Compliance-Berater' : 'EU AI Act Compliance Advisor'}
             </p>
-            <p className="text-slate-600 text-sm max-w-md mx-auto">
+            <p className="text-slate-500 dark:text-slate-600 text-sm max-w-md mx-auto">
               {language === 'de'
                 ? 'Fragen Sie mich zum EU-KI-Gesetz. Ich durchsuche die Verordnung und zitiere die relevanten Artikel.'
                 : 'Ask me anything about the EU AI Act. I\u2019ll search the regulation and cite specific articles in my response.'}
@@ -507,8 +644,9 @@ export function AgentChat({ language }: { language: Language }) {
                   onClick={() => { setInput(pair[language]); }}
                   title={language === 'de' ? pair.en : undefined}
                   className="px-3 py-1.5 rounded-full text-xs
-                             bg-slate-800 border border-slate-700 text-slate-400
-                             hover:border-amber-500/50 hover:text-amber-300
+                             bg-white dark:bg-slate-800 border border-stone-300 dark:border-slate-700
+                             text-slate-600 dark:text-slate-400
+                             hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-300
                              transition-all duration-200"
                 >
                   {pair[language]}
@@ -533,11 +671,11 @@ export function AgentChat({ language }: { language: Language }) {
               <div className="max-w-[75%] space-y-2">
                 {/* Collapsible thinking steps */}
                 {msg.steps && msg.steps.length > 0 && (
-                  <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg overflow-hidden">
+                  <div className="bg-stone-100 dark:bg-slate-800/50 border border-stone-200 dark:border-slate-700/50 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleSteps(i)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-400
-                                 hover:bg-slate-700/30 transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-600 dark:text-slate-400
+                                 hover:bg-stone-200/60 dark:hover:bg-slate-700/30 transition-colors"
                     >
                       {stepsExpanded[i]
                         ? <ChevronDown className="w-3 h-3 flex-shrink-0" />
@@ -557,7 +695,7 @@ export function AgentChat({ language }: { language: Language }) {
                     </button>
 
                     {stepsExpanded[i] && (
-                      <div className="border-t border-slate-700/50 px-3 py-2 space-y-0.5 max-h-64 overflow-y-auto scrollbar-dark">
+                      <div className="border-t border-stone-200 dark:border-slate-700/50 px-3 py-2 space-y-0.5 max-h-64 overflow-y-auto scrollbar-dark">
                         {msg.steps.map((step, si) => (
                           <StepRow
                             key={si}
@@ -584,15 +722,55 @@ export function AgentChat({ language }: { language: Language }) {
                 {/* Agent message content */}
                 {msg.content && (
                   <div className="rounded-xl px-4 py-3 text-sm leading-relaxed
-                                  bg-slate-800/70 border border-slate-700/50 text-slate-300
+                                  bg-white dark:bg-slate-800/70 border border-stone-200 dark:border-slate-700/50
+                                  text-slate-700 dark:text-slate-300
                                   agent-markdown">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        a: ({ href, children }) => (
+                          <a href={href} target="_blank" rel="noopener noreferrer">
+                            {children}
+                          </a>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+
+                {msg.status === 'complete' && i === messages.length - 1 && !isLoading && (followupsLoading || followups.length > 0) && (
+                  <div className="mt-3 min-h-[28px]">
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-1.5">Suggested follow-ups</p>
+                    <div className="flex flex-wrap gap-1.5">
+                    {followupsLoading ? (
+                      <div className="flex gap-1.5">
+                        {[1, 2, 3].map(n => (
+                          <div key={n} className="h-6 w-32 rounded-full bg-stone-200 dark:bg-slate-700 animate-pulse" />
+                        ))}
+                      </div>
+                    ) : followups.map((q, qi) => (
+                      <button
+                        key={qi}
+                        type="button"
+                        onClick={() => setInput(q)}
+                        className="px-2.5 py-1 rounded-full text-xs
+                                   bg-white dark:bg-slate-800 border border-stone-300 dark:border-slate-700
+                                   text-slate-600 dark:text-slate-400
+                                   hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-300
+                                   transition-all duration-200"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
               <div className="max-w-[75%] rounded-xl px-4 py-3 text-sm leading-relaxed
-                              bg-amber-500/15 border border-amber-500/25 text-slate-200">
+                              bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/25
+                              text-slate-700 dark:text-slate-200">
                 {msg.imageUrl && (
                   <img
                     src={msg.imageUrl}
@@ -605,8 +783,8 @@ export function AgentChat({ language }: { language: Language }) {
             )}
 
             {msg.role === 'user' && (
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center mt-1">
-                <User className="w-4 h-4 text-slate-400" />
+              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-stone-200 dark:bg-slate-700 flex items-center justify-center mt-1">
+                <User className="w-4 h-4 text-slate-500 dark:text-slate-400" />
               </div>
             )}
           </div>
@@ -615,30 +793,33 @@ export function AgentChat({ language }: { language: Language }) {
 
       {/* VLM analyzing indicator */}
       {isAnalyzingImage && (
-        <div className="mb-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-sm text-center flex items-center justify-center gap-2">
-          <Loader2 className="w-4 h-4 animate-spin" />
-          Analyzing architecture diagram...
+        <div className="mb-3 p-3 bg-teal-500/10 border border-teal-500/30 rounded-lg text-sm text-center space-y-1">
+          <div className="flex items-center justify-center gap-2 text-teal-700 dark:text-teal-300">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Analyzing architecture diagram with <span className="font-semibold">Jina VLM</span>
+          </div>
+          <p className="text-xs text-slate-500 font-mono">model: jina-vlm</p>
         </div>
       )}
 
       {/* Error */}
       {error && (
         <div className="mb-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm overflow-hidden">
-          <div className="p-3 text-red-300 text-center">
+          <div className="p-3 text-red-700 dark:text-red-300 text-center">
             {error.message}
           </div>
           {error.detail && (
             <>
               <button
                 onClick={() => setErrorExpanded(prev => !prev)}
-                className="w-full py-1.5 text-xs text-red-400 hover:text-red-300
+                className="w-full py-1.5 text-xs text-red-600 dark:text-red-400 hover:text-red-500 dark:hover:text-red-300
                            border-t border-red-500/20 transition-colors"
               >
                 {errorExpanded ? 'hide details' : 'expand for details'}
               </button>
               {errorExpanded && (
-                <pre className="px-3 pb-3 text-xs text-slate-400 font-mono whitespace-pre-wrap break-all
-                                border-t border-red-500/20 bg-slate-900/50">
+                <pre className="px-3 pb-3 text-xs text-slate-600 dark:text-slate-400 font-mono whitespace-pre-wrap break-all
+                                border-t border-red-500/20 bg-stone-100 dark:bg-slate-900/50">
                   {error.detail}
                 </pre>
               )}
@@ -648,7 +829,7 @@ export function AgentChat({ language }: { language: Language }) {
       )}
 
       {/* Input */}
-      <div className="pt-4 border-t border-slate-800">
+      <div className="pt-4 border-t border-stone-200 dark:border-slate-800">
         {imagePreview && (
           <div className="mb-3 space-y-2">
             <div className="flex items-start gap-2">
@@ -656,18 +837,40 @@ export function AgentChat({ language }: { language: Language }) {
                 <img
                   src={imagePreview}
                   alt="Selected diagram"
-                  className="h-20 rounded-lg border border-slate-700"
+                    className="h-20 rounded-lg border border-stone-300 dark:border-slate-700"
                 />
                 <button
                   type="button"
                   onClick={clearImage}
-                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-slate-700 hover:bg-red-600
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-stone-300 dark:bg-slate-700 hover:bg-red-600
                              flex items-center justify-center transition-colors"
                 >
-                  <X className="w-3 h-3 text-slate-300" />
+                  <X className="w-3 h-3 text-slate-600 dark:text-slate-300" />
                 </button>
               </div>
-              <span className="text-xs text-slate-500 mt-1">Architecture diagram attached</span>
+              <div className="flex flex-col gap-1 mt-1">
+                {vlmPreAnalyzing && (
+                  <span className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Analyzing with Jina VLM...
+                  </span>
+                )}
+                {vlmPreAnalysis && !vlmPreAnalyzing && (
+                  <span className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Analysis ready
+                  </span>
+                )}
+                {vlmPreAnalysisError && !vlmPreAnalyzing && !vlmPreAnalysis && (
+                  <span className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                    <AlertCircle className="w-3 h-3" />
+                    Analysis failed — will retry on send
+                  </span>
+                )}
+                {!vlmPreAnalyzing && !vlmPreAnalysis && !vlmPreAnalysisError && (
+                  <span className="text-xs text-slate-500">Architecture diagram attached</span>
+                )}
+              </div>
             </div>
             {!isLoading && (
               <div className="flex flex-wrap gap-1.5">
@@ -682,8 +885,9 @@ export function AgentChat({ language }: { language: Language }) {
                     onClick={() => setInput(pair[language])}
                     title={language === 'de' ? pair.en : undefined}
                     className="px-2.5 py-1 rounded-full text-xs
-                               bg-slate-800 border border-slate-700 text-slate-400
-                               hover:border-amber-500/50 hover:text-amber-300
+                               bg-white dark:bg-slate-800 border border-stone-300 dark:border-slate-700
+                               text-slate-600 dark:text-slate-400
+                               hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-300
                                transition-all duration-200"
                   >
                     {pair[language]}
@@ -699,8 +903,10 @@ export function AgentChat({ language }: { language: Language }) {
             onClick={() => setShowImageModal(true)}
             disabled={isLoading}
             title="Upload architecture diagram for VLM analysis"
-            className="bg-slate-800 border border-slate-700 hover:border-amber-500/50
-                       text-slate-400 hover:text-amber-300 disabled:opacity-50
+            className="bg-white dark:bg-slate-800 border border-stone-300 dark:border-slate-700
+                       hover:border-amber-500/50
+                       text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-300
+                       disabled:opacity-50
                        px-3 py-3 rounded-xl transition-all duration-200
                        disabled:cursor-not-allowed"
           >
@@ -714,16 +920,18 @@ export function AgentChat({ language }: { language: Language }) {
               ? (language === 'de' ? 'Frage zu diesem Diagramm (optional)...' : 'Ask about this diagram (optional)...')
               : (language === 'de' ? 'Frage zum EU-KI-Gesetz...' : 'Ask about the EU AI Act...')}
             disabled={isLoading}
-            className="flex-1 bg-slate-800 border border-slate-700 rounded-xl
-                       px-4 py-3 text-sm text-slate-100 placeholder-slate-500
+            className="flex-1 bg-white dark:bg-slate-800 border border-stone-300 dark:border-slate-700 rounded-xl
+                       px-4 py-3 text-sm text-slate-800 dark:text-slate-100
+                       placeholder-slate-400 dark:placeholder-slate-500
                        focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500
                        disabled:opacity-50 transition-all duration-200"
           />
           <button
             type="submit"
             disabled={isLoading || (!input.trim() && !imageFile)}
-            className="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700
-                       text-slate-900 disabled:text-slate-500
+            className="bg-amber-500 hover:bg-amber-400
+                       disabled:bg-stone-200 dark:disabled:bg-slate-700
+                       text-slate-900 disabled:text-slate-400 dark:disabled:text-slate-500
                        px-4 py-3 rounded-xl transition-all duration-200
                        disabled:cursor-not-allowed"
           >

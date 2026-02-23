@@ -18,6 +18,11 @@ export function ImageUploadModal({ isOpen, onClose, onFile }: ImageUploadModalPr
 
   useEffect(() => {
     if (!isOpen) return;
+    fetch('/api/vision/warmup', { method: 'POST' }).catch(() => {});
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { ResultsList } from '@/components/ResultsList';
@@ -11,6 +11,7 @@ import { AgentChat } from '@/components/AgentChat';
 import { DataLab } from '@/components/DataLab';
 import { VlmWarmupModal } from '@/components/VlmWarmupModal';
 import type { Language } from '@/components/LanguageToggle';
+import { JinaBadge, JinaInline, ElasticLogo } from '@/components/JinaBadge';
 import type { SearchState, VisionErrorResponse, AuditError } from '@/types';
 
 const VLM_RETRY_MAX = 5;
@@ -79,11 +80,17 @@ export default function Home() {
     }
   }, [language]);
 
-  const callVisionApi = async (formData: FormData): Promise<Response> => {
-    return fetch('/api/vision', { method: 'POST', body: formData });
+  const vlmAbortRef = useRef<AbortController | null>(null);
+
+  const callVisionApi = async (formData: FormData, signal?: AbortSignal): Promise<Response> => {
+    return fetch('/api/vision', { method: 'POST', body: formData, signal });
   };
 
   const handleImageUpload = useCallback(async (file: File) => {
+    vlmAbortRef.current?.abort();
+    const controller = new AbortController();
+    vlmAbortRef.current = controller;
+
     setErrorExpanded(false);
     setVlmWarming(false);
     setVlmAttempt(0);
@@ -102,7 +109,7 @@ export default function Home() {
       const formData = new FormData();
       formData.append('image', file);
 
-      let visionResponse = await callVisionApi(formData);
+      let visionResponse = await callVisionApi(formData, controller.signal);
 
       if (!visionResponse.ok) {
         const errorData: VisionErrorResponse = await visionResponse.json().catch(() => ({
@@ -114,11 +121,17 @@ export default function Home() {
 
           for (let attempt = 1; attempt <= VLM_RETRY_MAX; attempt++) {
             setVlmAttempt(attempt);
-            await new Promise(r => setTimeout(r, VLM_RETRY_DELAY_MS));
+            await new Promise<void>((resolve, reject) => {
+              const timer = setTimeout(resolve, VLM_RETRY_DELAY_MS);
+              controller.signal.addEventListener('abort', () => {
+                clearTimeout(timer);
+                reject(new DOMException('Aborted', 'AbortError'));
+              }, { once: true });
+            });
 
             const retryForm = new FormData();
             retryForm.append('image', file);
-            visionResponse = await callVisionApi(retryForm);
+            visionResponse = await callVisionApi(retryForm, controller.signal);
 
             if (visionResponse.ok) break;
 
@@ -176,6 +189,10 @@ export default function Home() {
 
       await handleSearch(analysis);
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setState(prev => ({ ...prev, isAuditing: false }));
+        return;
+      }
       console.error('Image upload error:', error);
       setVlmWarming(false);
       setState(prev => ({
@@ -291,11 +308,25 @@ export default function Home() {
 
             {/* Results Explainer */}
             {state.hasSearched && state.naiveResults.length > 0 && (
-              <p className="mb-4 text-slate-500 text-sm text-center">
-                {state.vlmAnalysis
-                  ? 'Your architecture diagram was analyzed by Jina VLM. The analysis was used to search for relevant EU AI Act compliance articles below.'
-                  : 'Showing EU AI Act articles most semantically relevant to your query, ranked by meaning similarity.'}
-              </p>
+              <div className="mb-4 text-sm text-center space-y-2">
+                {state.vlmAnalysis ? (
+                  <>
+                    <p className="text-slate-500">
+                      Your architecture diagram was analyzed by <JinaInline service="vlm" /> <span className="font-mono text-slate-500 dark:text-slate-600 text-xs">(jina-vlm)</span>.<br />
+                      The analysis was embedded using <JinaInline service="embeddings" /> <span className="font-mono text-slate-500 dark:text-slate-600 text-xs">(.jina-embeddings-v5-text-small)</span> to find relevant compliance articles.
+                    </p>
+                    <div className="flex items-center justify-center gap-3">
+                      <JinaBadge service="vlm" showModel={false} size="sm" />
+                      <span className="text-slate-700">+</span>
+                      <JinaBadge service="embeddings" showModel={false} size="sm" />
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-slate-500">
+                    Results ranked by semantic similarity using <JinaInline service="embeddings" /> <span className="font-mono text-slate-500 dark:text-slate-600 text-xs">(.jina-embeddings-v5-text-small)</span> via <ElasticLogo className="w-3.5 h-3.5 inline align-text-bottom" /> Elasticsearch.
+                  </p>
+                )}
+              </div>
             )}
 
             {/* Results Section */}

@@ -26,7 +26,7 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 │   │   ├── credentials.py      # Shared credential management (loads ui/.env.local as primary)
 │   │   ├── parsing.py          # parse_articles() — extracted from NB 01 for testability
 │   │   ├── comparison.py       # build_comparison() — extracted from NB 03 for testability
-│   │   ├── inference.py        # create_embedding_inference / create_reranker_inference
+│   │   ├── inference.py        # verify_embedding_endpoint / create_reranker_inference
 │   │   ├── reader.py           # fetch_with_jina_reader() — Jina Reader API with retry
 │   │   └── colab_setup.py      # setup_environment() — shared Colab/local detection
 │   └── tests/                  # pytest suite (46 unit + 3 smoke + 4 integration)
@@ -47,9 +47,11 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 │   │   ├── layout.tsx
 │   │   ├── globals.css         # Dark theme + agent markdown styles
 │   │   └── api/
-│   │       ├── search/route.ts # Elasticsearch semantic search + reranking
-│   │       ├── vision/route.ts # Jina VLM diagram auditor (multipart/form-data)
-│   │       └── agent/route.ts  # SSE proxy to Kibana Agent Builder
+│   │       ├── search/route.ts          # Elasticsearch semantic search + reranking
+│   │       ├── vision/route.ts          # Jina VLM diagram auditor (multipart/form-data)
+│   │       ├── vision/warmup/route.ts   # VLM cold-start warmup endpoint
+│   │       ├── agent/route.ts           # SSE proxy to Kibana Agent Builder
+│   │       └── agent/followups/route.ts # LLM-generated follow-up questions
 │   ├── components/
 │   │   ├── SearchBar.tsx       # Text input + image upload button
 │   │   ├── ResultsList.tsx     # Renders search results
@@ -69,9 +71,9 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 │   │   ├── setup-demo-index.ts # Creates index, fetches EU AI Act (EN+DE), bulk indexes
 │   │   └── setup-agent.ts      # Provisions Agent Builder tool + agent via Kibana API
 │   ├── __tests__/
-│   │   ├── unit/               # Vitest unit tests (123 tests)
+│   │   ├── unit/               # Vitest unit tests
 │   │   │   ├── components/     # 11 component test files
-│   │   │   ├── api/            # 3 API route test files
+│   │   │   ├── api/            # 4 API route test files (search, agent, vision, followups)
 │   │   │   └── lib/            # 2 library test files
 │   │   └── e2e/                # Playwright E2E tests (25 tests)
 │   │       ├── search-flow.spec.ts
@@ -119,8 +121,10 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 ### 3. Agent Chat
 - User toggles to "Agent" mode via `ModeToggle`
 - Chat messages go through `POST /api/agent` -> Kibana `converse/async` endpoint (SSE)
-- Agent uses `eu-ai-act-search` tool (index_search type) to query the same ES index
+- Agent uses `eu-ai-act-search` tool (esql type) to query the same ES index
 - `AgentChat.tsx` renders thinking steps, tool calls/results (collapsible), and markdown responses
+- After each response, `/api/agent/followups` generates contextual follow-up question pills via the LLM connector
+- Image uploads go through Jina VLM first, then the VLM analysis is passed to the agent as context
 
 ## Environment Variables
 
@@ -130,7 +134,7 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 | `ELASTIC_CLOUD_ID` | Alt* | Classic Cloud deployment ID (alternative to URL) |
 | `ELASTIC_API_KEY` | Yes | API key with index/search/manage permissions |
 | `JINA_API_KEY` | Yes | Jina AI API key (used for VLM + EIS setup) |
-| `AGENT_CONNECTOR_ID` | For Agent | LLM connector ID for Agent Builder (e.g. `Google-Gemini-2-5-Flash`) |
+| `AGENT_CONNECTOR_ID` | For Agent | LLM connector ID for Agent Builder (e.g. `OpenAI-GPT-4-1-Mini`) |
 | `KIBANA_URL` | No | Override — auto-derived from `ELASTICSEARCH_URL` by swapping `.es.` -> `.kb.` |
 
 *One of `ELASTICSEARCH_URL` or `ELASTIC_CLOUD_ID` is required. Prefer `ELASTICSEARCH_URL` for Serverless.
@@ -140,10 +144,10 @@ Both parts operate on the **same Elasticsearch index**: `search-eu-ai-act-demo`.
 | Resource | ID / Name |
 |----------|-----------|
 | Elasticsearch index | `search-eu-ai-act-demo` |
-| Embedding inference endpoint | `jina-embeddings-v3-demo` |
+| Embedding inference endpoint | `.jina-embeddings-v5-text-small` (built-in on Serverless) |
 | Reranker inference endpoint | `jina-reranker-v3-demo` |
 | Agent Builder agent | `eu-ai-act-compliance-agent` |
-| Agent Builder tool | `eu-ai-act-search` (type: `index_search`, pattern: `search-eu-ai-act-demo`) |
+| Agent Builder tool | `eu-ai-act-search` (type: `esql`, index: `search-eu-ai-act-demo`) |
 
 ## Key Architectural Patterns
 
@@ -217,7 +221,8 @@ Located in `notebooks/tests/`. Config in `pytest.ini` (project root). Run with `
 - `get_elasticsearch_client()` routing (URL vs Cloud ID)
 - `parse_articles()` on fixture markdown: count, IDs, titles, body text, edge cases, language parameter
 - `build_comparison()` ranking movement: up/down/same/NEW, title truncation, empty-input guard, dynamic label
-- `create_embedding_inference()` / `create_reranker_inference()`: success, already-exists, re-raise
+- `verify_embedding_endpoint()`: confirms built-in `.jina-embeddings-v5-text-small` is available
+- `create_reranker_inference()`: success, already-exists, re-raise
 - `fetch_with_jina_reader()`: success, retry on empty, exhaustion, HTTP errors, auth headers
 
 **Smoke tests** (3 tests) — `test_notebooks_smoke.py`:
@@ -246,6 +251,7 @@ Located in `ui/__tests__/unit/`. Run with `npm test`.
 **API route tests** (`api/`):
 - `search.test.ts` — Request validation, naive vs reranked routing, language passthrough, error classification (503 for config, 503 for missing index, 500 for generic), timing
 - `agent.test.ts` — Request validation, Kibana payload construction, German language prefix injection, conversationId passthrough, SSE stream headers, error proxying
+- `followups.test.ts` — Request validation, Kibana connector call, JSON array parsing (message/choices fields, embedded text), truncation, German language, graceful degradation on failures
 - `vision.test.ts` — FormData validation, Jina VLM payload construction, retry on 502/503/429, cold start response after retries exhausted, unexpected response shapes
 
 **Component tests** (`components/`):
@@ -255,7 +261,7 @@ Located in `ui/__tests__/unit/`. Run with `npm test`.
 - `SearchBar.test.tsx` — Input rendering, form submission, loading/auditing states, image upload button
 - `ResultCard.test.tsx` — Rank badge, article number, score, expand/collapse, source link, movement indicators (up/down/same/new), semantic_text object handling
 - `ResultsList.test.tsx` — Naive results rendering, loading shimmer, empty state, comparison header, reranking impact stats
-- `AgentChat.test.tsx` — Empty state EN/DE, suggestion pills + tooltips, input placeholders, image upload/preview, message sending
+- `AgentChat.test.tsx` — Empty state EN/DE, suggestion pills + tooltips, input placeholders, image upload/preview, message sending, follow-up pill rendering/interaction/graceful failure
 - `DeepAnalysisButton.test.tsx` — Label, loading state, disabled state, click handler
 - `VlmAuditPanel.test.tsx` — Heading, expand/collapse toggle, analysis text display
 - `EuAiActModal.test.tsx` — Content sections, EUR-Lex link, close button, Escape key, backdrop click
@@ -280,7 +286,7 @@ Located in `ui/__tests__/e2e/`. Run with `npm run test:e2e`. Requires the dev se
 
 1. **Jina VLM beta URL** — Must use `api-beta-vlm.jina.ai`, not `api.jina.ai`. The VLM model is on a separate beta endpoint.
 
-2. **EIS `jinaai` service rejects `task_settings`** — When creating Jina embedding inference endpoints via EIS, do NOT include `task_settings`. The jinaai service provider does not accept them.
+2. **Embedding endpoint is built-in on Serverless** — `.jina-embeddings-v5-text-small` is pre-configured on Elastic Serverless. Do NOT call `inference.put()` for it; just reference it in mappings directly. Only the reranker endpoint still needs explicit creation via the `jinaai` service.
 
 3. **Agent Builder `_getType` error** — Certain LLM connectors (e.g. `OpenAI-GPT-4-1-Mini`) trigger `Cannot read properties of undefined (reading '_getType')` when the agent's `index_search` tool queries a `semantic_text` field. Switching to `Google-Gemini-2-5-Flash` resolved this. This is a server-side connector compatibility issue, not a code bug.
 

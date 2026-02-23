@@ -1,6 +1,7 @@
 'use client';
 
 import { Database, ExternalLink, FileText } from 'lucide-react';
+import { JinaLogo, ElasticLogo } from '../JinaBadge';
 import type { SampleArticle } from '@/types';
 
 interface DataPreviewProps {
@@ -57,10 +58,18 @@ export function DataPreview({
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
+      <div className="grid grid-cols-3 gap-3 mb-3">
         <StatBadge label="Total Documents" value={totalDocs} />
         <StatBadge label="English" value={enCount} />
         <StatBadge label="German" value={deCount} />
+      </div>
+
+      {/* Jina embedding callout */}
+      <div className="flex items-center justify-center gap-2 mb-5 py-2 px-3 rounded-lg bg-teal-500/5 border border-teal-500/15">
+        <JinaLogo className="w-8 h-3.5 shrink-0" />
+        <span className="text-[11px] text-teal-700/80 dark:text-teal-400/80 inline-flex items-center gap-1 flex-wrap justify-center">
+          Each document embedded with <span className="font-semibold text-teal-700 dark:text-teal-400">.jina-embeddings-v5-text-small</span> via <ElasticLogo className="w-3.5 h-3.5 inline" /> Elasticsearch Inference API
+        </span>
       </div>
 
       {/* Sample articles */}

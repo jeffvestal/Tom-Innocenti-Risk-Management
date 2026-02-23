@@ -7,7 +7,7 @@ A field engineering enablement kit demonstrating the **"Full Chain" search pipel
 We're simulating a high-stakes legal compliance firm called **"Innocenti & Associates"** that needs to search the **EU AI Act** with precision. Standard search fails on legal nuance -- we fix that with a complete pipeline:
 
 1. **Jina Reader** → Converts messy PDFs to clean markdown
-2. **Jina Embeddings v3** → Multilingual semantic understanding
+2. **Jina Embeddings v5** → Next-gen multilingual embeddings (built-in on Serverless)
 3. **Jina Reranker v3** → Listwise precision (the "Lawyer's Brain")
 4. **Jina VLM** → Vision Language Model that audits architecture diagrams for compliance risks
 
@@ -37,14 +37,18 @@ The kit has two parts: **Python notebooks** for the data pipeline and a **Next.j
 │   │   ├── page.tsx             #   Main search page
 │   │   └── api/
 │   │       ├── search/          #   Elasticsearch semantic search + reranking
+│   │       ├── agent/           #   Kibana Agent Builder proxy (SSE)
+│   │       │   └── followups/   #   LLM-generated follow-up question suggestions
 │   │       ├── vision/          #   Jina VLM diagram auditor
+│   │       │   └── warmup/      #   VLM cold-start warmup endpoint
 │   │       └── ingest/          #   Data Lab SSE pipeline (GET status, POST ingest)
-│   ├── components/              #   SearchBar, ResultsList, VlmAuditPanel, DataLab, etc.
+│   ├── components/              #   SearchBar, ResultsList, AgentChat, VlmAuditPanel, DataLab, etc.
 │   ├── lib/
 │   │   ├── elasticsearch.ts     #   ES client + search functions
 │   │   └── ingest.ts            #   Shared Jina Reader ingestion logic
 │   └── scripts/
-│       └── setup-demo-index.ts  #   Index creation + data loading (uses lib/ingest)
+│       ├── setup-demo-index.ts  #   Index creation + data loading (uses lib/ingest)
+│       └── setup-agent.ts       #   Agent Builder tool + agent provisioning
 │
 └── requirements.txt             # Python dependencies
 ```
@@ -54,11 +58,12 @@ The kit has two parts: **Python notebooks** for the data pipeline and a **Next.j
 | Layer | Concept | Jina Product |
 |-------|---------|--------------|
 | Notebook 01 | PDF parsing without OCR | Jina Reader (ReaderLM) |
-| Notebook 02 | Zero-config embeddings | Jina Embeddings v3 via EIS |
+| Notebook 02 | Zero-config embeddings | Jina Embeddings v5 via EIS |
 | Notebook 03 | Listwise reranking | Jina Reranker v3 via EIS |
-| UI - Text Search | Semantic search + reranking | Jina Embeddings v3 + Reranker v3 via EIS |
+| UI - Text Search | Semantic search + reranking | Jina Embeddings v5 + Reranker v3 via EIS |
 | UI - Data Lab | Interactive ingestion pipeline visualization | Jina Reader (PDF → markdown → articles) |
 | UI - Diagram Auditor | Architecture diagram analysis | Jina VLM (Vision Language Model) |
+| UI - Agent Chat | RAG-powered EU AI Act compliance advisor | Kibana Agent Builder + LLM connector |
 
 ## Prerequisites
 
@@ -75,6 +80,7 @@ The kit has two parts: **Python notebooks** for the data pipeline and a **Next.j
 | `ELASTIC_CLOUD_ID` | Alternative: classic Cloud deployment ID (if not using URL) |
 | `ELASTIC_API_KEY` | API key with index/search permissions |
 | `JINA_API_KEY` | Jina AI API key |
+| `AGENT_CONNECTOR_ID` | Kibana LLM connector ID for Agent mode (see below) |
 
 The UI accepts either `ELASTICSEARCH_URL` or `ELASTIC_CLOUD_ID` -- use whichever matches your deployment.
 
@@ -152,12 +158,21 @@ The Data Lab tab makes the Jina Reader ingestion pipeline visible and interactiv
 6. Watch the 5-step pipeline visualizer animate in real-time:
    - **Fetch PDF** → Jina Reader converts each PDF to markdown via `r.jina.ai`
    - **Parse Articles** → Regex splits markdown into individual articles
-   - **Inference Endpoints** → Creates Jina Embeddings v3 + Reranker v2 in Elasticsearch
+   - **Inference Endpoints** → Uses built-in Jina Embeddings v5 + creates Reranker v2 in Elasticsearch
    - **Index Documents** → Bulk indexes articles with automatic semantic embedding
    - **Complete** → Data is ready for search
 7. After completion, the Data Preview section shows sample indexed articles with stats
 
 > **Tip:** If data already exists, the preview loads immediately and the button shows "Re-process Data".
+
+**Agent Chat**
+1. Switch to the **Agent** tab using the mode toggle
+2. Ask any question about the EU AI Act (e.g. "What are the prohibited AI practices?")
+3. Upload an architecture diagram and ask "Are there any prohibited AI practices in this architecture?"
+4. The agent searches the EU AI Act index, reasons through multiple articles, and produces a structured compliance assessment
+5. After each response, contextual follow-up question pills appear -- click one to continue the conversation
+
+> **Agent LLM Connector:** Set `AGENT_CONNECTOR_ID` in `.env.local`. Recommended: `OpenAI-GPT-4-1-Mini` (fastest, 25s) or `Anthropic-Claude-Opus-4-6` (most thorough, 90s). All Elastic-preconfigured `.inference` connectors are supported. Run `npm run setup:agent` after first setup.
 
 **Visual Diagram Auditor**
 1. Click the image icon next to the search bar and select an architecture diagram
@@ -183,10 +198,12 @@ The Data Lab tab makes the Jina Reader ingestion pipeline visible and interactiv
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Next.js Server                               │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │  /api/search  - Elasticsearch semantic search + rerank   │   │
-│  │  /api/agent   - Kibana Agent Builder proxy (SSE)        │   │
-│  │  /api/vision  - Jina VLM for diagram analysis           │   │
-│  │  /api/ingest  - Data Lab pipeline (SSE progress stream) │   │
+│  │  /api/search          - ES semantic search + rerank      │   │
+│  │  /api/agent           - Kibana Agent Builder proxy (SSE) │   │
+│  │  /api/agent/followups - LLM follow-up suggestions        │   │
+│  │  /api/vision          - Jina VLM diagram analysis        │   │
+│  │  /api/vision/warmup   - VLM cold-start warmup            │   │
+│  │  /api/ingest          - Data Lab pipeline (SSE stream)   │   │
 │  └─────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -195,7 +212,7 @@ The Data Lab tab makes the Jina Reader ingestion pipeline visible and interactiv
 ┌────────────────────────────┐  ┌────────────────────────────────┐
 │       Elastic Cloud         │  │          Jina AI                │
 │  search-eu-ai-act (index)  │  │  Reader (r.jina.ai)            │
-│  Jina Embeddings v3 (EIS)  │  │  VLM (api-beta-vlm.jina.ai)   │
+│  Jina Embeddings v5 (EIS)  │  │  VLM (api-beta-vlm.jina.ai)   │
 │  Jina Reranker v3 (EIS)    │  │                                │
 └────────────────────────────┘  └────────────────────────────────┘
 ```
@@ -293,6 +310,7 @@ cd ui && npm run test:all
 | Unit | `lib/kibana.test.ts` | Kibana URL derivation, auth headers |
 | Unit | `api/search.test.ts` | Validation, naive vs reranked routing, language passthrough |
 | Unit | `api/agent.test.ts` | Validation, German prefix injection, SSE streaming, error handling |
+| Unit | `api/followups.test.ts` | Follow-up question generation, connector payload, error handling |
 | Unit | `api/vision.test.ts` | Image validation, Jina VLM calls, retry logic, cold start |
 | Unit | `components/*.test.tsx` | All 11 UI components: rendering, interactions, state changes |
 | E2E | `search-flow.spec.ts` | Search suggestions, results, expand/collapse, Deep Analysis |
@@ -314,10 +332,11 @@ cd ui && npm run test:all
 |-----------|------------|
 | Notebooks | Python, Jupyter |
 | UI Framework | Next.js 14 (App Router) |
-| Styling | Tailwind CSS (dark theme) |
+| Styling | Tailwind CSS (light/dark mode) |
 | Icons | Lucide React |
 | Search Backend | Elasticsearch with `semantic_text` |
-| AI Models | Jina Reader, Embeddings v3, Reranker v3, VLM |
+| Agent | Kibana Agent Builder (ES|QL tool) |
+| AI Models | Jina Reader, Embeddings v5, Reranker v3, VLM |
 
 ## Troubleshooting
 

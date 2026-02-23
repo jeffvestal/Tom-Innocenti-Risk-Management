@@ -14,11 +14,11 @@ import type {
 } from '@/types';
 
 const DEFAULT_STEPS: PipelineStep[] = [
-  { id: 'fetch', label: 'Fetch PDF', description: 'Jina Reader converts PDF to markdown', status: 'idle' },
+  { id: 'fetch', label: 'Jina Reader', description: 'Jina Reader (r.jina.ai) converts PDF to LLM-ready markdown', status: 'idle' },
   { id: 'parse', label: 'Parse Articles', description: 'Split markdown into articles', status: 'idle' },
-  { id: 'inference', label: 'Inference Endpoints', description: 'Embeddings + Reranker via Jina', status: 'idle' },
-  { id: 'index', label: 'Index Documents', description: 'Bulk index with auto-embedding', status: 'idle' },
-  { id: 'complete', label: 'Complete', description: 'Ready to search', status: 'idle' },
+  { id: 'inference', label: 'Jina Inference', description: '.jina-embeddings-v5-text-small + jina-reranker-v2 via ES Inference API', status: 'idle' },
+  { id: 'index', label: 'Index Documents', description: 'Bulk index with Jina Embeddings auto-embedding', status: 'idle' },
+  { id: 'complete', label: 'Complete', description: 'Powered by Jina AI — ready to search', status: 'idle' },
 ];
 
 type LangChoice = 'en' | 'de' | 'both';
@@ -170,7 +170,7 @@ export function DataLab() {
       <div className="text-center mb-2">
         <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Data Lab</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          See how Jina Reader ingests, parses, and indexes the EU AI Act
+          See how <span className="text-teal-700 dark:text-teal-400 font-semibold">Jina Reader</span>, <span className="text-teal-700 dark:text-teal-400 font-semibold">Jina Embeddings</span>, and <span className="text-teal-700 dark:text-teal-400 font-semibold">Jina Reranker</span> power the full pipeline
         </p>
       </div>
 

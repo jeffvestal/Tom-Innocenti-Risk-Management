@@ -23,7 +23,7 @@ class TestGetInferenceId:
     def test_embeddings(self, monkeypatch):
         monkeypatch.setenv("USER_SUFFIX", "test")
         from utils.credentials import get_inference_id
-        assert get_inference_id("embeddings") == "jina-embeddings-v3-test"
+        assert get_inference_id("embeddings") == ".jina-embeddings-v5-text-small"
 
     def test_reranker(self, monkeypatch):
         monkeypatch.setenv("USER_SUFFIX", "test")

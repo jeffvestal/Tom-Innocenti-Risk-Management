@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { Search, Loader2, ScanEye, ImagePlus } from 'lucide-react';
 import { ImageUploadModal } from './ImageUploadModal';
+import { JinaBadge, ElasticLogo } from './JinaBadge';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -89,14 +90,30 @@ export function SearchBar({
       </div>
       
       {isAuditing && (
-        <p className="mt-3 text-center text-amber-500/80 text-sm animate-pulse">
-          This may take up to a minute on first use...
+        <div className="mt-3 text-center space-y-1.5 animate-pulse">
+          <p className="text-amber-700 dark:text-amber-500/80 text-sm">
+            Analyzing with <span className="font-semibold text-teal-700 dark:text-teal-400">Jina VLM</span> <span className="text-slate-600 dark:text-slate-500 font-mono text-xs">(jina-vlm)</span>
+          </p>
+          <p className="text-slate-600 dark:text-slate-500 text-xs">
+            This may take up to a minute on first use...
+          </p>
+        </div>
+      )}
+      {isLoading && !isAuditing && (
+        <p className="mt-3 text-center text-amber-700 dark:text-amber-500/80 text-sm animate-pulse">
+          Embedding query with <span className="font-semibold text-teal-700 dark:text-teal-400">Jina Embeddings</span> <span className="text-slate-600 dark:text-slate-500 font-mono text-xs">(.jina-embeddings-v5-text-small)</span>
         </p>
       )}
-      {!isAuditing && (
-        <p className="mt-3 text-center text-slate-500 dark:text-slate-600 text-sm">
-          Powered by Jina AI embeddings & Elasticsearch semantic search
-        </p>
+      {!busy && (
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <span className="text-slate-500 dark:text-slate-600 text-sm">Powered by</span>
+          <JinaBadge service="embeddings" showModel={false} size="sm" />
+          <span className="text-slate-600 dark:text-slate-700 text-sm">&</span>
+          <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-sm">
+            <ElasticLogo className="w-4 h-4" />
+            Elasticsearch
+          </span>
+        </div>
       )}
 
       {onImageUpload && (

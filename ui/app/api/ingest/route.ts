@@ -8,7 +8,7 @@ import {
   getElasticsearchClient,
   fetchWithJinaReader,
   parseArticles,
-  createEmbeddingInference,
+  verifyEmbeddingEndpoint,
   createRerankerInference,
   createIndexIfNeeded,
   bulkIndexArticles,
@@ -164,21 +164,19 @@ export async function POST(request: NextRequest) {
             });
           }
 
-          // Step 3: Create inference endpoints (language-agnostic, runs once)
+          // Step 3: Verify/create inference endpoints (language-agnostic, runs once)
           emit({
             step: 'inference',
             status: 'start',
-            message: 'Creating Jina embedding & reranker endpoints in Elasticsearch...',
+            message: 'Setting up Jina inference endpoints in Elasticsearch...',
           });
 
-          const embeddingCreated = await createEmbeddingInference(es, EMBEDDING_ID, jinaKey);
+          await verifyEmbeddingEndpoint(es, EMBEDDING_ID);
           emit({
             step: 'inference',
             status: 'progress',
-            message: embeddingCreated
-              ? `Created embedding endpoint: ${EMBEDDING_ID}`
-              : `Embedding endpoint already exists: ${EMBEDDING_ID}`,
-            detail: { endpoint: EMBEDDING_ID, created: embeddingCreated },
+            message: `Using built-in embedding endpoint: ${EMBEDDING_ID}`,
+            detail: { endpoint: EMBEDDING_ID, builtIn: true },
           });
 
           const rerankerCreated = await createRerankerInference(es, RERANKER_ID, jinaKey);

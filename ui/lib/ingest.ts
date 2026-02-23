@@ -8,7 +8,7 @@
 import { Client } from '@elastic/elasticsearch';
 
 export const INDEX_NAME = 'search-eu-ai-act-demo';
-export const EMBEDDING_ID = 'jina-embeddings-v3-demo';
+export const EMBEDDING_ID = '.jina-embeddings-v5-text-small';
 export const RERANKER_ID = 'jina-reranker-v3-demo';
 
 export const PDF_URLS: Record<string, string> = {
@@ -161,25 +161,15 @@ async function inferenceExists(es: Client, inferenceId: string): Promise<boolean
   }
 }
 
-export async function createEmbeddingInference(
+/**
+ * Verifies the built-in embedding endpoint exists on Serverless.
+ * `.jina-embeddings-v5-text-small` is pre-configured -- no creation needed.
+ */
+export async function verifyEmbeddingEndpoint(
   es: Client,
   inferenceId: string,
-  jinaKey: string,
 ): Promise<boolean> {
-  if (await inferenceExists(es, inferenceId)) return false;
-
-  await es.inference.put({
-    inference_id: inferenceId,
-    task_type: 'text_embedding',
-    inference_config: {
-      service: 'jinaai',
-      service_settings: {
-        model_id: 'jina-embeddings-v3',
-        api_key: jinaKey,
-      },
-    },
-  });
-  return true;
+  return inferenceExists(es, inferenceId);
 }
 
 export async function createRerankerInference(

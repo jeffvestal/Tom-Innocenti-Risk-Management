@@ -12,6 +12,7 @@ import {
   Play,
   RotateCcw,
 } from 'lucide-react';
+import { JinaLogo } from '../JinaBadge';
 import type { PipelineStep, PipelineStepId } from '@/types';
 
 const STEP_ICONS: Record<PipelineStepId, typeof FileDown> = {
@@ -144,6 +145,15 @@ export function PipelineVisualizer({
                   {step.description}
                 </p>
 
+                {(step.id === 'fetch' || step.id === 'inference') && step.status !== 'idle' && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <JinaLogo className="w-7 h-3" />
+                    <span className="text-[9px] font-mono text-teal-600/60 dark:text-teal-500/60">
+                      {step.id === 'fetch' ? 'r.jina.ai' : '.jina-embeddings-v5-text-small'}
+                    </span>
+                  </div>
+                )}
+
                 {step.message && step.status !== 'idle' && (
                   <p className={`text-[11px] text-center mt-1.5 px-2 leading-tight max-w-[160px]
                                  ${step.status === 'error' ? 'text-red-500 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
@@ -167,10 +177,16 @@ export function PipelineVisualizer({
       </div>
 
       {allDone && !isRunning && (
-        <div className="mt-4 pt-4 border-t border-stone-200/60 dark:border-slate-700/40 text-center">
+        <div className="mt-4 pt-4 border-t border-stone-200/60 dark:border-slate-700/40 text-center space-y-2">
           <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
             Pipeline complete — data is ready for search
           </p>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20">
+            <JinaLogo className="w-10 h-4" />
+            <span className="text-[11px] text-teal-700 dark:text-teal-400 font-medium">
+              Powered by Jina Reader + Jina Embeddings v5 + Jina Reranker v2
+            </span>
+          </div>
         </div>
       )}
     </div>

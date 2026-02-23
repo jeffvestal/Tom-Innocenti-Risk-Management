@@ -5,33 +5,34 @@ from unittest.mock import MagicMock
 import pytest
 from elasticsearch import BadRequestError
 
-from utils.inference import create_embedding_inference, create_reranker_inference
+from utils.inference import (
+    verify_embedding_endpoint,
+    create_embedding_inference,
+    create_reranker_inference,
+)
 
 
-class TestCreateEmbeddingInference:
-    def test_creates_successfully(self):
+class TestVerifyEmbeddingEndpoint:
+    def test_returns_true_when_exists(self):
         es = MagicMock()
-        assert create_embedding_inference(es, "jina-emb-test") is True
-        es.inference.put.assert_called_once()
-
-    def test_returns_false_when_already_exists(self):
-        es = MagicMock()
-        es.inference.put.side_effect = BadRequestError(
-            message="resource_already_exists_exception",
-            meta=MagicMock(),
-            body={},
+        assert verify_embedding_endpoint(es, ".jina-embeddings-v5-text-small") is True
+        es.inference.get.assert_called_once_with(
+            inference_id=".jina-embeddings-v5-text-small"
         )
-        assert create_embedding_inference(es, "jina-emb-test") is False
 
-    def test_reraises_other_bad_request(self):
+    def test_returns_false_when_not_found(self):
         es = MagicMock()
-        es.inference.put.side_effect = BadRequestError(
-            message="something else went wrong",
-            meta=MagicMock(),
-            body={},
-        )
-        with pytest.raises(BadRequestError, match="something else"):
-            create_embedding_inference(es, "jina-emb-test")
+        es.inference.get.side_effect = Exception("not found")
+        assert verify_embedding_endpoint(es, ".jina-embeddings-v5-text-small") is False
+
+
+class TestCreateEmbeddingInferenceCompat:
+    """The legacy wrapper delegates to verify_embedding_endpoint."""
+
+    def test_delegates_to_verify(self):
+        es = MagicMock()
+        assert create_embedding_inference(es, ".jina-embeddings-v5-text-small") is True
+        es.inference.get.assert_called_once()
 
 
 class TestCreateRerankerInference:

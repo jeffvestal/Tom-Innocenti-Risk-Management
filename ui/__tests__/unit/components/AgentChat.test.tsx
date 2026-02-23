@@ -174,4 +174,109 @@ describe('AgentChat', () => {
       expect(screen.getByText('What is Article 5?')).toBeInTheDocument();
     });
   });
+
+  describe('follow-up suggestions', () => {
+    it('fetches and renders follow-up pills after agent response completes', async () => {
+      const user = userEvent.setup();
+      const encoder = new TextEncoder();
+
+      mockFetch.mockImplementation((url: string) => {
+        if (typeof url === 'string' && url.includes('/api/agent/followups')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              questions: [
+                'What penalties apply for high-risk violations?',
+                'How is biometric identification defined?',
+                'What about transparency obligations?',
+              ],
+            }),
+          });
+        }
+        const body = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode('event: message_chunk\ndata: {"data":{"text_chunk":"Biometric systems are high-risk."}}\n\n'));
+            controller.close();
+          },
+        });
+        return Promise.resolve({ ok: true, body });
+      });
+
+      render(<AgentChat language="en" />);
+
+      const input = screen.getByPlaceholderText('Ask about the EU AI Act...');
+      await user.type(input, 'What is biometric identification?');
+      await user.click(screen.getAllByRole('button').pop()!);
+
+      const pill = await screen.findByText('What penalties apply for high-risk violations?');
+      expect(pill).toBeInTheDocument();
+      expect(screen.getByText('How is biometric identification defined?')).toBeInTheDocument();
+      expect(screen.getByText('What about transparency obligations?')).toBeInTheDocument();
+    });
+
+    it('populates input when a follow-up pill is clicked', async () => {
+      const user = userEvent.setup();
+      const encoder = new TextEncoder();
+
+      mockFetch.mockImplementation((url: string) => {
+        if (typeof url === 'string' && url.includes('/api/agent/followups')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              questions: ['Follow-up question one?'],
+            }),
+          });
+        }
+        const body = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode('event: message_chunk\ndata: {"data":{"text_chunk":"Test response."}}\n\n'));
+            controller.close();
+          },
+        });
+        return Promise.resolve({ ok: true, body });
+      });
+
+      render(<AgentChat language="en" />);
+
+      const input = screen.getByPlaceholderText('Ask about the EU AI Act...');
+      await user.type(input, 'Test question');
+      await user.click(screen.getAllByRole('button').pop()!);
+
+      const pill = await screen.findByText('Follow-up question one?');
+      await user.click(pill);
+
+      expect(screen.getByPlaceholderText('Ask about the EU AI Act...')).toHaveValue('Follow-up question one?');
+    });
+
+    it('renders gracefully when followup API fails', async () => {
+      const user = userEvent.setup();
+      const encoder = new TextEncoder();
+
+      mockFetch.mockImplementation((url: string) => {
+        if (typeof url === 'string' && url.includes('/api/agent/followups')) {
+          return Promise.resolve({
+            ok: false,
+            status: 500,
+            json: async () => ({ questions: [] }),
+          });
+        }
+        const body = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode('event: message_chunk\ndata: {"data":{"text_chunk":"Response text."}}\n\n'));
+            controller.close();
+          },
+        });
+        return Promise.resolve({ ok: true, body });
+      });
+
+      render(<AgentChat language="en" />);
+
+      const input = screen.getByPlaceholderText('Ask about the EU AI Act...');
+      await user.type(input, 'Test question');
+      await user.click(screen.getAllByRole('button').pop()!);
+
+      await screen.findByText('Response text.');
+      expect(screen.queryByRole('button', { name: /follow/i })).not.toBeInTheDocument();
+    });
+  });
 });

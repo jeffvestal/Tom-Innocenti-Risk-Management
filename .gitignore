@@ -50,6 +50,7 @@ node_modules/
 .next/
 .vercel
 *.local
+*.tsbuildinfo
 
 # Test artifacts
 test-results/

@@ -3,8 +3,17 @@ import { NextRequest, NextResponse } from 'next/server';
 const JINA_VLM_URL = 'https://api-beta-vlm.jina.ai/v1/chat/completions';
 const RETRY_STATUS_CODES = new Set([502, 503, 429]);
 
-const SYSTEM_PROMPT =
-  'You are a Senior Cloud Architect. Your job is to analyze this system architecture diagram and write a dense, highly detailed technical summary of how data flows through the system. Provide your output as a single, detailed paragraph. You MUST explicitly name every Machine Learning service shown. More importantly, you MUST transcribe any text on the diagram that describes the specific types of data, metadata, labels, or user inputs being processed (for example, if a step says \'extracts X and Y metadata\', you must include X and Y in your summary). Do not classify the system or mention regulations. Just describe exactly what the system does and what specific data it touches based on the text in the diagram.';
+const SYSTEM_PROMPT = [
+  'You are a Senior Cloud Architect. Your job is to analyze this system architecture diagram and write a dense, highly detailed technical summary of how data flows through the system. Provide your output as a single, detailed paragraph. You MUST explicitly name every Machine Learning service shown. You MUST transcribe any text on the diagram that describes the specific types of data, metadata, labels, or user inputs being processed (for example, if a step says \'extracts X and Y metadata\', you must include X and Y in your summary).',
+  '',
+  'For any AI or ML service in the architecture, explicitly state:',
+  '1. What type of data it processes (images, text, audio, video, personal data, biometric data, financial data, medical data, behavioral data, etc.)',
+  '2. What decisions or outputs it produces (classifications, scores, identifications, recommendations, predictions, generated content, etc.)',
+  '3. Who or what the system acts upon (individuals, groups, infrastructure, content, etc.)',
+  '4. Whether any human review or override point exists in the flow.',
+  '',
+  'Do not classify the system under any regulation or make compliance judgments. Focus on factual description of capabilities and data flows.',
+].join('\n');
 
 export async function POST(request: NextRequest) {
   try {

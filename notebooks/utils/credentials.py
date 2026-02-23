@@ -217,12 +217,12 @@ def get_inference_id(model_type: str) -> str:
     Returns:
         Inference ID with user suffix appended
     
-    Example: "embeddings" -> "jina-embeddings-v3-jdoe"
+    Example: "embeddings" -> ".jina-embeddings-v5-text-small"
     """
     suffix = os.getenv("USER_SUFFIX") or _get_user_suffix()
     
     if model_type == "embeddings":
-        return f"jina-embeddings-v3-{suffix}"
+        return ".jina-embeddings-v5-text-small"
     elif model_type == "reranker":
         return f"jina-reranker-v3-{suffix}"
     else:
