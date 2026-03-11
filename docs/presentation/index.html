@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jina AI + Elastic Inference Service — 101</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--bg-card:#1a1d27;--bg-card-hover:#222633;
+  --text:#e2e8f0;--text-muted:#94a3b8;--text-dim:#64748b;
+  --elastic-blue:#0B64DD;--elastic-teal:#02BCB7;--elastic-gold:#FEC514;
+  --elastic-pink:#F04E98;--elastic-green:#9ADC30;--elastic-light-blue:#1BA9F5;
+  --jina-teal:#009191;--jina-red:#EB6161;--jina-yellow:#FBCB67;
+  --code-bg:#161922;--border:#2a2e3a;
+  --font:Inter,system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;overflow-x:hidden}
+
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--jina-teal),var(--elastic-blue));z-index:1000;transition:width .3s ease;width:0}
+#nav{position:fixed;top:3px;left:0;right:0;z-index:999;background:rgba(15,17,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:48px;gap:1.5rem;font-size:.75rem;transition:transform .3s ease}
+#nav.hidden{transform:translateY(0)}
+.nav-logo{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.nav-logo svg{height:18px;width:auto}
+.nav-sections{display:flex;gap:.25rem;overflow-x:auto;scrollbar-width:none}
+.nav-sections::-webkit-scrollbar{display:none}
+.nav-pill{padding:.25rem .6rem;border-radius:4px;color:var(--text-dim);white-space:nowrap;cursor:pointer;transition:all .2s;text-decoration:none;font-weight:500;border:1px solid transparent}
+.nav-pill:hover{color:var(--text-muted);background:rgba(255,255,255,.04)}
+.nav-pill.active{color:var(--elastic-light-blue);background:rgba(11,100,221,.12);border-color:rgba(11,100,221,.25)}
+.nav-pill.jina.active{color:var(--jina-teal);background:rgba(0,145,145,.12);border-color:rgba(0,145,145,.25)}
+
+section{min-height:100vh;padding:6rem 2rem 4rem;display:flex;flex-direction:column;justify-content:center;max-width:1200px;margin:0 auto}
+section.full-bleed{max-width:none;padding-left:4rem;padding-right:4rem}
+section.auto-height{min-height:auto;padding-top:4rem;padding-bottom:4rem}
+
+.title-section{align-items:center;text-align:center;gap:2rem}
+.title-logos{display:flex;align-items:center;gap:2rem;margin-bottom:1rem}
+.title-logos svg{height:48px;width:auto}
+.title-logos .x{color:var(--text-dim);font-size:1.5rem;font-weight:300}
+h1{font-size:3.2rem;font-weight:800;letter-spacing:-.03em;line-height:1.15;background:linear-gradient(135deg,var(--jina-teal),var(--elastic-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:1.25rem;color:var(--text-muted);font-weight:400;max-width:700px}
+.meta{display:flex;gap:2rem;color:var(--text-dim);font-size:.85rem;margin-top:1rem}
+
+.section-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label.jina{color:var(--jina-teal)}
+.section-label.eis{color:var(--elastic-blue)}
+.section-label::before{content:'';width:24px;height:2px;border-radius:1px}
+.section-label.jina::before{background:var(--jina-teal)}
+.section-label.eis::before{background:var(--elastic-blue)}
+h2{font-size:2.4rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:1.5rem}
+h3{font-size:1.3rem;font-weight:600;margin-bottom:1rem;color:var(--text)}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem}
+.card-grid.three{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:all .25s}
+.card:hover{background:var(--bg-card-hover);border-color:rgba(255,255,255,.08)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.card-title{font-size:1.1rem;font-weight:600}
+.card-badge{font-size:.65rem;font-weight:600;padding:.2rem .5rem;border-radius:4px;text-transform:uppercase;letter-spacing:.05em}
+.badge-eis{background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25)}
+.badge-active{background:rgba(11,100,221,.12);color:var(--elastic-light-blue);border:1px solid rgba(11,100,221,.2)}
+.badge-rec{background:rgba(254,197,20,.12);color:var(--elastic-gold);border:1px solid rgba(254,197,20,.25)}
+.badge-new{background:rgba(154,220,48,.12);color:var(--elastic-green);border:1px solid rgba(154,220,48,.25)}
+.card-desc{color:var(--text-muted);font-size:.9rem;margin-bottom:1rem;line-height:1.5}
+.card-stats{display:flex;flex-wrap:wrap;gap:.75rem}
+.stat{display:flex;flex-direction:column;gap:.15rem}
+.stat-value{font-size:.95rem;font-weight:600;font-family:var(--mono);color:var(--text)}
+.stat-label{font-size:.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em}
+
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:var(--bg-card)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:.75rem 1rem;background:rgba(255,255,255,.03);color:var(--text-muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:.6rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06);padding:.15rem .4rem;border-radius:3px;color:var(--elastic-light-blue)}
+.highlight-row td{background:rgba(0,145,145,.06)}
+.new-row td{background:rgba(154,220,48,.04)}
+
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;font-family:var(--mono);font-size:.8rem;line-height:1.7;overflow-x:auto;position:relative;white-space:pre}
+.code-block .lang{position:absolute;top:.5rem;right:.75rem;font-size:.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em}
+.ck{color:#c678dd}.cs{color:#98c379}.cn{color:#d19a66}.cc{color:#5c6370;font-style:italic}.cp{color:#e06c75}
+
+.bullet-list{list-style:none;display:flex;flex-direction:column;gap:.75rem}
+.bullet-list li{padding-left:1.5rem;position:relative;color:var(--text-muted);font-size:.95rem}
+.bullet-list li::before{content:'';position:absolute;left:0;top:.55rem;width:6px;height:6px;border-radius:50%}
+.bullet-list.jina li::before{background:var(--jina-teal)}
+.bullet-list.eis li::before{background:var(--elastic-blue)}
+.bullet-list li strong{color:var(--text);font-weight:600}
+
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.compare-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;position:relative;overflow:hidden}
+.compare-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.compare-box.jina-accent::before{background:linear-gradient(90deg,var(--jina-teal),var(--jina-yellow))}
+.compare-box.elastic-accent::before{background:linear-gradient(90deg,var(--elastic-blue),var(--elastic-teal))}
+
+.pipeline{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:2rem 0}
+.pipe-step{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;text-align:center;min-width:140px;flex:1}
+.pipe-step .step-num{font-size:.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem}
+.pipe-step .step-title{font-weight:600;font-size:.9rem;margin-bottom:.25rem}
+.pipe-step .step-detail{font-size:.75rem;color:var(--text-muted)}
+.pipe-arrow{color:var(--text-dim);font-size:1.2rem;flex-shrink:0}
+
+.mode-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.mode-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;position:relative;overflow:hidden}
+.mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.mode-card:nth-child(1)::before{background:var(--elastic-teal)}
+.mode-card:nth-child(2)::before{background:var(--elastic-blue)}
+.mode-card:nth-child(3)::before{background:var(--elastic-gold)}
+.mode-num{font-size:.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
+.mode-title{font-size:1.1rem;font-weight:600;margin-bottom:.5rem}
+.mode-desc{font-size:.85rem;color:var(--text-muted);line-height:1.5;margin-bottom:.75rem}
+
+.handson-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.handson-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center}
+.handson-num{font-size:2rem;font-weight:800;margin-bottom:.5rem}
+.handson-card:nth-child(1) .handson-num{color:var(--jina-teal)}
+.handson-card:nth-child(2) .handson-num{color:var(--elastic-blue)}
+.handson-card:nth-child(3) .handson-num{color:var(--elastic-gold)}
+
+.section-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:2rem 0}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start}
+.fade-up{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+.callout{background:rgba(0,145,145,.08);border:1px solid rgba(0,145,145,.2);border-radius:10px;padding:1.25rem 1.5rem;margin:1.25rem 0;font-size:.9rem;color:var(--text-muted);line-height:1.6}
+.callout strong{color:var(--jina-teal)}
+.callout.blue{background:rgba(11,100,221,.08);border-color:rgba(11,100,221,.2)}
+.callout.blue strong{color:var(--elastic-light-blue)}
+.callout.gold{background:rgba(254,197,20,.08);border-color:rgba(254,197,20,.2)}
+.callout.gold strong{color:var(--elastic-gold)}
+
+.scenario-intro{border-left:3px solid var(--elastic-gold);background:rgba(254,197,20,.04);border-radius:0 8px 8px 0;padding:.85rem 1.25rem;margin-bottom:1.5rem;font-size:.95rem;font-style:italic;color:var(--text-muted);line-height:1.6;font-weight:300}
+
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.concept{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem}
+.concept-term{font-size:.9rem;font-weight:700;color:var(--jina-teal);margin-bottom:.4rem}
+.concept-def{font-size:.82rem;color:var(--text-muted);line-height:1.55}
+
+.hero-card{background:var(--bg-card);border:2px solid rgba(254,197,20,.35);border-radius:14px;padding:2rem;position:relative;overflow:hidden}
+.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--elastic-gold),var(--jina-teal))}
+
+@media(max-width:900px){
+  .card-grid,.card-grid.three,.compare-row,.mode-cards,.handson-grid,.two-col,.concept-grid{grid-template-columns:1fr}
+  h1{font-size:2.2rem}h2{font-size:1.8rem}
+  section{padding:5rem 1.25rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<nav id="nav">
+  <div class="nav-logo">
+    <svg viewBox="0 0 235 100" xmlns="http://www.w3.org/2000/svg" height="20"><circle fill="#EB6161" cx="15.3" cy="84.5" r="15.3"/><path fill="#009191" d="M63.5 36.3c2 0 3.6 1.6 3.6 3.6l-.2 29.3c0 16.7-13.4 30.3-30.1 30.6h-.5V69.3 40c0-2 1.8-3.7 3.8-3.7h23.4zm47 0c2 0 3.6 1.6 3.6 3.6v41c0 2-1.6 3.6-3.6 3.6H87.1c-2 0-3.6-1.6-3.6-3.6V39.9c0-2 1.6-3.6 3.6-3.6h23.4zm36.8-.1h.5c15 .2 27.2 12.3 27.6 27.3v17.3c0 2-1.6 3.6-3.6 3.6H134c-2 0-3.6-1.6-3.6-3.6V39.8c0-2 1.6-3.6 3.6-3.6h13.3zM209.2 84c-12.6-.8-22.7-11.3-22.7-24.1 0-13.3 10.8-24.1 24.1-24.1 12.8 0 23.3 10 24.1 22.7v21.9c0 2-1.6 3.6-3.6 3.6h-21.9z"/><circle fill="#FBCB67" cx="98.749" cy="15.3" r="15.3"/></svg>
+    <span style="color:var(--text-dim);font-size:.7rem">+</span>
+    <svg viewBox="0 0 205 204" xmlns="http://www.w3.org/2000/svg" height="20"><path d="M80.43 87.74l44.77 20.41 45.16-39.57c2.29-11.41.56-23.26-4.88-33.54-5.44-10.28-14.32-18.37-25.04-22.9-10.72-4.52-22.67-5.2-33.84-1.93-11.17 3.27-20.86 10.3-27.44 19.9l-7.52 39.01 8.74 18.63z" fill="#FEC514"/><path d="M34.1 135.15c-2.33 11.46-.62 23.38 4.84 33.72 5.46 10.34 14.34 18.48 25.12 23.02 10.78 4.54 22.8 5.21 34.02 1.89 11.22-3.32 20.94-10.42 27.51-20.1l7.45-38.84-10-19-44.89-20.5-43.04 39.81z" fill="#02BCB7"/><path d="M33.79 57.68l30.7 7.24 6.72-34.88c-4.17-3.16-9.26-4.88-14.49-4.91-5.24-.03-10.34 1.63-14.55 4.74-4.21 3.11-7.3 7.5-8.81 12.51-1.51 5.01-1.36 10.38.43 15.3z" fill="#F04E98"/><path d="M31.15 64.98c-6.63 2.19-12.42 6.38-16.58 11.99-4.16 5.61-6.47 12.38-6.63 19.36-.16 6.98 1.84 13.84 5.74 19.64 3.89 5.8 9.48 10.25 16.01 12.75l42.99-38.91-7.89-16.83-33.64-8z" fill="#1BA9F5"/><path d="M133.44 173.68c3.57 2.75 7.84 4.44 12.33 4.89 4.49.44 9.01-.39 13.05-2.38 4.04-2 7.44-5.09 9.81-8.92 2.37-3.84 3.62-8.26 3.6-12.77.01-2.87-.49-5.72-1.47-8.41l-30.65-7.17-6.68 34.76z" fill="#9ADC30"/><path d="M139.68 130.89l33.75 7.89c6.74-2.27 12.6-6.59 16.76-12.35 4.17-5.76 6.43-12.67 6.48-19.78-.01-6.85-2.1-13.54-5.99-19.18-3.9-5.64-9.42-9.96-15.83-12.38l-44.13 38.67 8.96 17.13z" fill="#0B64DD"/></svg>
+  </div>
+  <div class="nav-sections" id="navSections"></div>
+</nav>
+
+<!-- ================================================================ -->
+<!-- TITLE -->
+<!-- ================================================================ -->
+<section class="title-section" data-nav="Title" data-group="title">
+  <div class="title-logos fade-up">
+    <svg viewBox="0 0 235 100" xmlns="http://www.w3.org/2000/svg" height="48"><circle fill="#EB6161" cx="15.3" cy="84.5" r="15.3"/><path fill="#009191" d="M63.5 36.3c2 0 3.6 1.6 3.6 3.6l-.2 29.3c0 16.7-13.4 30.3-30.1 30.6h-.5V69.3 40c0-2 1.8-3.7 3.8-3.7h23.4zm47 0c2 0 3.6 1.6 3.6 3.6v41c0 2-1.6 3.6-3.6 3.6H87.1c-2 0-3.6-1.6-3.6-3.6V39.9c0-2 1.6-3.6 3.6-3.6h23.4zm36.8-.1h.5c15 .2 27.2 12.3 27.6 27.3v17.3c0 2-1.6 3.6-3.6 3.6H134c-2 0-3.6-1.6-3.6-3.6V39.8c0-2 1.6-3.6 3.6-3.6h13.3zM209.2 84c-12.6-.8-22.7-11.3-22.7-24.1 0-13.3 10.8-24.1 24.1-24.1 12.8 0 23.3 10 24.1 22.7v21.9c0 2-1.6 3.6-3.6 3.6h-21.9z"/><circle fill="#FBCB67" cx="98.749" cy="15.3" r="15.3"/></svg>
+    <span class="x">&times;</span>
+    <svg viewBox="0 0 205 204" xmlns="http://www.w3.org/2000/svg" height="48"><path d="M80.43 87.74l44.77 20.41 45.16-39.57c2.29-11.41.56-23.26-4.88-33.54-5.44-10.28-14.32-18.37-25.04-22.9-10.72-4.52-22.67-5.2-33.84-1.93-11.17 3.27-20.86 10.3-27.44 19.9l-7.52 39.01 8.74 18.63z" fill="#FEC514"/><path d="M34.1 135.15c-2.33 11.46-.62 23.38 4.84 33.72 5.46 10.34 14.34 18.48 25.12 23.02 10.78 4.54 22.8 5.21 34.02 1.89 11.22-3.32 20.94-10.42 27.51-20.1l7.45-38.84-10-19-44.89-20.5-43.04 39.81z" fill="#02BCB7"/><path d="M33.79 57.68l30.7 7.24 6.72-34.88c-4.17-3.16-9.26-4.88-14.49-4.91-5.24-.03-10.34 1.63-14.55 4.74-4.21 3.11-7.3 7.5-8.81 12.51-1.51 5.01-1.36 10.38.43 15.3z" fill="#F04E98"/><path d="M31.15 64.98c-6.63 2.19-12.42 6.38-16.58 11.99-4.16 5.61-6.47 12.38-6.63 19.36-.16 6.98 1.84 13.84 5.74 19.64 3.89 5.8 9.48 10.25 16.01 12.75l42.99-38.91-7.89-16.83-33.64-8z" fill="#1BA9F5"/><path d="M133.44 173.68c3.57 2.75 7.84 4.44 12.33 4.89 4.49.44 9.01-.39 13.05-2.38 4.04-2 7.44-5.09 9.81-8.92 2.37-3.84 3.62-8.26 3.6-12.77.01-2.87-.49-5.72-1.47-8.41l-30.65-7.17-6.68 34.76z" fill="#9ADC30"/><path d="M139.68 130.89l33.75 7.89c6.74-2.27 12.6-6.59 16.76-12.35 4.17-5.76 6.43-12.67 6.48-19.78-.01-6.85-2.1-13.54-5.99-19.18-3.9-5.64-9.42-9.96-15.83-12.38l-44.13 38.67 8.96 17.13z" fill="#0B64DD"/></svg>
+  </div>
+  <h1 class="fade-up">&ldquo;We Might Be Illegal in Europe&rdquo;</h1>
+  <p class="subtitle fade-up">Building a compliance search tool with Jina AI + Elastic Inference Service &mdash; before the lawyers&rsquo; deadline.</p>
+  <div class="meta fade-up">
+    <span>A story about shipping first and reading the fine print second</span>
+    <span>&bull;</span>
+    <span>~30 min talk + hands-on</span>
+    <span>&bull;</span>
+    <span>Internal Enablement</span>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- WHAT IS JINA AI -->
+<!-- ================================================================ -->
+<section data-nav="What Is Jina" data-group="jina">
+  <div class="section-label jina">Part 1 &mdash; Jina AI</div>
+  <div class="scenario-intro fade-up">Your company just shipped facial recognition for user onboarding. Legal has questions. You need an emergency response team. Meet Jina AI.</div>
+  <h2 class="fade-up">What Is Jina AI?</h2>
+  <div class="two-col fade-up">
+    <div>
+      <ul class="bullet-list jina">
+        <li>Berlin-based AI company, <strong>acquired by Elastic in October 2025</strong></li>
+        <li>Builds <strong>search foundation models</strong> &mdash; the ML models that sit between your data and your search results. They turn &ldquo;dumb&rdquo; keyword lookup into intelligent meaning-based retrieval.</li>
+        <li>Not a search engine. They build the <em>models</em> that make search engines smart &mdash; converting text into mathematical representations, scoring relevance, cleaning up messy input data, and understanding images.</li>
+        <li>All current models (v3+): <strong>CC BY-NC 4.0</strong> &mdash; free to evaluate, commercial use through Elastic licensing</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Five Product Families</span></div>
+        <div class="card-desc">Each solves a different part of the search and AI pipeline:</div>
+        <div class="card-stats" style="flex-direction:column;gap:.6rem">
+          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">Embeddings</span> <span style="color:var(--text-muted);font-size:.85rem">Text &amp; images &rarr; vectors for semantic search</span></div>
+          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">Rerankers</span> <span style="color:var(--text-muted);font-size:.85rem">Re-score and re-order results for precision</span></div>
+          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">Reader</span> <span style="color:var(--text-muted);font-size:.85rem">Full service &mdash; URL/PDF &rarr; clean markdown or JSON</span></div>
+          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">CLIP</span> <span style="color:var(--text-muted);font-size:.85rem">Cross-modal: find images with text, text with images</span></div>
+          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">VLM</span> <span style="color:var(--text-muted);font-size:.85rem">Vision language model &mdash; look at an image, answer questions</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- KEY CONCEPTS -->
+<!-- ================================================================ -->
+<section data-nav="Key Concepts" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Before you can build anything, the PM wants to know what an &ldquo;embedding&rdquo; is. Fair enough &mdash; you had to Google it too.</div>
+  <h2 class="fade-up">Key Concepts &mdash; Quick Primer</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Before diving into models, here are the foundational ideas you&rsquo;ll need when talking to customers. If someone asks &ldquo;what is an embedding?&rdquo; &mdash; you&rsquo;ll find the answer here.</p>
+  <div class="concept-grid fade-up">
+    <div class="concept">
+      <div class="concept-term">What Is an Embedding?</div>
+      <div class="concept-def">When an AI model reads text, it converts it into a list of numbers &mdash; a <strong style="color:var(--text)">vector</strong>. The key insight: <em>similar meanings produce similar numbers</em>. A search for &ldquo;how to fix a leaky faucet&rdquo; will match a document about &ldquo;repairing dripping taps&rdquo; even though the exact words are completely different. This is how semantic search works.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">What Is a Context Window?</div>
+      <div class="concept-def">The maximum amount of text a model can process in a single pass, measured in tokens (~1 token &asymp; 1 word). A 512-token window handles about one paragraph. <strong style="color:var(--text)">8K tokens &asymp; 6 pages. 32K tokens &asymp; 25 pages.</strong> Longer context = fewer chunks, less lost meaning at boundaries, better search quality for long documents.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">What Is Matryoshka Representation Learning?</div>
+      <div class="concept-def">Named after Russian nesting dolls. The model <strong style="color:var(--text)">front-loads the most important information into the first dimensions</strong> of the embedding. You can truncate from 1,024 down to 256 dimensions and keep 90%+ of search quality. This lets customers trade a tiny accuracy reduction for major storage savings and faster searches.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">What Are LoRA Adapters?</div>
+      <div class="concept-def">Small, lightweight plugin modules (a few million extra parameters) attached to one base model. Instead of deploying separate models for retrieval, classification, and clustering, customers <strong style="color:var(--text)">deploy one model and switch tasks by selecting the adapter at query time</strong>. One deployment, not three. Simpler infrastructure, lower cost.</div>
+    </div>
+  </div>
+
+  <div class="fade-up" style="margin-top:2rem">
+    <h3 style="margin-bottom:.25rem">Try It: Embedding Similarity</h3>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">This is why &ldquo;facial recognition&rdquo; finds &ldquo;biometric identification&rdquo; &mdash; same neighborhood in vector space.</p>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">See how similar meanings cluster together, even with completely different words.</p>
+    <div id="embeddingDemo" style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+      <div style="flex:1;min-width:280px">
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem" id="embPhrases">
+          <span class="emb-tag" data-idx="0" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;fix a leaky faucet&rdquo;</span>
+          <span class="emb-tag" data-idx="1" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;repairing dripping taps&rdquo;</span>
+          <span class="emb-tag" data-idx="2" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;plumbing repair guide&rdquo;</span>
+          <span class="emb-tag" data-idx="3" style="background:rgba(254,197,20,.2);border:1px solid rgba(254,197,20,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;quantum physics research&rdquo;</span>
+          <span class="emb-tag" data-idx="4" style="background:rgba(11,100,221,.2);border:1px solid rgba(11,100,221,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;train a neural network&rdquo;</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:.72rem;font-family:var(--mono)" id="simMatrix">
+          <thead>
+            <tr>
+              <th style="padding:.35rem .5rem;text-align:left;border-bottom:1px solid var(--border);color:var(--text-dim)">Cosine Similarity</th>
+              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="fix a leaky faucet">Faucet</th>
+              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="repairing dripping taps">Taps</th>
+              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="plumbing repair guide">Plumbing</th>
+              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:#FEC514" title="quantum physics research">Quantum</th>
+              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--elastic-blue)" title="train a neural network">Neural</th>
+            </tr>
+          </thead>
+          <tbody id="simBody"></tbody>
+        </table>
+      </div>
+      <div style="flex:0 0 260px;min-width:200px">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center">
+          <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">2D Vector Space</div>
+          <svg id="embSvg" viewBox="0 0 240 200" style="width:100%;height:auto"></svg>
+          <div style="display:flex;justify-content:center;gap:.75rem;margin-top:.5rem;font-size:.65rem;color:var(--text-dim)">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--jina-teal);vertical-align:middle"></span> Plumbing</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FEC514;vertical-align:middle"></span> Physics</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--elastic-blue);vertical-align:middle"></span> ML</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- EMBEDDINGS — v5 HERO + ELSER COMPARISON -->
+<!-- ================================================================ -->
+<section data-nav="Embeddings" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">The regulation calls it &ldquo;real-time remote biometric identification systems.&rdquo; Your old search calls that &ldquo;no results found.&rdquo; Time for a better model.</div>
+  <h2 class="fade-up">Embedding Models &mdash; Lead with v5</h2>
+
+  <div class="hero-card fade-up" style="margin-bottom:1.5rem">
+    <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:1rem">
+      <div style="flex:1;min-width:300px">
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+          <span style="font-size:1.4rem;font-weight:700">jina-embeddings-v5-text-small</span>
+          <span class="card-badge badge-new">New Default</span>
+          <span class="card-badge badge-eis">On EIS</span>
+        </div>
+        <p style="color:var(--text-muted);font-size:.95rem;line-height:1.6;margin-bottom:1rem">The recommended default embedding model for Elastic, <strong style="color:var(--elastic-gold)">replacing ELSER</strong> as the go-to for new deployments. Best search quality of any multilingual model under 1B parameters. If you&rsquo;re recommending ELSER today, recommend v5-text-small instead.</p>
+        <div class="card-stats">
+          <div class="stat"><span class="stat-value">677M</span><span class="stat-label">Parameters</span></div>
+          <div class="stat"><span class="stat-value">1,024</span><span class="stat-label">Dimensions</span></div>
+          <div class="stat"><span class="stat-value">32K</span><span class="stat-label">Context (25 pages)</span></div>
+          <div class="stat"><span class="stat-value">119+</span><span class="stat-label">Languages</span></div>
+          <div class="stat"><span class="stat-value">4</span><span class="stat-label">LoRA adapters</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid fade-up" style="margin-bottom:1.5rem">
+    <div class="card">
+      <div class="card-header"><span class="card-title">v5-text-nano</span><span class="card-badge badge-eis">On EIS</span></div>
+      <div class="card-desc">Ultra-compact at just 239M params. Matches models with 2&times; its size. Perfect for edge deployments, latency-sensitive apps, or when GPU memory is limited.</div>
+      <div class="card-stats">
+        <div class="stat"><span class="stat-value">239M</span><span class="stat-label">Params</span></div>
+        <div class="stat"><span class="stat-value">768</span><span class="stat-label">Dims</span></div>
+        <div class="stat"><span class="stat-value">32K</span><span class="stat-label">Context</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">v4 (Multimodal)</span><span class="card-badge badge-active">Active</span></div>
+      <div class="card-desc">Handles both text <em>and</em> images through one unified model. A text query can find relevant images, and an image query can find relevant text. Use for charts, slides, scans, product catalogs.</div>
+      <div class="card-stats">
+        <div class="stat"><span class="stat-value">3.8B</span><span class="stat-label">Params</span></div>
+        <div class="stat"><span class="stat-value">2,048</span><span class="stat-label">Dims</span></div>
+        <div class="stat"><span class="stat-value">32K</span><span class="stat-label">Context</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout fade-up">
+    <strong>All Jina embedding models support:</strong> Matryoshka dimensions (truncate to save storage), LoRA adapters (one model for retrieval + classification + clustering), and binary quantization (compress to binary, still robust).
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- v5 vs ELSER -->
+<!-- ================================================================ -->
+<section data-nav="v5 vs ELSER" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Your cluster still has ELSER configured from 2024. Here&rsquo;s why that won&rsquo;t save you.</div>
+  <h2 class="fade-up">v5-text-small vs ELSER &mdash; Why the Switch?</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">ELSER was a great first step &mdash; it brought learned sparse retrieval to Elastic and worked well for English keyword-expansion style search. But v5 is a generational leap: true multilingual semantic search with 64&times; longer context.</p>
+  <div class="table-wrap fade-up" style="max-width:900px">
+    <table>
+      <thead><tr><th>Dimension</th><th>ELSER v2</th><th>Jina v5-text-small</th></tr></thead>
+      <tbody>
+        <tr><td>Type</td><td>Sparse (learned sparse)</td><td><strong>Dense (vector)</strong></td></tr>
+        <tr><td>Languages</td><td>English-focused</td><td><strong>119+ languages</strong></td></tr>
+        <tr><td>Context Window</td><td>512 tokens (~1 paragraph)</td><td><strong>32K tokens (~25 pages)</strong></td></tr>
+        <tr><td>Dimensions</td><td>Sparse (variable)</td><td><strong>1,024 (truncatable via Matryoshka)</strong></td></tr>
+        <tr><td>Long Documents</td><td>Needs aggressive chunking</td><td><strong>25 pages in a single pass</strong></td></tr>
+        <tr><td>Task Adapters</td><td>None</td><td><strong>4 LoRA adapters</strong></td></tr>
+        <tr><td>On EIS</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Status</td><td>Legacy default</td><td><strong style="color:var(--elastic-gold)">New default</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout gold fade-up" style="max-width:900px">
+    <strong>Bottom line:</strong> ELSER = English keyword expansion. v5-text-small = true multilingual semantic understanding with 64&times; more context. For new deployments, always recommend v5-text-small.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- RERANKERS -->
+<!-- ================================================================ -->
+<section data-nav="Rerankers" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Semantic search returns five articles that mention facial recognition. Only one of them actually answers your legal team&rsquo;s question. The reranker figures out which one.</div>
+  <h2 class="fade-up">Rerankers &mdash; The Precision Layer</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px"><strong style="color:var(--text)">Why two stages?</strong> Embedding search is fast and scales to millions of documents, but it works by comparing pre-computed vectors and can miss subtle relationships. A reranker reads each candidate alongside the query in full detail and re-scores them. You get speed from embeddings (find 100 candidates in milliseconds) and precision from reranking (surface the best 10).</p>
+
+  <div class="compare-row fade-up">
+    <div class="compare-box jina-accent">
+      <h3>Reranker v3 <span class="card-badge badge-rec" style="vertical-align:middle;margin-left:.5rem">Recommended</span></h3>
+      <ul class="bullet-list jina">
+        <li><strong>Listwise scoring</strong> &mdash; processes the query and up to 64 documents simultaneously in a single pass</li>
+        <li>Compares documents against <strong>each other</strong>, not just against the query. &ldquo;Which of these is <em>most</em> relevant?&rdquo; instead of &ldquo;Is this relevant?&rdquo;</li>
+        <li><strong>600M</strong> params, <strong>131K</strong> token context</li>
+        <li>100+ languages, outperforms models with 2.5&times; more parameters</li>
+      </ul>
+    </div>
+    <div class="compare-box" style="border-color:var(--border)">
+      <h3>Reranker v2</h3>
+      <ul class="bullet-list jina">
+        <li><strong>Pointwise scoring</strong> &mdash; each document scored independently against the query</li>
+        <li><strong>278M</strong> params, <strong>1K</strong> token context</li>
+        <li>100+ languages, 6&times; faster than v1</li>
+        <li>Unique: <strong>function-calling</strong> support (match queries to APIs) + code search</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout fade-up">
+    <strong>The analogy:</strong> Embedding search is scanning a library catalog to find the right shelf. The reranker is a librarian who reads the actual pages and tells you which books best answer your specific question.
+  </div>
+
+  <div class="fade-up" style="margin-top:2rem">
+    <h3 style="margin-bottom:.25rem">Live Demo: Before &amp; After Reranking</h3>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">Your legal team&rsquo;s first question. Let&rsquo;s see if search can answer it.</p>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">Query: &ldquo;Can law enforcement use facial recognition?&rdquo; &mdash; EU AI Act corpus</p>
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+      <button id="rerankBtn" onclick="runRerank()" style="background:var(--jina-teal);color:#fff;border:none;padding:.5rem 1.25rem;border-radius:6px;font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s">Run Reranker v3</button>
+      <button id="resetBtn" onclick="resetRerank()" style="background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);padding:.5rem 1rem;border-radius:6px;font-family:var(--font);font-size:.8rem;cursor:pointer;display:none">Reset</button>
+      <span id="rerankStatus" style="color:var(--text-dim);font-size:.75rem"></span>
+    </div>
+    <div class="compare-row" style="gap:1rem">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--text-dim)"></div>
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">Semantic Search Only</div>
+        <div id="naiveResults">
+          <div class="demo-result" data-id="r1" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease">
+            <span style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#1</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">Art. 5 &mdash; Prohibited AI Practices</div><div style="font-size:.7rem;color:var(--text-dim)">General prohibitions on AI systems deemed unacceptable</div></div>
+            <span style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">0.81</span>
+          </div>
+          <div class="demo-result" data-id="r2" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease">
+            <span style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#2</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">Art. 52 &mdash; Transparency for AI Systems</div><div style="font-size:.7rem;color:var(--text-dim)">Disclosure obligations for AI interacting with people</div></div>
+            <span style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">0.79</span>
+          </div>
+          <div class="demo-result" data-id="r3" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease">
+            <span style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#3</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">Art. 6 &mdash; Classification of High-Risk AI</div><div style="font-size:.7rem;color:var(--text-dim)">Criteria for classifying AI as high-risk</div></div>
+            <span style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">0.77</span>
+          </div>
+          <div class="demo-result" data-id="r4" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease">
+            <span style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#4</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">Art. 26 &mdash; Obligations of Deployers</div><div style="font-size:.7rem;color:var(--text-dim)">Responsibilities when deploying high-risk AI</div></div>
+            <span style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">0.74</span>
+          </div>
+          <div class="demo-result" data-id="r5" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease">
+            <span style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#5</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">Art. 9 &mdash; Risk Management System</div><div style="font-size:.7rem;color:var(--text-dim)">Establishing risk management for high-risk AI</div></div>
+            <span style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">0.71</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;position:relative;overflow:hidden">
+        <div id="rerankAccent" style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--text-dim);transition:background .4s"></div>
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">After Reranking (Jina v3)</div>
+        <div id="rerankedResults">
+          <div class="demo-result" data-id="p1" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease;opacity:.3">
+            <span class="rerank-pos" style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#1</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">Waiting for rerank&hellip;</div><div style="font-size:.7rem;color:var(--text-dim)">&nbsp;</div></div>
+            <span class="rerank-score" style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">&mdash;</span>
+            <span class="rerank-move" style="font-size:.7rem;width:36px;text-align:center">&nbsp;</span>
+          </div>
+          <div class="demo-result" data-id="p2" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease;opacity:.3">
+            <span class="rerank-pos" style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#2</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">&nbsp;</div><div style="font-size:.7rem;color:var(--text-dim)">&nbsp;</div></div>
+            <span class="rerank-score" style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">&mdash;</span>
+            <span class="rerank-move" style="font-size:.7rem;width:36px;text-align:center">&nbsp;</span>
+          </div>
+          <div class="demo-result" data-id="p3" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease;opacity:.3">
+            <span class="rerank-pos" style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#3</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">&nbsp;</div><div style="font-size:.7rem;color:var(--text-dim)">&nbsp;</div></div>
+            <span class="rerank-score" style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">&mdash;</span>
+            <span class="rerank-move" style="font-size:.7rem;width:36px;text-align:center">&nbsp;</span>
+          </div>
+          <div class="demo-result" data-id="p4" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease;opacity:.3">
+            <span class="rerank-pos" style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#4</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">&nbsp;</div><div style="font-size:.7rem;color:var(--text-dim)">&nbsp;</div></div>
+            <span class="rerank-score" style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">&mdash;</span>
+            <span class="rerank-move" style="font-size:.7rem;width:36px;text-align:center">&nbsp;</span>
+          </div>
+          <div class="demo-result" data-id="p5" style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-radius:6px;margin-bottom:.4rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);transition:all .6s ease;opacity:.3">
+            <span class="rerank-pos" style="font-family:var(--mono);font-size:.7rem;color:var(--text-dim);width:20px;text-align:right">#5</span>
+            <div style="flex:1"><div style="font-size:.82rem;font-weight:500">&nbsp;</div><div style="font-size:.7rem;color:var(--text-dim)">&nbsp;</div></div>
+            <span class="rerank-score" style="font-family:var(--mono);font-size:.75rem;color:var(--text-muted)">&mdash;</span>
+            <span class="rerank-move" style="font-size:.7rem;width:36px;text-align:center">&nbsp;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- JINA READER SERVICE -->
+<!-- ================================================================ -->
+<section data-nav="Reader" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Step one: be able to read the regulation. The EU published it as an HTML page with 200 lines of navigation, cookie banners, and a sidebar. Reader fixes that.</div>
+  <h2 class="fade-up">Jina Reader &mdash; Content Pipeline Service</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Before documents can be embedded, indexed, or searched, they need to be clean and structured. Raw web pages are full of JavaScript, CSS, ads, and navigation noise. Jina Reader is a <strong style="color:var(--text)">full service</strong> (not just a model) that handles this preprocessing.</p>
+
+  <div class="card-grid three fade-up">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Reader API</span></div>
+      <div class="card-desc">Prepend <code>r.jina.ai/</code> to any URL and get clean Markdown back. Handles HTML, PDFs, dynamic JavaScript pages. The simplest integration path.</div>
+      <div class="code-block" style="font-size:.78rem;padding:.75rem 1rem;margin-top:.5rem">r.jina.ai/https://example.com
+<span class="cc"># returns clean Markdown</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Search Mode</span></div>
+      <div class="card-desc">Prepend <code>s.jina.ai/</code> to a search query. Searches the web and returns top 5 results already converted to clean Markdown.</div>
+      <div class="code-block" style="font-size:.78rem;padding:.75rem 1rem;margin-top:.5rem">s.jina.ai/EU AI Act biometric
+<span class="cc"># web search → clean results</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">ReaderLM v2 (Model)</span></div>
+      <div class="card-desc">The underlying 1.5B-param model. Deploy locally for private use. HTML &rarr; Markdown <em>and</em> HTML &rarr; structured JSON extraction using predefined schemas. 29 languages, 512K context.</div>
+    </div>
+  </div>
+  <div class="callout fade-up">
+    <strong>Why it matters:</strong> Every RAG pipeline starts with clean data. Jina Reader is the preprocessing step that ensures AI models get high-quality input instead of noisy HTML. Outperforms models 20&times; its size on HTML-to-Markdown quality benchmarks.
+  </div>
+
+  <div class="fade-up" style="margin-top:2rem">
+    <h3 style="margin-bottom:.25rem">See It: Before &amp; After Jina Reader</h3>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">This is what the EU AI Act looks like when you download it. Good luck with Ctrl+F.</p>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">What a web page looks like before and after processing with <code>r.jina.ai/</code></p>
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+      <button id="readerBtn" onclick="runReader()" style="background:var(--jina-teal);color:#fff;border:none;padding:.4rem 1rem;border-radius:6px;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s">Process with Reader</button>
+      <button id="readerResetBtn" onclick="resetReader()" style="background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);padding:.4rem .8rem;border-radius:6px;font-family:var(--font);font-size:.78rem;cursor:pointer;display:none">Reset</button>
+    </div>
+    <div class="compare-row" style="gap:1rem">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;position:relative;overflow:hidden;flex:1">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--text-dim)"></div>
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">Raw HTML Source</div>
+        <pre id="readerRaw" style="font-family:var(--mono);font-size:.68rem;line-height:1.5;color:var(--text-muted);white-space:pre;overflow-x:auto;margin:0;max-height:300px;overflow-y:auto">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;EU AI Act - Official Text&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/css/main.min.css"&gt;
+  &lt;script src="/js/analytics.js"&gt;&lt;/script&gt;
+  &lt;script src="/js/cookie-consent.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;nav class="top-bar"&gt;
+    &lt;div class="nav-menu"&gt;
+      &lt;a href="/"&gt;Home&lt;/a&gt;
+      &lt;a href="/legislation"&gt;Legislation&lt;/a&gt;
+      &lt;a href="/about"&gt;About&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;div class="cookie-banner" id="cb"&gt;
+      We use cookies to improve... &lt;button&gt;Accept&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/nav&gt;
+  &lt;div class="sidebar"&gt; &lt;!-- 200 lines of nav --&gt; &lt;/div&gt;
+  &lt;main class="content"&gt;
+    &lt;article id="article-5"&gt;
+      &lt;h2&gt;Article 5 - Prohibited AI Practices&lt;/h2&gt;
+      &lt;div class="legal-text"&gt;
+        &lt;p&gt;The following AI practices shall
+        be prohibited:&lt;/p&gt;
+        &lt;ol type="a"&gt;
+          &lt;li&gt;The placing on the market...
+          of an AI system that deploys
+          subliminal techniques beyond a
+          person's consciousness...&lt;/li&gt;
+        &lt;/ol&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  &lt;/main&gt;
+  &lt;footer&gt; &lt;!-- 80 lines --&gt; &lt;/footer&gt;
+  &lt;script src="/js/tracking.js"&gt;&lt;/script&gt;
+  &lt;script&gt;initGA('UA-12345');&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;position:relative;overflow:hidden;flex:1">
+        <div id="readerAccent" style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--text-dim);transition:background .4s"></div>
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">After Jina Reader &rarr; Clean Markdown</div>
+        <pre id="readerClean" style="font-family:var(--mono);font-size:.68rem;line-height:1.5;color:var(--text-muted);white-space:pre;overflow-x:auto;margin:0;max-height:300px;overflow-y:auto;opacity:.3;transition:opacity .6s">Waiting for Reader processing&hellip;</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- CLIP + VLM -->
+<!-- ================================================================ -->
+<section data-nav="CLIP &amp; VLM" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Your CTO asks: &ldquo;Is our AWS architecture compliant?&rdquo; You upload the diagram. The VLM reads it and flags Amazon Rekognition as a biometric system. Now you know what to search for.</div>
+  <h2 class="fade-up">Visual Intelligence &mdash; CLIP &amp; VLM</h2>
+  <div class="compare-row fade-up">
+    <div class="compare-box jina-accent">
+      <h3>CLIP v2 &mdash; Cross-Modal Search</h3>
+      <div class="card-desc">Separate text and image encoders trained to produce embeddings in the <strong style="color:var(--text)">same vector space</strong>. A text query like &ldquo;red sports car&rdquo; finds matching images. An image of a car finds matching product descriptions. This is cross-modal retrieval.</div>
+      <ul class="bullet-list jina" style="margin-top:.75rem">
+        <li><strong>865M</strong> params, <strong>89 languages</strong></li>
+        <li><strong>512&times;512</strong> image resolution (4&times; v1)</li>
+        <li>Matryoshka: truncate 1,024 &rarr; 64 dims with &lt;1% loss</li>
+        <li>Lighter than v4 &mdash; choose for speed/cost when you don&rsquo;t need document understanding</li>
+      </ul>
+    </div>
+    <div class="compare-box elastic-accent">
+      <h3>VLM &mdash; Vision Language Model</h3>
+      <div class="card-desc">A <strong style="color:var(--text)">generative</strong> model: it looks at an image and produces text answers to questions about it. Not retrieval &mdash; understanding. &ldquo;What does this chart show?&rdquo; &ldquo;What text is in this scanned document?&rdquo;</div>
+      <ul class="bullet-list eis" style="margin-top:.75rem">
+        <li><strong>2.4B</strong> params, <strong>29 languages</strong></li>
+        <li>Best multilingual VQA among open 2B models</li>
+        <li>Strong OCR (778/1000 OCRBench)</li>
+        <li>Lowest hallucination rate (90.3 POPE) in its class</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout fade-up">
+    <strong>CLIP vs VLM vs v4:</strong> CLIP v2 embeds images for <em>search</em> (lightweight, fast). v4 embeds images + text together for <em>multimodal search</em> (heavier, handles complex visual docs). VLM <em>generates text</em> about images (answers questions, extracts info). They can be used together in a pipeline.
+  </div>
+
+  <div class="fade-up" style="margin-top:2rem">
+    <h3 style="margin-bottom:.25rem">VLM in Action: Image &rarr; Text Analysis</h3>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">The CTO&rsquo;s Slack message: &ldquo;Are we using any of these banned AI services?&rdquo;</p>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">Upload an architecture diagram and the VLM tells you what it sees.</p>
+    <div style="display:flex;gap:1.25rem;flex-wrap:wrap">
+      <div style="flex:0 0 260px;min-width:220px">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+          <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:1.5rem;min-height:180px;display:flex;align-items:center;justify-content:center">
+            <svg viewBox="0 0 200 140" width="200" height="140">
+              <rect x="5" y="10" width="55" height="28" rx="4" fill="#0B64DD" opacity=".8"/><text x="32" y="28" fill="#fff" font-size="7" text-anchor="middle" font-family="system-ui">API Gateway</text>
+              <rect x="72" y="2" width="55" height="28" rx="4" fill="#009191" opacity=".8"/><text x="99" y="20" fill="#fff" font-size="7" text-anchor="middle" font-family="system-ui">Lambda</text>
+              <rect x="72" y="38" width="55" height="28" rx="4" fill="#009191" opacity=".8"/><text x="99" y="56" fill="#fff" font-size="7" text-anchor="middle" font-family="system-ui">Rekognition</text>
+              <rect x="140" y="10" width="55" height="28" rx="4" fill="#0B64DD" opacity=".8"/><text x="167" y="28" fill="#fff" font-size="7" text-anchor="middle" font-family="system-ui">S3 Bucket</text>
+              <rect x="72" y="78" width="55" height="28" rx="4" fill="#FEC514" opacity=".8"/><text x="99" y="96" fill="#000" font-size="7" text-anchor="middle" font-family="system-ui">DynamoDB</text>
+              <rect x="140" y="78" width="55" height="28" rx="4" fill="#FEC514" opacity=".8"/><text x="167" y="96" fill="#000" font-size="7" text-anchor="middle" font-family="system-ui">SNS Topic</text>
+              <line x1="60" y1="24" x2="72" y2="16" stroke="#555" stroke-width="1"/>
+              <line x1="60" y1="24" x2="72" y2="52" stroke="#555" stroke-width="1"/>
+              <line x1="127" y1="16" x2="140" y2="24" stroke="#555" stroke-width="1"/>
+              <line x1="127" y1="52" x2="140" y2="24" stroke="#555" stroke-width="1"/>
+              <line x1="99" y1="66" x2="99" y2="78" stroke="#555" stroke-width="1"/>
+              <line x1="127" y1="92" x2="140" y2="92" stroke="#555" stroke-width="1"/>
+              <text x="100" y="130" fill="#888" font-size="6" text-anchor="middle" font-family="system-ui">cloud-architecture-v2.png</text>
+            </svg>
+          </div>
+          <div style="padding:.65rem .85rem;border-top:1px solid var(--border)">
+            <div style="font-size:.7rem;color:var(--text-dim)">Input Image</div>
+            <div style="font-size:.78rem;font-weight:500">Cloud Architecture Diagram</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:320px">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;height:100%;display:flex;flex-direction:column">
+          <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.5rem;font-weight:600">VLM Analysis</div>
+          <div style="background:rgba(0,145,145,.08);border:1px solid rgba(0,145,145,.2);border-radius:6px;padding:.6rem .8rem;margin-bottom:.75rem">
+            <div style="font-size:.65rem;color:var(--jina-teal);font-weight:600;margin-bottom:.2rem">PROMPT</div>
+            <div style="font-size:.8rem;color:var(--text)">What does this architecture diagram show? Identify all services and their connections.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+            <button id="vlmBtn" onclick="runVlm()" style="background:var(--jina-teal);color:#fff;border:none;padding:.35rem .85rem;border-radius:6px;font-family:var(--font);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s">Analyze</button>
+            <button id="vlmResetBtn" onclick="resetVlm()" style="background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);padding:.35rem .65rem;border-radius:6px;font-family:var(--font);font-size:.72rem;cursor:pointer;display:none">Reset</button>
+          </div>
+          <div id="vlmOutput" style="flex:1;font-size:.78rem;line-height:1.65;color:var(--text-muted);overflow-y:auto;max-height:220px">
+            <span style="color:var(--text-dim)">Click &ldquo;Analyze&rdquo; to run the VLM&hellip;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- QUICK REFERENCE TABLE -->
+<!-- ================================================================ -->
+<section class="full-bleed" data-nav="Quick Reference" data-group="jina">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-label jina">Jina AI</div>
+    <div class="scenario-intro fade-up">Your team&rsquo;s cheat sheet. Bookmark this one &mdash; you&rsquo;ll need it during the hands-on.</div>
+    <h2 class="fade-up">Quick Reference &mdash; Every Current Model</h2>
+    <div class="table-wrap fade-up">
+      <table>
+        <thead><tr><th>Model</th><th>Type</th><th>Params</th><th>Context</th><th>Languages</th><th>On EIS?</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr class="highlight-row"><td><strong>v5-text-small</strong></td><td>Embedding</td><td>677M</td><td>32K</td><td>119+</td><td>Yes</td><td>Default for text search &amp; RAG</td></tr>
+          <tr class="highlight-row"><td><strong>v5-text-nano</strong></td><td>Embedding</td><td>239M</td><td>32K</td><td>Multi</td><td>Yes</td><td>Edge, low-latency, budget</td></tr>
+          <tr><td>v4</td><td>Embedding</td><td>3.8B</td><td>32K</td><td>30+</td><td>No</td><td>Visual documents, multimodal search</td></tr>
+          <tr><td>jina-clip-v2</td><td>CLIP</td><td>865M</td><td>8K</td><td>89</td><td>No</td><td>Cross-modal text &harr; image</td></tr>
+          <tr class="highlight-row"><td><strong>jina-reranker-v3</strong></td><td>Reranker</td><td>600M</td><td>131K</td><td>100+</td><td>Yes</td><td>Best accuracy, listwise scoring</td></tr>
+          <tr class="highlight-row"><td><strong>jina-reranker-v2</strong></td><td>Reranker</td><td>278M</td><td>1K</td><td>100+</td><td>Yes</td><td>Fast, compact, function-calling</td></tr>
+          <tr><td>ReaderLM v2</td><td>SLM</td><td>1.5B</td><td>512K</td><td>29</td><td>No</td><td>HTML/PDF to Markdown/JSON</td></tr>
+          <tr><td>jina-vlm</td><td>VLM</td><td>2.4B</td><td>Multi-img</td><td>29</td><td>No</td><td>Visual QA, OCR, doc understanding</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- WHY IT MATTERS -->
+<!-- ================================================================ -->
+<section data-nav="Why It Matters" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Legal says the regulation text can&rsquo;t leave the cluster. So no, you can&rsquo;t just call OpenAI.</div>
+  <h2 class="fade-up">Why This Matters</h2>
+  <div class="two-col fade-up">
+    <div>
+      <h3>For Customer Conversations</h3>
+      <ul class="bullet-list jina">
+        <li><strong>Pure text search?</strong> &rarr; v5-text-small on EIS. Done.</li>
+        <li><strong>Documents with images/charts?</strong> &rarr; v4.</li>
+        <li><strong>Tight on budget/latency?</strong> &rarr; v5-text-nano.</li>
+        <li><strong>Need reranking precision?</strong> &rarr; Add Reranker v3.</li>
+        <li><strong>Quick PoC?</strong> &rarr; v5-text-small on EIS. One API call, one field type change. Working prototype in under an hour.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>vs. OpenAI / Cohere Embeddings</h3>
+      <div class="card" style="border-color:rgba(0,145,145,.3)">
+        <ul class="bullet-list jina" style="gap:.6rem">
+          <li><strong>No external API calls</strong> &mdash; Jina on EIS runs inside Elasticsearch</li>
+          <li><strong>No data leaving the cluster</strong> &mdash; text sent to EIS only, discarded after processing</li>
+          <li><strong>Predictable costs</strong> &mdash; part of Elastic Cloud subscription, not per-token third-party pricing</li>
+          <li><strong>Equal or better quality</strong> &mdash; v5-text-small matches/exceeds OpenAI on standard benchmarks</li>
+          <li><strong>OpenAI-compatible API schema</strong> &mdash; straightforward migration</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- JINA API SERVICE -->
+<!-- ================================================================ -->
+<section data-nav="Jina API" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">But first &mdash; you prototype with the Jina API to prove the approach works before touching production. No cluster needed.</div>
+  <h2 class="fade-up">Jina API Service &mdash; jina.ai</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">All Jina models are available directly via a REST API at <strong style="color:var(--text)">jina.ai</strong> &mdash; no Elastic cluster required. Instant access, no credit card or registration needed. SOC 2 Type 1 &amp; 2 compliant. Useful for quick prototyping, evaluation, or integrating into non-Elastic workflows.</p>
+
+  <div class="card-grid three fade-up">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Reader</span><span class="card-badge badge-eis">r.jina.ai</span></div>
+      <div class="card-desc">Prepend <code>r.jina.ai/</code> to any URL to get clean Markdown. Or use <code>s.jina.ai/</code> to search the web and get results already converted.</div>
+      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl "https://r.jina.ai/https://example.com"
+<span class="cc"># → clean Markdown</span>
+
+curl "https://s.jina.ai/EU AI Act biometric"
+<span class="cc"># → web search → clean results</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Embeddings</span><span class="card-badge badge-active">api.jina.ai</span></div>
+      <div class="card-desc">Generate embeddings via REST. Supports all Jina embedding models (v3, v5, CLIP). Pass text or images, get vectors back.</div>
+      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl https://api.jina.ai/v1/embeddings \
+  -H "Authorization: Bearer &lt;KEY&gt;" \
+  -d '{
+    <span class="cp">"model"</span>: <span class="cs">"jina-embeddings-v3"</span>,
+    <span class="cp">"input"</span>: [<span class="cs">"Your text here"</span>]
+  }'</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Reranker</span><span class="card-badge badge-active">api.jina.ai</span></div>
+      <div class="card-desc">Pass a query + documents, get them re-scored and re-ordered by relevance. Same v2/v3 models available on EIS.</div>
+      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl https://api.jina.ai/v1/rerank \
+  -H "Authorization: Bearer &lt;KEY&gt;" \
+  -d '{
+    <span class="cp">"model"</span>: <span class="cs">"jina-reranker-v3"</span>,
+    <span class="cp">"query"</span>: <span class="cs">"AI regulation"</span>,
+    <span class="cp">"documents"</span>: [<span class="cs">"..."</span>]
+  }'</div>
+    </div>
+  </div>
+
+  <div class="compare-row fade-up" style="margin-top:1.5rem">
+    <div class="callout">
+      <strong>MCP Server:</strong> Add <code>mcp.jina.ai</code> as an MCP server to access Reader, Embeddings, and Reranker directly from LLMs and AI agents. No custom integration code required.
+    </div>
+    <div class="callout gold">
+      <strong>Getting an API Key:</strong> Go to <strong>jina.ai</strong> &rarr; click &ldquo;How to get my API key?&rdquo; &rarr; key appears in the <strong>API Key &amp; Billing</strong> tab. Free tier with rate limits; add your key to requests for higher throughput.
+    </div>
+  </div>
+
+  <div class="callout blue fade-up" style="margin-top:1rem;max-width:900px">
+    <strong>Jina API vs EIS:</strong> The Jina API at jina.ai is great for prototyping and non-Elastic use cases. For production Elastic deployments, use <strong>EIS</strong> (next section) &mdash; same models, but managed inside Elasticsearch with no external calls, no data leaving the cluster, and integrated billing.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- WHAT IS EIS -->
+<!-- ================================================================ -->
+<section data-nav="What Is EIS" data-group="eis">
+  <div class="section-label eis">Part 2 &mdash; Elastic Inference Service</div>
+  <div class="scenario-intro fade-up">Prototype works. Now make it production-ready without provisioning GPU nodes at 2am.</div>
+  <h2 class="fade-up">What Is EIS?</h2>
+  <div class="two-col fade-up">
+    <div>
+      <p style="color:var(--text-muted);margin-bottom:1rem">Historically, running ML models in Elasticsearch meant provisioning dedicated ML nodes, managing GPU resources, scaling allocations, and monitoring model health. That&rsquo;s a lot of infrastructure just to enable semantic search.</p>
+      <ul class="bullet-list eis">
+        <li><strong>Managed ML inference as a service</strong> &mdash; embeddings, reranking, and LLM chat without deploying any ML nodes</li>
+        <li><strong>No GPU management</strong> &mdash; Elastic runs the models on their infrastructure</li>
+        <li><strong>Billed per million tokens</strong>, not VCU hours or node count</li>
+        <li><strong>Data stays in your cluster</strong> &mdash; only the text sent for inference is transmitted, discarded immediately after processing</li>
+      </ul>
+    </div>
+    <div>
+      <div class="callout blue">
+        <strong>The key idea:</strong> Instead of provisioning and scaling ML nodes yourself, EIS handles all of that. You configure an inference endpoint &mdash; one API call &mdash; and Elasticsearch uses it automatically for ingest, search, and chat. Zero infrastructure to manage.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- WHERE AVAILABLE -->
+<!-- ================================================================ -->
+<section data-nav="Where Available" data-group="eis">
+  <div class="section-label eis">EIS</div>
+  <div class="scenario-intro fade-up">Good news: your customer&rsquo;s cluster already has access. Here&rsquo;s the deployment map.</div>
+  <h2 class="fade-up">Where Is EIS Available?</h2>
+  <div class="table-wrap fade-up" style="max-width:900px">
+    <table>
+      <thead><tr><th>Deployment Type</th><th>Availability</th><th>Setup Required</th><th>Version</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Elastic Cloud Serverless</strong></td><td>Built-in, zero setup</td><td>None &mdash; pre-configured endpoints ready to use</td><td>GA</td></tr>
+        <tr><td><strong>Elastic Cloud Hosted</strong></td><td>Built-in, zero setup</td><td>None &mdash; pre-configured endpoints ready to use</td><td>GA</td></tr>
+        <tr><td><strong>Self-managed (ECE, ECK, standalone)</strong></td><td>Via Cloud Connect</td><td>Connect cluster to Elastic Cloud, enable EIS</td><td>9.3+</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout blue fade-up" style="max-width:900px;margin-top:1.5rem">
+    <strong>Cloud Connect for self-managed:</strong> Bridges your cluster to Elastic Cloud services without hosting them locally. After enabling, Elasticsearch <strong>automatically creates</strong> inference endpoints and Kibana AI connectors. Requires Enterprise license or active trial. Stack 9.3+.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- THREE MODES -->
+<!-- ================================================================ -->
+<section data-nav="Three Modes" data-group="eis">
+  <div class="section-label eis">EIS</div>
+  <div class="scenario-intro fade-up">Three ways to wire it up. For the compliance tool, Mode 1 is all you need &mdash; the models are already there.</div>
+  <h2 class="fade-up">The Three Modes</h2>
+  <div class="mode-cards fade-up">
+    <div class="mode-card">
+      <div class="mode-num">Mode 1</div>
+      <div class="mode-title">Pre-configured (Default)</div>
+      <div class="mode-desc">Exist out of the box on Serverless, Cloud Hosted, and Cloud Connect. No API calls needed &mdash; just reference the dot-prefixed ID:</div>
+      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem"><span class="cs">".jina-embeddings-v5-text-small"</span>
+<span class="cs">".jina-embeddings-v5-text-nano"</span>
+<span class="cs">".jina-reranker-v3"</span>
+<span class="cs">".elser-2-elastic"</span></div>
+    </div>
+    <div class="mode-card">
+      <div class="mode-num">Mode 2</div>
+      <div class="mode-title">Custom EIS Endpoints</div>
+      <div class="mode-desc">Create your own pointing to EIS-managed models. Still runs on Elastic&rsquo;s infrastructure:</div>
+      <div class="code-block" style="font-size:.72rem;padding:.75rem 1rem"><span class="ck">PUT</span> _inference/text_embedding/my-v5
+{
+  <span class="cp">"service"</span>: <span class="cs">"elastic"</span>,
+  <span class="cp">"service_settings"</span>: {
+    <span class="cp">"model_id"</span>: <span class="cs">"jina-embeddings-v5-text-small"</span>
+  }
+}</div>
+    </div>
+    <div class="mode-card">
+      <div class="mode-num">Mode 3</div>
+      <div class="mode-title">Third-Party / BYOK</div>
+      <div class="mode-desc">Your own API keys, external providers. Orchestrated through the same Inference API:</div>
+      <div class="code-block" style="font-size:.72rem;padding:.75rem 1rem"><span class="ck">PUT</span> _inference/text_embedding/my-oai
+{
+  <span class="cp">"service"</span>: <span class="cs">"openai"</span>,
+  <span class="cp">"service_settings"</span>: {
+    <span class="cp">"model_id"</span>: <span class="cs">"text-embedding-3-small"</span>,
+    <span class="cp">"api_key"</span>: <span class="cs">"&lt;YOUR_KEY&gt;"</span>
+  }
+}</div>
+    </div>
+  </div>
+  <div class="callout blue fade-up" style="margin-top:1.5rem">
+    <strong>Key difference:</strong> Modes 1 &amp; 2 run inference on Elastic&rsquo;s infrastructure (EIS). Mode 3 sends requests to external providers. All three are managed through the same Inference API.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- MODELS ON EIS — UPDATED FROM LIVE DATA -->
+<!-- ================================================================ -->
+<section class="full-bleed" data-nav="Models on EIS" data-group="eis">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-label eis">EIS</div>
+    <div class="scenario-intro fade-up">The full menu. For our compliance tool we need embeddings, a reranker, and an LLM for the agent. All here.</div>
+    <h2 class="fade-up">What&rsquo;s Available on EIS?</h2>
+
+    <h3 class="fade-up" style="margin-top:1.5rem;color:var(--elastic-light-blue)">LLM Chat Models (Elastic Managed)</h3>
+    <div class="table-wrap fade-up" style="margin-bottom:2rem">
+      <table>
+        <thead><tr><th>Author</th><th>Model</th><th>ID</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Anthropic</td><td>Claude Opus 4.6</td><td><code>anthropic-claude-4.6-opus</code></td><td>GA</td></tr>
+          <tr class="new-row"><td>Anthropic</td><td>Claude Sonnet 4.6</td><td><code>anthropic-claude-4.6-sonnet</code></td><td>Beta</td></tr>
+          <tr><td>Anthropic</td><td>Claude Opus 4.5</td><td><code>anthropic-claude-4.5-opus</code></td><td>GA</td></tr>
+          <tr><td>Anthropic</td><td>Claude Sonnet 4.5</td><td><code>anthropic-claude-4.5-sonnet</code></td><td>GA</td></tr>
+          <tr class="new-row"><td>Anthropic</td><td>Claude Haiku 4.5</td><td><code>anthropic-claude-4.5-haiku</code></td><td>Beta</td></tr>
+          <tr><td>Anthropic</td><td>Claude Sonnet 3.7</td><td><code>rainbow-sprinkles</code></td><td>GA (legacy)</td></tr>
+          <tr><td>Google</td><td>Gemini 2.5 Pro</td><td><code>google-gemini-2.5-pro</code></td><td>GA</td></tr>
+          <tr><td>Google</td><td>Gemini 2.5 Flash</td><td><code>google-gemini-2.5-flash</code></td><td>GA</td></tr>
+          <tr class="new-row"><td>Google</td><td>Gemini 2.5 Flash Lite</td><td><code>google-gemini-2.5-flash-lite</code></td><td>Beta</td></tr>
+          <tr><td>OpenAI</td><td>GPT-5.2</td><td><code>openai-gpt-5.2</code></td><td>GA</td></tr>
+          <tr><td>OpenAI</td><td>GPT-4.1</td><td><code>openai-gpt-4.1</code></td><td>GA</td></tr>
+          <tr><td>OpenAI</td><td>GPT-4.1 Mini</td><td><code>openai-gpt-4.1-mini</code></td><td>GA</td></tr>
+          <tr><td>OpenAI</td><td>GPT-OSS 120B</td><td><code>openai-gpt-oss-120b</code></td><td>GA</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="compare-row fade-up">
+      <div>
+        <h3 style="color:var(--jina-teal)">Embedding Models</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>ID</th><th>Dims</th><th>Service</th></tr></thead>
+            <tbody>
+              <tr class="highlight-row"><td><strong>Jina v5 Small</strong></td><td><code>jina-embeddings-v5-text-small</code></td><td>1,024</td><td>EIS</td></tr>
+              <tr class="highlight-row"><td><strong>Jina v5 Nano</strong></td><td><code>jina-embeddings-v5-text-nano</code></td><td>768</td><td>EIS</td></tr>
+              <tr class="highlight-row"><td>Jina v3</td><td><code>jina-embeddings-v3</code></td><td>1,024</td><td>EIS</td></tr>
+              <tr><td>ELSER v2 (EIS)</td><td><code>elser_model_2</code></td><td>sparse</td><td>EIS</td></tr>
+              <tr><td>ELSER v2 (ML node)</td><td><code>.elser_model_2_linux-x86_64</code></td><td>sparse</td><td>ES</td></tr>
+              <tr class="new-row"><td>E5 Large</td><td><code>microsoft-multilingual-e5-large</code></td><td>1,024</td><td>EIS (Beta)</td></tr>
+              <tr><td>E5 Small (ML node)</td><td><code>.multilingual-e5-small_linux-x86_64</code></td><td>&mdash;</td><td>ES</td></tr>
+              <tr><td>Gemini Emb 001</td><td><code>google-gemini-embedding-001</code></td><td>768</td><td>EIS</td></tr>
+              <tr><td>OpenAI Emb 3 Large</td><td><code>openai-text-embedding-3-large</code></td><td>3,072</td><td>EIS</td></tr>
+              <tr><td>OpenAI Emb 3 Small</td><td><code>openai-text-embedding-3-small</code></td><td>1,536</td><td>EIS</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 style="color:var(--jina-teal)">Rerankers</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>ID</th><th>Service</th></tr></thead>
+            <tbody>
+              <tr class="highlight-row"><td><strong>Jina Reranker v3</strong></td><td><code>jina-reranker-v3</code></td><td>EIS</td></tr>
+              <tr class="highlight-row"><td><strong>Jina Reranker v2</strong></td><td><code>jina-reranker-v2-base-multilingual</code></td><td>EIS</td></tr>
+              <tr><td>Rerank v1 (ML node)</td><td><code>.rerank-v1</code></td><td>ES</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout blue" style="margin-top:1rem;font-size:.85rem">
+          All LLMs: <strong>0-day data retention</strong>, data NOT used to train models, inference in US region. <span style="color:var(--elastic-green)">Green rows</span> = newly added (Beta).
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- HOW IT WORKS -->
+<!-- ================================================================ -->
+<section data-nav="How It Works" data-group="eis">
+  <div class="section-label eis">EIS</div>
+  <div class="scenario-intro fade-up">Three API calls. That&rsquo;s it. Map a field, search it, rerank the results. This is what you&rsquo;re about to build.</div>
+  <h2 class="fade-up">How It Works &mdash; End to End</h2>
+
+  <div class="pipeline fade-up">
+    <div class="pipe-step"><div class="step-num">Step 1</div><div class="step-title">Map</div><div class="step-detail"><code>semantic_text</code> field</div></div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step"><div class="step-num">Step 2</div><div class="step-title">Index</div><div class="step-detail">Auto-embed on ingest</div></div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step"><div class="step-num">Step 3</div><div class="step-title">Search</div><div class="step-detail"><code>match</code> &rarr; semantic</div></div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step"><div class="step-num">Step 4</div><div class="step-title">Rerank</div><div class="step-detail"><code>text_similarity_reranker</code></div></div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step"><div class="step-num">Step 5</div><div class="step-title">Results</div><div class="step-detail">Precision-ranked hits</div></div>
+  </div>
+
+  <div class="compare-row fade-up">
+    <div class="code-block"><span class="lang">Create index</span>
+<span class="ck">PUT</span> my-index
+{
+  <span class="cp">"mappings"</span>: {
+    <span class="cp">"properties"</span>: {
+      <span class="cp">"text"</span>: {
+        <span class="cp">"type"</span>: <span class="cs">"semantic_text"</span>,
+        <span class="cp">"inference_id"</span>: <span class="cs">".jina-embeddings-v5-text-small"</span>
+      }
+    }
+  }
+}</div>
+    <div class="code-block"><span class="lang">Search</span>
+<span class="ck">GET</span> my-index/_search
+{
+  <span class="cp">"query"</span>: {
+    <span class="cp">"match"</span>: {
+      <span class="cp">"text"</span>: <span class="cs">"soccer"</span>
+    }
+  }
+}
+
+<span class="cc">// Returns "Aberdeen Football Club"</span>
+<span class="cc">// because the model understands</span>
+<span class="cc">// football ≈ soccer semantically</span></div>
+    <div class="code-block"><span class="lang">Search + Rerank</span>
+<span class="ck">GET</span> my-index/_search
+{
+  <span class="cp">"retriever"</span>: {
+    <span class="cp">"text_similarity_reranker"</span>: {
+      <span class="cp">"retriever"</span>: {
+        <span class="cp">"standard"</span>: {
+          <span class="cp">"query"</span>: {
+            <span class="cp">"match"</span>: {
+              <span class="cp">"text"</span>: <span class="cs">"soccer"</span>
+            }
+          }
+        }
+      },
+      <span class="cp">"inference_id"</span>: <span class="cs">".jina-reranker-v3"</span>,
+      <span class="cp">"inference_text"</span>: <span class="cs">"soccer"</span>,
+      <span class="cp">"field"</span>: <span class="cs">"text"</span>,
+      <span class="cp">"rank_window_size"</span>: <span class="cs">50</span>
+    }
+  }
+}
+
+<span class="cc">// Same search, but results are</span>
+<span class="cc">// precision-reranked by the reranker</span></div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- HANDS-ON -->
+<!-- ================================================================ -->
+<section data-nav="Hands-On" data-group="handson">
+  <div class="section-label" style="color:var(--elastic-gold)">Part 3 &mdash; Hands-On</div>
+  <div class="scenario-intro fade-up">Your turn. Build the tool that would have saved your team a week of panic.</div>
+  <h2 class="fade-up">Let&rsquo;s Build It</h2>
+  <p class="fade-up" style="color:var(--text-muted);font-size:1.05rem;margin-bottom:2rem;max-width:700px">Three notebooks, one full pipeline &mdash; from raw PDF to precision-ranked semantic search. Then we&rsquo;ll explore the interactive UI demo.</p>
+
+  <div class="handson-grid fade-up">
+    <div class="handson-card">
+      <div class="handson-num">01</div>
+      <h3>Ingest</h3>
+      <p style="color:var(--text-muted);font-size:.85rem">Jina Reader converts the EU AI Act PDF into clean, structured markdown. Chunked by article for legal context preservation.</p>
+    </div>
+    <div class="handson-card">
+      <div class="handson-num">02</div>
+      <h3>Index</h3>
+      <p style="color:var(--text-muted);font-size:.85rem">Jina Embeddings v5 on EIS. <code>semantic_text</code> field type &mdash; zero-config vector search. One mapping change, done.</p>
+    </div>
+    <div class="handson-card">
+      <div class="handson-num">03</div>
+      <h3>Rerank</h3>
+      <p style="color:var(--text-muted);font-size:.85rem">Jina Reranker via <code>text_similarity_reranker</code> retriever. Side-by-side before vs. after &mdash; see the precision difference.</p>
+    </div>
+  </div>
+
+  <div class="section-divider fade-up"></div>
+
+  <div class="card fade-up" style="max-width:700px;margin-top:1rem">
+    <div class="card-header"><span class="card-title">Then: The Interactive Demo App</span></div>
+    <div class="card-desc" style="margin-bottom:0">
+      <strong>Search tab:</strong> Semantic search + Deep Analysis (reranking with before/after) &bull;
+      <strong>Agent tab:</strong> AI agent with EU AI Act expertise + VLM architecture diagram analysis &bull;
+      <strong>Data Lab:</strong> Watch the full ingestion pipeline execute live
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const sections = document.querySelectorAll('section[data-nav]');
+  const navContainer = document.getElementById('navSections');
+  const progress = document.getElementById('progress');
+  const nav = document.getElementById('nav');
+
+  sections.forEach((sec, i) => {
+    const pill = document.createElement('a');
+    pill.className = 'nav-pill' + (sec.dataset.group === 'jina' ? ' jina' : '');
+    pill.textContent = sec.dataset.nav;
+    pill.href = '#';
+    pill.addEventListener('click', e => { e.preventDefault(); sec.scrollIntoView({ behavior: 'smooth' }); });
+    pill.dataset.idx = i;
+    navContainer.appendChild(pill);
+  });
+
+  const pills = navContainer.querySelectorAll('.nav-pill');
+  let currentIdx = 0;
+  let lastScroll = 0;
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = [...sections].indexOf(entry.target);
+        if (idx >= 0) {
+          currentIdx = idx;
+          pills.forEach(p => p.classList.remove('active'));
+          pills[idx].classList.add('active');
+          pills[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          progress.style.width = ((idx + 1) / sections.length * 100) + '%';
+        }
+      }
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+
+  
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      const next = Math.min(currentIdx + 1, sections.length - 1);
+      sections[next].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const prev = Math.max(currentIdx - 1, 0);
+      sections[prev].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  sections[0].querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+})();
+
+/* ============================
+   RERANKER BEFORE/AFTER DEMO
+   ============================ */
+const rerankData = {
+  naive: [
+    {id:'r1', title:'Art. 5 — Prohibited AI Practices', desc:'General prohibitions on AI systems deemed unacceptable', score:0.81},
+    {id:'r2', title:'Art. 52 — Transparency for AI Systems', desc:'Disclosure obligations for AI interacting with people', score:0.79},
+    {id:'r3', title:'Art. 6 — Classification of High-Risk AI', desc:'Criteria for classifying AI as high-risk', score:0.77},
+    {id:'r4', title:'Art. 26 — Obligations of Deployers', desc:'Responsibilities when deploying high-risk AI', score:0.74},
+    {id:'r5', title:'Art. 9 — Risk Management System', desc:'Establishing risk management for high-risk AI', score:0.71}
+  ],
+  reranked: [
+    {origIdx:2, title:'Art. 6 — Classification of High-Risk AI', desc:'Annex III explicitly lists biometric identification including facial recognition as high-risk', score:0.96, move:'↑2'},
+    {origIdx:0, title:'Art. 5 — Prohibited AI Practices', desc:'Bans real-time remote biometric identification by law enforcement with narrow exceptions', score:0.93, move:'↓1'},
+    {origIdx:3, title:'Art. 26 — Obligations of Deployers', desc:'Law enforcement deployers must conduct fundamental rights impact assessments for biometrics', score:0.89, move:'↑1'},
+    {origIdx:4, title:'Art. 9 — Risk Management System', desc:'Facial recognition systems require specific risk assessment including bias testing', score:0.85, move:'↑1'},
+    {origIdx:1, title:'Art. 52 — Transparency for AI Systems', desc:'General transparency rules; not specific to law enforcement facial recognition', score:0.62, move:'↓3'}
+  ]
+};
+
+function runRerank() {
+  const btn = document.getElementById('rerankBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const status = document.getElementById('rerankStatus');
+  const accent = document.getElementById('rerankAccent');
+  btn.disabled = true;
+  btn.style.opacity = '.5';
+  status.textContent = 'Sending to Jina Reranker v3…';
+
+  setTimeout(() => {
+    status.textContent = 'Analyzing relevance…';
+    setTimeout(() => {
+      status.textContent = 'Reranking complete';
+      accent.style.background = 'var(--jina-teal)';
+      const results = document.getElementById('rerankedResults').children;
+      rerankData.reranked.forEach((r, i) => {
+        const el = results[i];
+        el.style.opacity = '1';
+        el.style.background = i === 0 ? 'rgba(0,145,145,.1)' : 'rgba(255,255,255,.02)';
+        el.style.borderColor = i === 0 ? 'rgba(0,145,145,.3)' : 'rgba(255,255,255,.04)';
+        el.querySelector('.rerank-pos').textContent = '#' + (i + 1);
+        el.querySelector('.rerank-score').textContent = r.score.toFixed(2);
+        el.querySelector('.rerank-score').style.color = r.score > 0.85 ? 'var(--jina-teal)' : 'var(--text-muted)';
+        const titleDiv = el.querySelectorAll('div')[1];
+        titleDiv.children[0].textContent = r.title;
+        titleDiv.children[1].textContent = r.desc;
+        const moveSpan = el.querySelector('.rerank-move');
+        moveSpan.textContent = r.move;
+        moveSpan.style.color = r.move.startsWith('↑') ? '#4caf87' : '#e57373';
+      });
+      btn.style.display = 'none';
+      resetBtn.style.display = '';
+      setTimeout(() => { status.textContent = ''; }, 2000);
+    }, 600);
+  }, 500);
+}
+
+function resetRerank() {
+  const btn = document.getElementById('rerankBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const accent = document.getElementById('rerankAccent');
+  accent.style.background = 'var(--text-dim)';
+  btn.style.display = '';
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  resetBtn.style.display = 'none';
+  const results = document.getElementById('rerankedResults').children;
+  for (let i = 0; i < results.length; i++) {
+    const el = results[i];
+    el.style.opacity = '.3';
+    el.style.background = 'rgba(255,255,255,.02)';
+    el.style.borderColor = 'rgba(255,255,255,.04)';
+    el.querySelector('.rerank-pos').textContent = '#' + (i + 1);
+    el.querySelector('.rerank-score').textContent = '—';
+    el.querySelector('.rerank-score').style.color = 'var(--text-muted)';
+    const titleDiv = el.querySelectorAll('div')[1];
+    titleDiv.children[0].innerHTML = i === 0 ? 'Waiting for rerank\u2026' : '&nbsp;';
+    titleDiv.children[1].innerHTML = '&nbsp;';
+    el.querySelector('.rerank-move').innerHTML = '&nbsp;';
+  }
+}
+
+/* ============================
+   EMBEDDING SIMILARITY DEMO
+   ============================ */
+(function(){
+  const phrases = [
+    'fix a leaky faucet',
+    'repairing dripping taps',
+    'plumbing repair guide',
+    'quantum physics research',
+    'train a neural network'
+  ];
+  const shortNames = ['Faucet','Taps','Plumbing','Quantum','Neural'];
+  const sims = [
+    [1.00, 0.92, 0.89, 0.12, 0.18],
+    [0.92, 1.00, 0.87, 0.10, 0.15],
+    [0.89, 0.87, 1.00, 0.14, 0.21],
+    [0.12, 0.10, 0.14, 1.00, 0.31],
+    [0.18, 0.15, 0.21, 0.31, 1.00]
+  ];
+  const colors = ['#009191','#009191','#009191','#FEC514','#0B64DD'];
+  const points = [
+    {x:60,  y:80},
+    {x:75,  y:95},
+    {x:50,  y:110},
+    {x:190, y:40},
+    {x:175, y:155}
+  ];
+
+  function simColor(v) {
+    if (v >= 0.85) return 'var(--jina-teal)';
+    if (v >= 0.50) return 'var(--text-muted)';
+    return 'var(--text-dim)';
+  }
+
+  const tbody = document.getElementById('simBody');
+  phrases.forEach((_, i) => {
+    const tr = document.createElement('tr');
+    const th = document.createElement('td');
+    th.style.cssText = 'padding:.35rem .5rem;border-bottom:1px solid var(--border);color:' + colors[i] + ';font-weight:600';
+    th.textContent = shortNames[i];
+    tr.appendChild(th);
+    sims[i].forEach((v, j) => {
+      const td = document.createElement('td');
+      td.style.cssText = 'padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:' + simColor(v);
+      if (i === j) { td.textContent = '—'; td.style.color = 'var(--text-dim)'; }
+      else td.textContent = v.toFixed(2);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  const svg = document.getElementById('embSvg');
+  points.forEach((p, i) => {
+    points.forEach((q, j) => {
+      if (j <= i) return;
+      if (sims[i][j] < 0.5) return;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', p.x); line.setAttribute('y1', p.y);
+      line.setAttribute('x2', q.x); line.setAttribute('y2', q.y);
+      line.setAttribute('stroke', colors[i]);
+      line.setAttribute('stroke-opacity', sims[i][j] * 0.4);
+      line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+    });
+  });
+  points.forEach((p, i) => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx', p.x); c.setAttribute('cy', p.y);
+    c.setAttribute('r', '7');
+    c.setAttribute('fill', colors[i]);
+    c.setAttribute('opacity', '0.85');
+    svg.appendChild(c);
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', p.x); t.setAttribute('y', p.y - 12);
+    t.setAttribute('fill', '#aaa');
+    t.setAttribute('font-size', '8');
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-family', 'system-ui');
+    t.textContent = shortNames[i];
+    svg.appendChild(t);
+  });
+})();
+
+/* ============================
+   READER BEFORE/AFTER DEMO
+   ============================ */
+const readerCleanText = `# Article 5 – Prohibited AI Practices
+
+The following AI practices shall be prohibited:
+
+## (a) Subliminal Techniques
+The placing on the market, the putting into service, or the
+use of an AI system that deploys subliminal techniques
+beyond a person's consciousness in order to materially
+distort a person's behaviour in a manner that causes or
+is reasonably likely to cause that person or another
+person physical or psychological harm.
+
+## (b) Exploitation of Vulnerabilities
+AI systems that exploit vulnerabilities of a specific group
+of persons due to their age, disability, or social or
+economic situation.
+
+---
+*Source: EU AI Act – Official Journal of the European Union*
+*Retrieved via r.jina.ai — scripts, nav, ads, cookies removed*`;
+
+function runReader() {
+  const btn = document.getElementById('readerBtn');
+  const resetBtn = document.getElementById('readerResetBtn');
+  const accent = document.getElementById('readerAccent');
+  const clean = document.getElementById('readerClean');
+  btn.disabled = true;
+  btn.style.opacity = '.5';
+
+  const rawEl = document.getElementById('readerRaw');
+  rawEl.style.transition = 'opacity .4s';
+  rawEl.style.opacity = '.4';
+
+  setTimeout(() => {
+    accent.style.background = 'var(--jina-teal)';
+    clean.style.opacity = '1';
+    clean.textContent = readerCleanText;
+    clean.style.color = 'var(--text)';
+    rawEl.style.opacity = '.25';
+    btn.style.display = 'none';
+    resetBtn.style.display = '';
+  }, 700);
+}
+
+function resetReader() {
+  const btn = document.getElementById('readerBtn');
+  const resetBtn = document.getElementById('readerResetBtn');
+  const accent = document.getElementById('readerAccent');
+  const clean = document.getElementById('readerClean');
+  const rawEl = document.getElementById('readerRaw');
+  accent.style.background = 'var(--text-dim)';
+  clean.style.opacity = '.3';
+  clean.textContent = 'Waiting for Reader processing\u2026';
+  clean.style.color = 'var(--text-muted)';
+  rawEl.style.opacity = '1';
+  btn.style.display = '';
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  resetBtn.style.display = 'none';
+}
+
+/* ============================
+   VLM ANALYSIS DEMO
+   ============================ */
+const vlmResponseLines = [
+  'This architecture diagram shows a **serverless image processing pipeline** on AWS with the following components:',
+  '',
+  '**Services identified:**',
+  '• **API Gateway** — Entry point for client requests, routes to processing functions',
+  '• **Lambda** — Serverless compute that orchestrates the image analysis workflow',
+  '• **Amazon Rekognition** — AI/ML service performing image classification and object detection',
+  '• **S3 Bucket** — Object storage for uploaded images and processed results',
+  '• **DynamoDB** — NoSQL database storing analysis metadata and results',
+  '• **SNS Topic** — Notification service for downstream consumers when analysis completes',
+  '',
+  '**Data flow:**',
+  '1. Client sends image via API Gateway',
+  '2. Lambda receives request, stores image in S3, triggers Rekognition',
+  '3. Rekognition analyzes image, returns labels/detections to Lambda',
+  '4. Lambda writes results to DynamoDB',
+  '5. SNS notifies subscribed services of completion',
+  '',
+  '⚠️ **Compliance note:** If Rekognition is used for facial recognition, this system may be classified as **high-risk AI** under EU AI Act Article 6 / Annex III.'
+];
+
+let vlmTimer = null;
+function runVlm() {
+  const btn = document.getElementById('vlmBtn');
+  const resetBtn = document.getElementById('vlmResetBtn');
+  const output = document.getElementById('vlmOutput');
+  btn.disabled = true;
+  btn.style.opacity = '.5';
+  output.innerHTML = '<span style="color:var(--text-dim)">Analyzing image with Jina VLM…</span>';
+
+  let lineIdx = 0;
+  setTimeout(() => {
+    output.innerHTML = '';
+    vlmTimer = setInterval(() => {
+      if (lineIdx >= vlmResponseLines.length) {
+        clearInterval(vlmTimer);
+        vlmTimer = null;
+        btn.style.display = 'none';
+        resetBtn.style.display = '';
+        return;
+      }
+      const line = vlmResponseLines[lineIdx];
+      const p = document.createElement('div');
+      p.style.marginBottom = '.15rem';
+      p.innerHTML = line
+        .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--text)">$1</strong>')
+        .replace(/⚠️/g, '<span style="color:#FEC514">⚠️</span>')
+        || '&nbsp;';
+      output.appendChild(p);
+      output.scrollTop = output.scrollHeight;
+      lineIdx++;
+    }, 80);
+  }, 500);
+}
+
+function resetVlm() {
+  if (vlmTimer) { clearInterval(vlmTimer); vlmTimer = null; }
+  const btn = document.getElementById('vlmBtn');
+  const resetBtn = document.getElementById('vlmResetBtn');
+  const output = document.getElementById('vlmOutput');
+  output.innerHTML = '<span style="color:var(--text-dim)">Click "Analyze" to run the VLM\u2026</span>';
+  btn.style.display = '';
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  resetBtn.style.display = 'none';
+}
+</script>
+</body>
+</html>
