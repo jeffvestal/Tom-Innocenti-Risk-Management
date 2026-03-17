@@ -32,9 +32,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:
 .nav-pill.active{color:var(--elastic-light-blue);background:rgba(11,100,221,.12);border-color:rgba(11,100,221,.25)}
 .nav-pill.jina.active{color:var(--jina-teal);background:rgba(0,145,145,.12);border-color:rgba(0,145,145,.25)}
 
-section{min-height:100vh;padding:6rem 2rem 4rem;display:flex;flex-direction:column;justify-content:center;max-width:1200px;margin:0 auto}
+section{min-height:100vh;padding:4.5rem 2rem 2.5rem;display:flex;flex-direction:column;justify-content:center;max-width:1200px;margin:0 auto}
 section.full-bleed{max-width:none;padding-left:4rem;padding-right:4rem}
-section.auto-height{min-height:auto;padding-top:4rem;padding-bottom:4rem}
+section.auto-height{min-height:auto;padding-top:3rem;padding-bottom:2.5rem}
 
 .title-section{align-items:center;text-align:center;gap:2rem}
 .title-logos{display:flex;align-items:center;gap:2rem;margin-bottom:1rem}
@@ -50,7 +50,7 @@ h1{font-size:3.2rem;font-weight:800;letter-spacing:-.03em;line-height:1.15;backg
 .section-label::before{content:'';width:24px;height:2px;border-radius:1px}
 .section-label.jina::before{background:var(--jina-teal)}
 .section-label.eis::before{background:var(--elastic-blue)}
-h2{font-size:2.4rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:1.5rem}
+h2{font-size:2rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:1.25rem}
 h3{font-size:1.3rem;font-weight:600;margin-bottom:1rem;color:var(--text)}
 
 .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem}
@@ -143,14 +143,35 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
 .hero-card{background:var(--bg-card);border:2px solid rgba(254,197,20,.35);border-radius:14px;padding:2rem;position:relative;overflow:hidden}
 .hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--elastic-gold),var(--jina-teal))}
 
+section img:not(.lightbox img){cursor:zoom-in}
+
+.lightbox{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(4px)}
+.lightbox.active{display:flex}
+.lightbox img{max-width:95vw;max-height:95vh;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+
+.concept,.card,.compare-box,.mode-card,.hero-card{cursor:pointer}
+
+.card-focus{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;cursor:default;backdrop-filter:blur(4px);padding:2rem;overflow-y:auto}
+.card-focus.active{display:flex}
+.card-focus-content{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:2.5rem;max-width:700px;width:100%;box-shadow:0 12px 60px rgba(0,0,0,.5);position:relative}
+.card-focus-content .concept-term,.card-focus-content .card-title,.card-focus-content .mode-title,.card-focus-content h3{font-size:1.4rem;margin-bottom:.6rem}
+.card-focus-content .concept-def,.card-focus-content .card-desc,.card-focus-content .mode-desc,.card-focus-content .bullet-list li{font-size:1.05rem;line-height:1.7}
+.card-focus-content .card-stats{gap:1.25rem}
+.card-focus-content .stat-value{font-size:1.1rem}
+.card-focus-content .stat-label{font-size:.75rem}
+.card-focus-content .code-block{font-size:.85rem}
+
 @media(max-width:900px){
   .card-grid,.card-grid.three,.compare-row,.mode-cards,.handson-grid,.two-col,.concept-grid{grid-template-columns:1fr}
   h1{font-size:2.2rem}h2{font-size:1.8rem}
-  section{padding:5rem 1.25rem 3rem}
+  section{padding:4rem 1.25rem 2rem}
 }
 </style>
 </head>
 <body>
+
+<div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
+<div class="card-focus" id="cardFocus"><div class="card-focus-content" id="cardFocusContent"></div></div>
 
 <div id="progress"></div>
 
@@ -172,14 +193,77 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
     <span class="x">&times;</span>
     <svg viewBox="0 0 205 204" xmlns="http://www.w3.org/2000/svg" height="48"><path d="M80.43 87.74l44.77 20.41 45.16-39.57c2.29-11.41.56-23.26-4.88-33.54-5.44-10.28-14.32-18.37-25.04-22.9-10.72-4.52-22.67-5.2-33.84-1.93-11.17 3.27-20.86 10.3-27.44 19.9l-7.52 39.01 8.74 18.63z" fill="#FEC514"/><path d="M34.1 135.15c-2.33 11.46-.62 23.38 4.84 33.72 5.46 10.34 14.34 18.48 25.12 23.02 10.78 4.54 22.8 5.21 34.02 1.89 11.22-3.32 20.94-10.42 27.51-20.1l7.45-38.84-10-19-44.89-20.5-43.04 39.81z" fill="#02BCB7"/><path d="M33.79 57.68l30.7 7.24 6.72-34.88c-4.17-3.16-9.26-4.88-14.49-4.91-5.24-.03-10.34 1.63-14.55 4.74-4.21 3.11-7.3 7.5-8.81 12.51-1.51 5.01-1.36 10.38.43 15.3z" fill="#F04E98"/><path d="M31.15 64.98c-6.63 2.19-12.42 6.38-16.58 11.99-4.16 5.61-6.47 12.38-6.63 19.36-.16 6.98 1.84 13.84 5.74 19.64 3.89 5.8 9.48 10.25 16.01 12.75l42.99-38.91-7.89-16.83-33.64-8z" fill="#1BA9F5"/><path d="M133.44 173.68c3.57 2.75 7.84 4.44 12.33 4.89 4.49.44 9.01-.39 13.05-2.38 4.04-2 7.44-5.09 9.81-8.92 2.37-3.84 3.62-8.26 3.6-12.77.01-2.87-.49-5.72-1.47-8.41l-30.65-7.17-6.68 34.76z" fill="#9ADC30"/><path d="M139.68 130.89l33.75 7.89c6.74-2.27 12.6-6.59 16.76-12.35 4.17-5.76 6.43-12.67 6.48-19.78-.01-6.85-2.1-13.54-5.99-19.18-3.9-5.64-9.42-9.96-15.83-12.38l-44.13 38.67 8.96 17.13z" fill="#0B64DD"/></svg>
   </div>
-  <h1 class="fade-up">&ldquo;We Might Be Illegal in Europe&rdquo;</h1>
-  <p class="subtitle fade-up">Building a compliance search tool with Jina AI + Elastic Inference Service &mdash; before the lawyers&rsquo; deadline.</p>
+  <p class="fade-up" style="font-size:.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.12em;font-weight:600">Customer scenario</p>
+  <h1 class="fade-up" style="font-size:2.2rem;font-weight:400;line-height:1.4">A customer&rsquo;s app may violate complex EU regulations.</h1>
+  <p class="fade-up" style="font-size:1.5rem;color:var(--text-muted);font-style:italic;margin-top:-.5rem;margin-bottom:1.5rem">They need a compliance search tool &mdash; yesterday.</p>
+  <p class="subtitle fade-up">We build it with Jina AI + Elastic Inference Service before the lawyers&rsquo; deadline.</p>
   <div class="meta fade-up">
-    <span>A story about shipping first and reading the fine print second</span>
+    <span>A running story that ties every concept back to a real use case</span>
     <span>&bull;</span>
     <span>~30 min talk + hands-on</span>
     <span>&bull;</span>
     <span>Internal Enablement</span>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- TL;DR — 10-MINUTE BRIEFING (3 slides) -->
+<!-- ================================================================ -->
+<section data-nav="TL;DR" data-group="title">
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;font-style:italic;margin-bottom:.5rem">You just started at Elastic. You have a customer call in 10 minutes.</p>
+  <h2 class="fade-up">Two Things to Know</h2>
+  <p class="fade-up" style="color:var(--text-muted);font-size:1rem;margin-bottom:2rem;max-width:700px">We&rsquo;ll go deep later. For now, just these two ideas:</p>
+  <div class="compare-row fade-up" style="max-width:800px">
+    <div class="card" style="text-align:center;border-color:rgba(0,145,145,.3);padding:2rem">
+      <div style="font-size:1.5rem;font-weight:700;color:var(--jina-teal);margin-bottom:.35rem">Jina AI</div>
+      <div style="color:var(--text);font-size:.95rem;font-weight:500">The <strong>models</strong> that make your search powerful</div>
+      <div style="color:var(--text-muted);font-size:.8rem;margin-top:.35rem">Best-in-class multilingual embeddings,<br>Built into Elastic<br>Out-of-the-box</div>
+    </div>
+    <div class="card" style="text-align:center;border-color:rgba(11,100,221,.3);padding:2rem">
+      <div style="font-size:1.5rem;font-weight:700;color:var(--elastic-light-blue);margin-bottom:.35rem">Elastic Inference Service</div>
+      <div style="color:var(--text);font-size:.95rem;font-weight:500">The <strong>service</strong> that runs them</div>
+      <div style="color:var(--text-muted);font-size:.8rem;margin-top:.35rem">On Serverless,<br>Models deployed and ready<br>Just use it</div>
+    </div>
+  </div>
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-top:2rem;text-align:center">Next two slides break each one down. Then we go deep.</p>
+</section>
+
+<section data-nav="TL;DR" data-group="title">
+  <div class="section-label jina" style="margin-bottom:.5rem">The Models</div>
+  <h2 class="fade-up">Jina AI &mdash; What to Tell a Customer</h2>
+  <div class="fade-up" style="max-width:800px">
+    <div class="card" style="border-color:rgba(0,145,145,.3);padding:2rem">
+      <ul class="bullet-list jina" style="gap:1rem">
+        <li>Jina AI builds <strong>state-of-the-art search models</strong> &mdash; the AI that makes search understand <em>meaning</em>, not just keywords.</li>
+        <li>The one model to remember: <strong style="color:var(--elastic-gold);font-size:1.05rem">jina-embeddings-v5-text-small</strong>. It&rsquo;s the <strong>new default embedding model</strong> &mdash; <strong>119+ languages</strong> out of the box.</li>
+        <li><strong>Rerankers</strong> &mdash; re-order search results for precision</li>
+        <li><strong>Reader</strong> &mdash; converts messy HTML and PDFs into clean text</li>
+        <li><strong>Vision model</strong> &mdash; understands images and diagrams</li>
+        <li>All models run in <strong>Elastic Inference Service</strong> &mdash; fully managed, nothing to deploy or maintain.</li>
+      </ul>
+    </div>
+    <div class="callout fade-up" style="margin-top:1.25rem">
+      <strong>The short version:</strong><br>Jina builds the models.<br>You use them in Elastic.<br>Data never leaves the cluster.
+    </div>
+  </div>
+</section>
+
+<section data-nav="TL;DR" data-group="title">
+  <div class="section-label eis" style="margin-bottom:.5rem">The Service</div>
+  <h2 class="fade-up">Elastic Inference Service &mdash; What to Tell a Customer</h2>
+  <div class="fade-up" style="max-width:800px">
+    <div class="card" style="border-color:rgba(11,100,221,.3);padding:2rem">
+      <ul class="bullet-list eis" style="gap:1rem">
+        <li><strong>Managed inference service</strong> built into Elasticsearch. No ML nodes to provision, no GPUs to manage.</li>
+        <li>On Serverless: <strong style="color:var(--elastic-gold);font-size:1.05rem">already on and running, zero setup</strong>. Pre-configured endpoints are ready to use out of the box.</li>
+        <li>What&rsquo;s available: <strong>Jina embeddings + rerankers</strong>, plus <strong>LLMs from OpenAI, Anthropic, and Google</strong> &mdash; all through the same API.</li>
+        <li>How it works: map a <code>semantic_text</code> field &rarr; index your data &rarr; search. Embedding happens <strong>automatically</strong> at ingest.</li>
+        <li>Billed <strong>per million tokens</strong>, not by infrastructure. No surprise GPU bills.</li>
+      </ul>
+    </div>
+    <div class="callout blue fade-up" style="margin-top:1.25rem">
+      <strong>The short version:</strong><br>Elastic Inference Service runs all these models for you.<br>On Serverless, it&rsquo;s already there.<br>You just use it.
+    </div>
   </div>
 </section>
 
@@ -215,6 +299,14 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
   </div>
 </section>
 
+<section data-nav="What Is Jina" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Search Pipeline Architecture</h2>
+  <div class="fade-up">
+    <img src="assets/pipeline-architecture.png" alt="Search pipeline architecture — EU AI Act compliance tool" style="width:100%;border-radius:8px">
+  </div>
+</section>
+
 <!-- ================================================================ -->
 <!-- KEY CONCEPTS -->
 <!-- ================================================================ -->
@@ -241,43 +333,56 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
       <div class="concept-def">Small, lightweight plugin modules (a few million extra parameters) attached to one base model. Instead of deploying separate models for retrieval, classification, and clustering, customers <strong style="color:var(--text)">deploy one model and switch tasks by selecting the adapter at query time</strong>. One deployment, not three. Simpler infrastructure, lower cost.</div>
     </div>
   </div>
+</section>
 
-  <div class="fade-up" style="margin-top:2rem">
-    <h3 style="margin-bottom:.25rem">Try It: Embedding Similarity</h3>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">This is why &ldquo;facial recognition&rdquo; finds &ldquo;biometric identification&rdquo; &mdash; same neighborhood in vector space.</p>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">See how similar meanings cluster together, even with completely different words.</p>
-    <div id="embeddingDemo" style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
-      <div style="flex:1;min-width:280px">
-        <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem" id="embPhrases">
-          <span class="emb-tag" data-idx="0" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;fix a leaky faucet&rdquo;</span>
-          <span class="emb-tag" data-idx="1" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;repairing dripping taps&rdquo;</span>
-          <span class="emb-tag" data-idx="2" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;plumbing repair guide&rdquo;</span>
-          <span class="emb-tag" data-idx="3" style="background:rgba(254,197,20,.2);border:1px solid rgba(254,197,20,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;quantum physics research&rdquo;</span>
-          <span class="emb-tag" data-idx="4" style="background:rgba(11,100,221,.2);border:1px solid rgba(11,100,221,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;train a neural network&rdquo;</span>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:.72rem;font-family:var(--mono)" id="simMatrix">
-          <thead>
-            <tr>
-              <th style="padding:.35rem .5rem;text-align:left;border-bottom:1px solid var(--border);color:var(--text-dim)">Cosine Similarity</th>
-              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="fix a leaky faucet">Faucet</th>
-              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="repairing dripping taps">Taps</th>
-              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="plumbing repair guide">Plumbing</th>
-              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:#FEC514" title="quantum physics research">Quantum</th>
-              <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--elastic-blue)" title="train a neural network">Neural</th>
-            </tr>
-          </thead>
-          <tbody id="simBody"></tbody>
-        </table>
+<section data-nav="Key Concepts" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Visualizing Embeddings &amp; Matryoshka</h2>
+  <div class="fade-up" style="display:flex;gap:1.5rem;flex-wrap:wrap">
+    <div style="flex:1;min-width:300px">
+      <img src="assets/embedding-vector-space.png" alt="Embedding vector space — semantic clusters" style="width:100%;border-radius:8px">
+    </div>
+    <div style="flex:1;min-width:300px">
+      <img src="assets/matryoshka-dimensions.png" alt="Matryoshka representation learning — dimension truncation" style="width:100%;border-radius:8px">
+    </div>
+  </div>
+</section>
+
+<section data-nav="Key Concepts" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Try It: Embedding Similarity</h2>
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">This is why &ldquo;facial recognition&rdquo; finds &ldquo;biometric identification&rdquo; &mdash; same neighborhood in vector space. See how similar meanings cluster together, even with completely different words.</p>
+  <div class="fade-up" id="embeddingDemo" style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1;min-width:280px">
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem" id="embPhrases">
+        <span class="emb-tag" data-idx="0" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;fix a leaky faucet&rdquo;</span>
+        <span class="emb-tag" data-idx="1" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;repairing dripping taps&rdquo;</span>
+        <span class="emb-tag" data-idx="2" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;plumbing repair guide&rdquo;</span>
+        <span class="emb-tag" data-idx="3" style="background:rgba(254,197,20,.2);border:1px solid rgba(254,197,20,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;quantum physics research&rdquo;</span>
+        <span class="emb-tag" data-idx="4" style="background:rgba(11,100,221,.2);border:1px solid rgba(11,100,221,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;train a neural network&rdquo;</span>
       </div>
-      <div style="flex:0 0 260px;min-width:200px">
-        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center">
-          <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">2D Vector Space</div>
-          <svg id="embSvg" viewBox="0 0 240 200" style="width:100%;height:auto"></svg>
-          <div style="display:flex;justify-content:center;gap:.75rem;margin-top:.5rem;font-size:.65rem;color:var(--text-dim)">
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--jina-teal);vertical-align:middle"></span> Plumbing</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FEC514;vertical-align:middle"></span> Physics</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--elastic-blue);vertical-align:middle"></span> ML</span>
-          </div>
+      <table style="width:100%;border-collapse:collapse;font-size:.72rem;font-family:var(--mono)" id="simMatrix">
+        <thead>
+          <tr>
+            <th style="padding:.35rem .5rem;text-align:left;border-bottom:1px solid var(--border);color:var(--text-dim)">Cosine Similarity</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="fix a leaky faucet">Faucet</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="repairing dripping taps">Taps</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="plumbing repair guide">Plumbing</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:#FEC514" title="quantum physics research">Quantum</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--elastic-blue)" title="train a neural network">Neural</th>
+          </tr>
+        </thead>
+        <tbody id="simBody"></tbody>
+      </table>
+    </div>
+    <div style="flex:0 0 260px;min-width:200px">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center">
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">2D Vector Space</div>
+        <svg id="embSvg" viewBox="0 0 240 200" style="width:100%;height:auto"></svg>
+        <div style="display:flex;justify-content:center;gap:.75rem;margin-top:.5rem;font-size:.65rem;color:var(--text-dim)">
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--jina-teal);vertical-align:middle"></span> Plumbing</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FEC514;vertical-align:middle"></span> Physics</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--elastic-blue);vertical-align:middle"></span> ML</span>
         </div>
       </div>
     </div>
@@ -399,10 +504,15 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
     <strong>The analogy:</strong> Embedding search is scanning a library catalog to find the right shelf. The reranker is a librarian who reads the actual pages and tells you which books best answer your specific question.
   </div>
 
-  <div class="fade-up" style="margin-top:2rem">
-    <h3 style="margin-bottom:.25rem">Live Demo: Before &amp; After Reranking</h3>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">Your legal team&rsquo;s first question. Let&rsquo;s see if search can answer it.</p>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">Query: &ldquo;Can law enforcement use facial recognition?&rdquo; &mdash; EU AI Act corpus</p>
+  <div class="fade-up" style="margin-top:1.5rem">
+    <img src="assets/reranker-before-after.png" alt="Reranker before and after — result reordering" style="width:100%;max-width:900px;border-radius:8px">
+  </div>
+</section>
+
+<section data-nav="Rerankers" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Live Demo: Before &amp; After Reranking</h2>
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">Query: &ldquo;Can law enforcement use facial recognition?&rdquo; &mdash; EU AI Act corpus</p>
     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
       <button id="rerankBtn" onclick="runRerank()" style="background:var(--jina-teal);color:#fff;border:none;padding:.5rem 1.25rem;border-radius:6px;font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s">Run Reranker v3</button>
       <button id="resetBtn" onclick="resetRerank()" style="background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);padding:.5rem 1rem;border-radius:6px;font-family:var(--font);font-size:.8rem;cursor:pointer;display:none">Reset</button>
@@ -510,11 +620,12 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
   <div class="callout fade-up">
     <strong>Why it matters:</strong> Every RAG pipeline starts with clean data. Jina Reader is the preprocessing step that ensures AI models get high-quality input instead of noisy HTML. Outperforms models 20&times; its size on HTML-to-Markdown quality benchmarks.
   </div>
+</section>
 
-  <div class="fade-up" style="margin-top:2rem">
-    <h3 style="margin-bottom:.25rem">See It: Before &amp; After Jina Reader</h3>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">This is what the EU AI Act looks like when you download it. Good luck with Ctrl+F.</p>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">What a web page looks like before and after processing with <code>r.jina.ai/</code></p>
+<section data-nav="Reader" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">See It: Before &amp; After Jina Reader</h2>
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">What a web page looks like before and after processing with <code>r.jina.ai/</code></p>
     <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
       <button id="readerBtn" onclick="runReader()" style="background:var(--jina-teal);color:#fff;border:none;padding:.4rem 1rem;border-radius:6px;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s">Process with Reader</button>
       <button id="readerResetBtn" onclick="resetReader()" style="background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border);padding:.4rem .8rem;border-radius:6px;font-family:var(--font);font-size:.78rem;cursor:pointer;display:none">Reset</button>
@@ -607,10 +718,15 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
     <strong>CLIP vs VLM vs v4:</strong> CLIP v2 embeds images for <em>search</em> (lightweight, fast). v4 embeds images + text together for <em>multimodal search</em> (heavier, handles complex visual docs). VLM <em>generates text</em> about images (answers questions, extracts info). They can be used together in a pipeline.
   </div>
 
-  <div class="fade-up" style="margin-top:2rem">
-    <h3 style="margin-bottom:.25rem">VLM in Action: Image &rarr; Text Analysis</h3>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">The CTO&rsquo;s Slack message: &ldquo;Are we using any of these banned AI services?&rdquo;</p>
-    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:1rem">Upload an architecture diagram and the VLM tells you what it sees.</p>
+  <div class="fade-up" style="margin-top:1.5rem">
+    <img src="assets/vlm-analysis-flow.png" alt="VLM analysis flow — image upload to semantic search" style="width:100%;border-radius:8px">
+  </div>
+</section>
+
+<section data-nav="CLIP &amp; VLM" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">VLM in Action: Image &rarr; Text Analysis</h2>
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">The CTO&rsquo;s Slack message: &ldquo;Are we using any of these banned AI services?&rdquo; Upload an architecture diagram and the VLM tells you what it sees.</p>
     <div style="display:flex;gap:1.25rem;flex-wrap:wrap">
       <div style="flex:0 0 260px;min-width:220px">
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
@@ -757,8 +873,12 @@ curl "https://s.jina.ai/EU AI Act biometric"
   }'</div>
     </div>
   </div>
+</section>
 
-  <div class="compare-row fade-up" style="margin-top:1.5rem">
+<section data-nav="Jina API" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Jina API &mdash; Tips &amp; Integration</h2>
+  <div class="compare-row fade-up">
     <div class="callout">
       <strong>MCP Server:</strong> Add <code>mcp.jina.ai</code> as an MCP server to access Reader, Embeddings, and Reranker directly from LLMs and AI agents. No custom integration code required.
     </div>
@@ -766,8 +886,7 @@ curl "https://s.jina.ai/EU AI Act biometric"
       <strong>Getting an API Key:</strong> Go to <strong>jina.ai</strong> &rarr; click &ldquo;How to get my API key?&rdquo; &rarr; key appears in the <strong>API Key &amp; Billing</strong> tab. Free tier with rate limits; add your key to requests for higher throughput.
     </div>
   </div>
-
-  <div class="callout blue fade-up" style="margin-top:1rem;max-width:900px">
+  <div class="callout blue fade-up" style="max-width:900px">
     <strong>Jina API vs EIS:</strong> The Jina API at jina.ai is great for prototyping and non-Elastic use cases. For production Elastic deployments, use <strong>EIS</strong> (next section) &mdash; same models, but managed inside Elasticsearch with no external calls, no data leaving the cluster, and integrated billing.
   </div>
 </section>
@@ -794,6 +913,9 @@ curl "https://s.jina.ai/EU AI Act biometric"
         <strong>The key idea:</strong> Instead of provisioning and scaling ML nodes yourself, EIS handles all of that. You configure an inference endpoint &mdash; one API call &mdash; and Elasticsearch uses it automatically for ingest, search, and chat. Zero infrastructure to manage.
       </div>
     </div>
+  </div>
+  <div class="fade-up" style="margin-top:2rem">
+    <img src="assets/eis-before-after.png" alt="EIS before and after — DIY vs managed inference" style="width:100%;border-radius:8px">
   </div>
 </section>
 
@@ -897,7 +1019,13 @@ curl "https://s.jina.ai/EU AI Act biometric"
         </tbody>
       </table>
     </div>
+  </div>
+</section>
 
+<section class="full-bleed" data-nav="Models on EIS" data-group="eis">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-label eis">EIS</div>
+    <h2 class="fade-up">EIS Embedding &amp; Reranker Models</h2>
     <div class="compare-row fade-up">
       <div>
         <h3 style="color:var(--jina-teal)">Embedding Models</h3>
@@ -959,8 +1087,8 @@ curl "https://s.jina.ai/EU AI Act biometric"
     <div class="pipe-step"><div class="step-num">Step 5</div><div class="step-title">Results</div><div class="step-detail">Precision-ranked hits</div></div>
   </div>
 
-  <div class="compare-row fade-up">
-    <div class="code-block"><span class="lang">Create index</span>
+  <div class="fade-up">
+    <div class="code-block" style="max-width:600px"><span class="lang">Create index</span>
 <span class="ck">PUT</span> my-index
 {
   <span class="cp">"mappings"</span>: {
@@ -972,6 +1100,13 @@ curl "https://s.jina.ai/EU AI Act biometric"
     }
   }
 }</div>
+  </div>
+</section>
+
+<section data-nav="How It Works" data-group="eis">
+  <div class="section-label eis">EIS</div>
+  <h2 class="fade-up">Search &amp; Rerank Queries</h2>
+  <div class="compare-row fade-up">
     <div class="code-block"><span class="lang">Search</span>
 <span class="ck">GET</span> my-index/_search
 {
@@ -1052,25 +1187,67 @@ curl "https://s.jina.ai/EU AI Act biometric"
 </section>
 
 <script>
+/* Lightbox */
+(function(){
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  document.body.addEventListener('click', function(e) {
+    const img = e.target.closest('section img');
+    if (!img) return;
+    lbImg.src = img.src;
+    lbImg.alt = img.alt || '';
+    lb.classList.add('active');
+  });
+  lb.addEventListener('click', function(){ lb.classList.remove('active'); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') lb.classList.remove('active'); });
+})();
+
+/* Card Focus */
+(function(){
+  var cf = document.getElementById('cardFocus');
+  var cfc = document.getElementById('cardFocusContent');
+  var sel = '.concept, .card, .compare-box, .mode-card, .hero-card';
+  document.body.addEventListener('click', function(e) {
+    if (cf.classList.contains('active')) return;
+    var card = e.target.closest(sel);
+    if (!card || !card.closest('section')) return;
+    if (e.target.closest('button, a, input')) return;
+    cfc.innerHTML = card.innerHTML;
+    cf.classList.add('active');
+    e.stopPropagation();
+  });
+  cf.addEventListener('click', function(e) {
+    if (e.target === cf || !e.target.closest('.card-focus-content')) cf.classList.remove('active');
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') cf.classList.remove('active'); });
+})();
+
 (function(){
   const sections = document.querySelectorAll('section[data-nav]');
   const navContainer = document.getElementById('navSections');
   const progress = document.getElementById('progress');
   const nav = document.getElementById('nav');
 
+  const pillMap = new Map();
+  const pillList = [];
+  const sectionToPill = [];
+
   sections.forEach((sec, i) => {
-    const pill = document.createElement('a');
-    pill.className = 'nav-pill' + (sec.dataset.group === 'jina' ? ' jina' : '');
-    pill.textContent = sec.dataset.nav;
-    pill.href = '#';
-    pill.addEventListener('click', e => { e.preventDefault(); sec.scrollIntoView({ behavior: 'smooth' }); });
-    pill.dataset.idx = i;
-    navContainer.appendChild(pill);
+    const label = sec.dataset.nav;
+    if (!pillMap.has(label)) {
+      const pill = document.createElement('a');
+      pill.className = 'nav-pill' + (sec.dataset.group === 'jina' ? ' jina' : '');
+      pill.textContent = label;
+      pill.href = '#';
+      pill.addEventListener('click', e => { e.preventDefault(); sec.scrollIntoView({ behavior: 'smooth' }); });
+      navContainer.appendChild(pill);
+      pillMap.set(label, pill);
+      pillList.push(pill);
+    }
+    sectionToPill[i] = pillMap.get(label);
   });
 
-  const pills = navContainer.querySelectorAll('.nav-pill');
   let currentIdx = 0;
-  let lastScroll = 0;
 
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -1078,9 +1255,9 @@ curl "https://s.jina.ai/EU AI Act biometric"
         const idx = [...sections].indexOf(entry.target);
         if (idx >= 0) {
           currentIdx = idx;
-          pills.forEach(p => p.classList.remove('active'));
-          pills[idx].classList.add('active');
-          pills[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          pillList.forEach(p => p.classList.remove('active'));
+          sectionToPill[idx].classList.add('active');
+          sectionToPill[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
           progress.style.width = ((idx + 1) / sections.length * 100) + '%';
         }
       }
@@ -1092,14 +1269,14 @@ curl "https://s.jina.ai/EU AI Act biometric"
 
   sections.forEach(s => observer.observe(s));
 
-  
-
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       e.preventDefault();
       const next = Math.min(currentIdx + 1, sections.length - 1);
       sections[next].scrollIntoView({ behavior: 'smooth' });
     } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       e.preventDefault();
       const prev = Math.max(currentIdx - 1, 0);
       sections[prev].scrollIntoView({ behavior: 'smooth' });

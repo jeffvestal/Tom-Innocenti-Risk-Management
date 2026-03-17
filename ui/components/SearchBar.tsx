@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { Search, Loader2, ScanEye, ImagePlus } from 'lucide-react';
 import { ImageUploadModal } from './ImageUploadModal';
 import { JinaBadge, ElasticLogo } from './JinaBadge';
@@ -22,6 +22,10 @@ export function SearchBar({
 }: SearchBarProps) {
   const [query, setQuery] = useState(initialQuery);
   const [showImageModal, setShowImageModal] = useState(false);
+
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   const busy = isLoading || isAuditing;
 

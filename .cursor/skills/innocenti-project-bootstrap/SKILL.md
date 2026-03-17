@@ -167,15 +167,46 @@ Plain technical walkthrough. Section titles like "What Is Jina AI?", "Embedding 
 
 Files: `index.html`, `export_pptx.py`, `nanobana2-prompts-themed.md`
 
-Same technical content, but wrapped in a narrative scenario: your company shipped facial recognition for user onboarding, legal forwarded the EU AI Act, and you need to build a compliance search tool before the lawyers' deadline. Each section has a gold-bordered `.scenario-intro` callout that connects the technical content to the scenario. Wry/dry humor, SE perspective.
+Same technical content, but wrapped in a narrative scenario: a **fictional customer** shipped facial recognition for user onboarding, legal forwarded the EU AI Act, and they need to build a compliance search tool before the lawyers' deadline. Each section has a gold-bordered `.scenario-intro` callout that connects the technical content to the scenario. The title slide has an explicit "CUSTOMER SCENARIO" label to make clear this is not about Jina/Elastic being non-compliant.
+
+### 13" Screen Optimization & Section Splits
+
+The themed `index.html` is optimized for a 13" MacBook Air (~800px viewport). Strategy: **split, don't shrink**. Dense sections are broken into multiple `<section>` elements that share the same `data-nav` value, so the nav bar shows one pill but arrow keys step through sub-slides.
+
+**Section padding**: `4.5rem 2rem 2.5rem` (reduced from `6rem 2rem 4rem`). **h2**: `2rem` (down from `2.4rem`).
+
+**Nav deduplication**: The nav JS uses a `pillMap` (Map) to create one pill per unique `data-nav` label. A `sectionToPill[]` array maps each section index to its shared pill. Arrow keys still navigate all 29 sections sequentially.
+
+Sections that were split (total: 17 → 29 sections, including 3 TL;DR sub-slides):
+
+| Original Section | Sub-slides | Split Point |
+|-----------------|------------|-------------|
+| TL;DR (themed only) | 3 | Overview / Jina summary / EIS summary |
+| What Is Jina | 2 | Text vs pipeline image |
+| Key Concepts | 3 | Concept cards / images / interactive demo |
+| Rerankers | 2 | Info+image vs live rerank demo |
+| Reader | 2 | Cards+callout vs before/after demo |
+| CLIP & VLM | 2 | Specs+image vs VLM interactive demo |
+| Jina API | 2 | API cards vs tips/callouts |
+| Models on EIS | 2 | LLM table vs embedding+reranker tables |
+| How It Works | 2 | Pipeline+create index vs search+rerank |
+
+### Lightbox & Card Focus (Presenter Mode)
+
+**Image lightbox**: Click any `<img>` inside a section to open it fullscreen (95vw/95vh) in a dark overlay. Click backdrop or press Escape to dismiss. CSS class `.lightbox`, JS uses event delegation on `section img`.
+
+**Card focus**: Click any `.concept`, `.card`, `.compare-box`, `.mode-card`, or `.hero-card` to pop it up centered at larger font size (titles 1.4rem, body 1.05rem) in a dark overlay. Useful during presentation to bring focus to one card while talking. Same dismiss pattern (click backdrop or Escape). CSS class `.card-focus`, JS clones `innerHTML` into `.card-focus-content`. Buttons/links inside cards are excluded from triggering the focus overlay.
+
+Both overlays: `z-index:2000`, `rgba(0,0,0,.92)` background, `backdrop-filter:blur(4px)`.
 
 ### Shared Structure
 
-Both versions share identical technical content, interactive demos, and section order:
+Both versions share the same technical content, interactive demos, and section order. The themed version adds a TL;DR section and scenario callouts:
 
 | Section | Group | Key Content |
 |---------|-------|-------------|
-| Title | — | Logos, title, subtitle |
+| Title | — | Logos, title, subtitle ("Customer scenario" label on themed) |
+| TL;DR | title | 3 sub-slides: "Two Things to Know" overview, Jina AI bullet summary, EIS bullet summary (themed only) |
 | What Is Jina | jina | Five product families, acquisition context |
 | Key Concepts | jina | Embeddings, context window, Matryoshka, LoRA + **embedding similarity demo** (cosine matrix + SVG scatter) |
 | Embeddings | jina | v5 hero, v5-text-nano, v4 stats |
@@ -204,31 +235,39 @@ All demos use hardcoded realistic data — not wired to a live cluster. Each has
 
 PPTX versions get static screenshot-style slides instead of interactive JS.
 
+### Generated Images (all 6 complete)
+
+All 6 diagram images have been generated via Nano Banana 2 and are wired into both `index.html` (as `<img>` tags) and `export_pptx.py` (as `add_picture` slides). Stored in `docs/presentation/assets/`.
+
+| # | Diagram | Filename | HTML Section | PPTX Slide |
+|---|---------|----------|-------------|------------|
+| 1 | Search pipeline architecture | `pipeline-architecture.png` | What Is Jina (below product families) | Slide 2 bottom |
+| 2 | Embedding vector space scatter | `embedding-vector-space.png` | Key Concepts (side-by-side with #4) | Slide 3a left |
+| 3 | Reranker before/after ranking | `reranker-before-after.png` | Rerankers (above live demo) | New slide before 6b |
+| 4 | Matryoshka dimensions | `matryoshka-dimensions.png` | Key Concepts (side-by-side with #2) | Slide 3a right |
+| 5 | VLM analysis flow (5-stage pipeline) | `vlm-analysis-flow.png` | CLIP & VLM (above VLM demo) | New slide before 8b |
+| 6 | EIS DIY vs managed | `eis-before-after.png` | What Is EIS (below key idea) | New slide after 12 |
+
 ### Nano Banana 2 Prompts
 
-`nanobana2-prompts-themed.md` and `nanobana2-prompts-standard.md` contain 6 ready-to-paste prompts for Gemini's Nano Banana 2 image generation model. All use a cinematic visual style: dark background (#0F1117), glowing data-stream lines, soft depth via drop shadows and radial glows, sans-serif font. Brand colors: Jina teal (#009191), Elastic blue (#0B64DD), gold (#FEC514) for emphasis. The themed prompts add narrative hooks from the "We Might Be Illegal in Europe" scenario (e.g., "the question that started the panic", "what the SE had at 2am"); the standard prompts use identical visual style with neutral technical language.
+`nanobana2-prompts-themed.md` and `nanobana2-prompts-standard.md` contain the generation prompts. All use cinematic visual style: dark background (#0F1117), glowing data-stream lines, soft depth via drop shadows and radial glows, sans-serif font. Brand colors: Jina teal (#009191), Elastic blue (#0B64DD), gold (#FEC514) for emphasis.
 
-| # | Diagram | Filename | Used In |
-|---|---------|----------|---------|
-| 1 | Search pipeline architecture | `pipeline-architecture.png` | Overview |
-| 2 | Embedding vector space scatter | `embedding-vector-space.png` | Key Concepts |
-| 3 | Reranker before/after ranking | `reranker-before-after.png` | Rerankers |
-| 4 | Matryoshka dimensions | `matryoshka-dimensions.png` | Key Concepts |
-| 5 | VLM analysis flow | `vlm-analysis-flow.png` | CLIP & VLM |
-| 6 | EIS before/after architecture | `eis-before-after.png` | What Is EIS |
-
-After generating: save to `docs/presentation/assets/`, add `<img>` tags to `index.html`, and update `export_pptx.py` to include on corresponding slides.
+**Themed prompt evolution notes** (prompts refined during development):
+- **#3 (Reranker)**: Rewritten to use labeled results (A–E) with explicit tables showing before/after order and crossing arrows. Original produced identical bars with parallel arrows showing no visible reordering.
+- **#4 (Matryoshka)**: Rewritten from concentric-shells metaphor to three horizontal truncation rows with real use-case tags ("2 AM partner email", "daily compliance scan", "bulk pre-filter"). Original nesting-doll visual didn't communicate the cost/quality tradeoff.
+- **#5 (VLM)**: Updated to include Jina Embeddings v5 as Stage 4 (embed the VLM description for semantic search). Original skipped the embedding step.
+- **#6 (EIS)**: Rewritten from "Before/After at 2 AM" framing (implied the SE built EIS) to "DIY vs With EIS" showing 6 named providers (OpenAI, Anthropic, Google, Jina, ELSER, E5) each with their own setup burden vs one EIS API. Includes "+1" badge for auto-provisioned new models.
 
 ### PPTX Export
 
 ```bash
 cd docs/presentation
 pip3 install python-pptx Pillow
-python3 export_pptx.py          # outputs to output/jina-eis-101.pptx (22 slides)
+python3 export_pptx.py          # outputs to output/jina-eis-101.pptx (~26 slides, includes image slides)
 python3 export_pptx_standard.py # outputs standard version
 ```
 
-Requires `python-pptx`. Logos loaded from `assets/jina-logo.png` and `assets/elastic-logo.png`.
+Requires `python-pptx`. Logos from `assets/jina-logo.png` and `assets/elastic-logo.png`. Generated diagram images are conditionally included — `if img.exists()` guards mean the PPTX builds fine even without the PNGs.
 
 ## Related Skills
 

@@ -29,7 +29,31 @@ Save generated images to `docs/presentation/assets/` and reference them via `<im
 **Filename:** `reranker-before-after.png`
 **Used in:** Rerankers section (static backup for the interactive demo)
 
-> Create a side-by-side comparison diagram on dark background (#0F1117) showing reranking as a dramatic before/after transformation. Left side labeled "Before: what the first search returned" — 5 result bars in a ranked list, dim and uncertain, bars in muted grey tones with slight visual noise/static, relevance scores 0.82, 0.79, 0.77, 0.75, 0.71 in faded text. Right side labeled "After: what the partner actually needed" — the same 5 bars reordered, now clean and glowing with confidence: result #4 moved to position 1 (highlighted with a gold #FEC514 spotlight effect and labeled "Most Relevant"), result #1 moved to position 2, etc. Between left and right, curved movement arrows rendered as light trails — teal (#009191) streaks showing each result sliding to its new position. The right panel feels resolved and authoritative; the left panel feels like guesswork. Teal (#009191) accent line at top, subtle depth via drop shadows. Sans-serif font. 900x500px, presentation slide format.
+> Create a side-by-side "Before → After" reranking diagram. Dark background (#0F1117), teal (#009191) accent line at top. Sans-serif font. 900×500px.
+>
+> **Left panel — "Before: what the first search returned"**
+> Five numbered result rows, muted grey bars with faded scores:
+>
+> | # | Label | Score |
+> |---|-------|-------|
+> | 1 | Result A | 0.82 |
+> | 2 | Result B | 0.79 |
+> | 3 | Result C | 0.77 |
+> | 4 | Result D | 0.75 |
+> | 5 | Result E | 0.71 |
+>
+> **Right panel — "After: what the partner actually needed"**
+> Same five results but in a completely different order, clean and bright:
+>
+> | # | Label | Note |
+> |---|-------|------|
+> | 1 | Result D | gold (#FEC514) glow, tagged "Most Relevant — was #4" |
+> | 2 | Result C | was #3 |
+> | 3 | Result A | was #1 |
+> | 4 | Result E | was #5 |
+> | 5 | Result B | was #2 |
+>
+> **Arrows between panels:** Draw one curved teal (#009191) arrow per result connecting its old position on the left to its new position on the right. The arrows must visibly cross each other to show the shuffle — this is the key visual. The arrow from #4→#1 should be the thickest/brightest. Drop shadows for depth.
 
 ---
 
@@ -38,7 +62,20 @@ Save generated images to `docs/presentation/assets/` and reference them via `<im
 **Filename:** `matryoshka-dimensions.png`
 **Used in:** Key Concepts section (Matryoshka explanation)
 
-> Create a visualization of Matryoshka Representation Learning on dark background (#0F1117) that makes the nesting-doll metaphor feel tangible and elegant. Show 3 concentric translucent shells — the outermost large and faintly glowing teal (#009191), each inner shell brighter and more concentrated, like layers of compressed meaning. Next to or below the shells, show 3 horizontal energy bars representing truncation levels: a full 1024-dim bar (glowing teal gradient, labeled "1024 dims — 100% quality" in an illuminated badge), a 512-dim bar (same gradient but shorter, labeled "512 dims — ~97% quality"), and a 256-dim bar (shortest, brightest core, labeled "256 dims — ~92% quality"). Each shorter bar retains the brightest left portion, visually reinforcing that the most important information is front-loaded. The bars should have a glowing energy-trail feel — not flat rectangles, but luminous data streams fading to dark on the right. Subtle depth via soft shadows and radial glow behind the shells. Sans-serif font. 800x400px, presentation slide format.
+> Create a diagram on dark background (#0F1117) titled "Matryoshka: Pay Only for the Precision You Need." The concept: a single embedding can be truncated to fewer dimensions — you lose a little quality but save a lot of cost and speed. Show this as three horizontal rows, one per truncation level, each row telling a small story:
+>
+> **Row 1 — 1024 dims (full resolution)**
+> A long, bright teal (#009191) bar stretching the full width. Label: "1024 dims — 100% quality." To the right, a small tag: "The 2 AM partner email — you need every dimension." The bar glows fully, dense with detail.
+>
+> **Row 2 — 512 dims (half the cost)**
+> The same bar but cut in half — the right half fades to dark, the left half stays bright. Label: "512 dims — ~97% quality." Tag: "Daily compliance scan — fast enough, accurate enough." A faint scissors or cut-line icon at the truncation point.
+>
+> **Row 3 — 256 dims (quarter the cost)**
+> The bar cut to a quarter — short and intensely bright. Label: "256 dims — ~92% quality." Tag: "Bulk pre-filter across 10k documents — speed over precision."
+>
+> Below all three rows, a single callout line: "The most important information is always in the first dimensions" with a small arrow pointing left toward the bright ends of all three bars.
+>
+> Visual style: the bars should feel like glowing data streams — luminous gradients fading to void on the right, not flat rectangles. The truncation points should feel clean and intentional (a sharp edge, a faint dashed line). Teal (#009191) for the bars, gold (#FEC514) accent on the Row 1 tag to connect it to the partner-panic theme. Subtle depth via drop shadows. Sans-serif font. 800×400px, presentation slide format.
 
 ---
 
@@ -47,7 +84,19 @@ Save generated images to `docs/presentation/assets/` and reference them via `<im
 **Filename:** `vlm-analysis-flow.png`
 **Used in:** CLIP & VLM section (static backup for the interactive demo)
 
-> Create a diagram on dark background (#0F1117) showing the Visual Diagram Auditor flow — the moment your architecture diagram gets flagged for compliance issues. Left: a thumbnail of a cloud architecture diagram (abstract service boxes and arrows) with a subtle red/orange warning glow around the edges — something in this diagram is about to cause problems. A glowing arrow labeled "Upload" points to center: "Jina VLM" box in teal (#009191) with an eye icon emitting a faint scanning beam over the diagram. A glowing arrow labeled "Analysis" points to right: a text block styled like a streaming terminal output showing "The system uses Amazon Rekognition for image classification… this falls under biometric categorization." Below that, another arrow labeled "Auto-search" points to an "Elasticsearch" box in blue (#0B64DD) with a glowing "MATCH FOUND" indicator and results: "EU AI Act Article 5: Prohibited practices…" — the moment the architecture got flagged. Use teal (#009191) for Jina components, blue (#0B64DD) for Elastic, and a touch of warning amber for the flagged diagram. Subtle depth with soft glows and drop shadows. Sans-serif font. 1000x400px, presentation slide format.
+> Create a left-to-right flow diagram on dark background (#0F1117) showing the Visual Diagram Auditor pipeline — from image upload to semantic search hit. Five stages connected by glowing arrows:
+>
+> **Stage 1 — Upload:** A thumbnail of a cloud architecture diagram (abstract service boxes and arrows) with a subtle red/orange warning glow around the edges — something in this diagram is about to cause problems. Arrow labeled "Upload" leads to →
+>
+> **Stage 2 — VLM Analysis:** "Jina VLM" box in teal (#009191) with an eye icon emitting a faint scanning beam. Arrow labeled "Describe" leads to →
+>
+> **Stage 3 — Text Output:** A terminal-styled text block showing the VLM's description: "The system uses Amazon Rekognition for image classification… this falls under biometric categorization." Arrow labeled "Embed" leads to →
+>
+> **Stage 4 — Embedding:** "Jina Embeddings v5" box in teal (#009191). The text visually dissolves into a floating vector array (small glowing numbers/dots) — showing the description being converted into a semantic embedding that can be searched. Arrow labeled "Semantic Search" leads to →
+>
+> **Stage 5 — Search Match:** "Elasticsearch" box in blue (#0B64DD) with a glowing "MATCH FOUND" indicator and result: "EU AI Act Article 5: Prohibited practices…" — the moment the architecture got flagged.
+>
+> The key insight this diagram communicates: the VLM *describes* the image, the embedding model makes that description *searchable*, and Elasticsearch finds the *regulation that matters*. Use teal (#009191) for Jina components, blue (#0B64DD) for Elastic, warning amber for the flagged diagram thumbnail. Subtle depth with soft glows and drop shadows. Sans-serif font. 1200×400px, presentation slide format.
 
 ---
 
@@ -56,7 +105,26 @@ Save generated images to `docs/presentation/assets/` and reference them via `<im
 **Filename:** `eis-before-after.png`
 **Used in:** What Is EIS section
 
-> Create a two-panel comparison diagram on dark background (#0F1117) showing the dramatic before/after of Elastic Inference Service. Left panel labeled "Before EIS (what the SE had at 2am)" — a stressed, overloaded aesthetic: tangled connection lines between ML Nodes (GPU icons with faint heat glow), scaling arrows pointing in conflicting directions, model deployment config files stacked haphazardly, monitoring dashboards with warning indicators, a small clock showing 2:00 AM. The whole left panel should feel heavy and suffocating — muted grey tones, visual noise, slight chaos. Right panel labeled "With EIS (what they had by morning)" — zen-like simplicity: a single clean API call box with a soft blue (#0B64DD) glow pointing to "Elastic Cloud" which handles everything, open space, a coffee cup icon with a wisp of steam. The right panel breathes — clean teal (#009191) and blue (#0B64DD) accents, generous whitespace, calm confidence. The contrast should be almost comedic in its severity. Subtle depth via drop shadows and soft ambient glow. Sans-serif font. 1000x500px, presentation slide format.
+> Create a two-panel comparison diagram on dark background (#0F1117). Sans-serif font. 1000×500px, presentation slide format.
+>
+> **Left panel — "DIY: manage it all yourself"**
+> Show 6 separate provider boxes arranged around a central "Your App" box, each requiring its own setup and ongoing maintenance:
+>
+> | Provider | What you manage |
+> |----------|----------------|
+> | OpenAI | API key, billing account, rate limits |
+> | Anthropic | API key, billing account, usage caps |
+> | Google AI | Service account JSON, project config |
+> | Jina AI | API key, separate billing |
+> | ELSER | Self-hosted ML node, GPU provisioning, scaling |
+> | E5 | Self-hosted ML node, model deployment YAML |
+>
+> Each box in muted grey with connection lines to "Your App." Scattered around the lines: small icons for API keys, billing invoices, config files, monitoring dashboards — the overhead of maintaining 6 separate integrations and 2 self-hosted models. The panel should feel heavy and cluttered — not broken, just exhausting. A lot of work to set up, a lot of work to maintain, and every new model means doing it all again.
+>
+> **Right panel — "With EIS: one API, every model"**
+> A single clean blue (#0B64DD) "Elastic Inference Service" box at center. Radiating out from it in a neat ring: the same 6 provider names (OpenAI, Anthropic, Google, Jina, ELSER, E5) as small, clean teal (#009191) badges — already connected, already configured. No separate API keys, no self-hosted nodes, no billing chaos. A single code snippet floating nearby: `"service": "elastic"`. Below the ring, a subtle "+1" badge with a dotted outline and the text "New model added? You get it automatically." — reinforcing that when Elastic adds a new provider, it just appears.
+>
+> The contrast: exhausting maintenance on the left, effortless access on the right. Subtle depth via drop shadows and soft ambient glow.
 
 ---
 

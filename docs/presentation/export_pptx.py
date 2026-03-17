@@ -263,6 +263,11 @@ def build_deck():
     add_multiline(slide, Inches(7.0), Inches(2.0), Inches(5.5), Inches(3.5),
                   families, font_size=13, spacing=Pt(8))
 
+    pipeline_img = ASSETS_DIR / "pipeline-architecture.png"
+    if pipeline_img.exists():
+        slide.shapes.add_picture(str(pipeline_img), Inches(0.8), Inches(5.2),
+                                  width=Inches(11.7))
+
     # =========================================================================
     # SLIDE 3: Key Concepts
     # =========================================================================
@@ -300,6 +305,25 @@ def build_deck():
                      term, font_size=13, color=JINA_TEAL, bold=True)
         add_text_box(slide, x, y + Inches(0.4), Inches(5.5), Inches(1.6),
                      definition, font_size=11, color=TEXT_MUTED)
+
+    # =========================================================================
+    # SLIDE 3a: Key Concepts — Visualizations
+    # =========================================================================
+    emb_vec_img = ASSETS_DIR / "embedding-vector-space.png"
+    mat_dim_img = ASSETS_DIR / "matryoshka-dimensions.png"
+    if emb_vec_img.exists() or mat_dim_img.exists():
+        slide = prs.slides.add_slide(blank)
+        set_slide_bg(slide)
+        add_section_label(slide, "Jina AI — Key Concepts", JINA_TEAL)
+        add_text_box(slide, Inches(0.8), Inches(1.3), Inches(10), Inches(0.7),
+                     "Visualizing Embeddings & Matryoshka Dimensions",
+                     font_size=28, color=TEXT_WHITE, bold=True)
+        if emb_vec_img.exists():
+            slide.shapes.add_picture(str(emb_vec_img), Inches(0.5), Inches(2.0),
+                                      width=Inches(6.0))
+        if mat_dim_img.exists():
+            slide.shapes.add_picture(str(mat_dim_img), Inches(6.8), Inches(2.0),
+                                      width=Inches(6.0))
 
     # =========================================================================
     # SLIDE 3b: Embedding Similarity Demo (Static)
@@ -487,6 +511,17 @@ def build_deck():
                  "The reranker = a librarian who reads the actual pages and tells you "
                  "which books best answer your question.",
                  font_size=13, color=JINA_TEAL)
+
+    reranker_img = ASSETS_DIR / "reranker-before-after.png"
+    if reranker_img.exists():
+        slide = prs.slides.add_slide(blank)
+        set_slide_bg(slide)
+        add_section_label(slide, "Jina AI — Rerankers", JINA_TEAL)
+        add_text_box(slide, Inches(0.8), Inches(1.3), Inches(10), Inches(0.7),
+                     "Reranking in Action", font_size=28,
+                     color=TEXT_WHITE, bold=True)
+        slide.shapes.add_picture(str(reranker_img), Inches(2.0), Inches(2.0),
+                                  width=Inches(9.3))
 
     # =========================================================================
     # SLIDE 6b: Reranker Demo (Static)
@@ -728,6 +763,17 @@ def build_deck():
                  "They can be used together.",
                  font_size=12, color=JINA_TEAL)
 
+    vlm_flow_img = ASSETS_DIR / "vlm-analysis-flow.png"
+    if vlm_flow_img.exists():
+        slide = prs.slides.add_slide(blank)
+        set_slide_bg(slide)
+        add_section_label(slide, "Jina AI — VLM", JINA_TEAL)
+        add_text_box(slide, Inches(0.8), Inches(1.3), Inches(10), Inches(0.7),
+                     "Visual Diagram Auditor — Full Pipeline",
+                     font_size=28, color=TEXT_WHITE, bold=True)
+        slide.shapes.add_picture(str(vlm_flow_img), Inches(0.5), Inches(2.0),
+                                  width=Inches(12.3))
+
     # =========================================================================
     # SLIDE 8b: VLM Demo (Static)
     # =========================================================================
@@ -946,6 +992,17 @@ def build_deck():
                  "Elasticsearch uses it automatically for ingest, search, and chat. "
                  "Zero infrastructure to manage.",
                  font_size=14, color=ELASTIC_LIGHT_BLUE)
+
+    eis_img = ASSETS_DIR / "eis-before-after.png"
+    if eis_img.exists():
+        slide = prs.slides.add_slide(blank)
+        set_slide_bg(slide)
+        add_section_label(slide, "EIS", ELASTIC_BLUE)
+        add_text_box(slide, Inches(0.8), Inches(1.3), Inches(10), Inches(0.7),
+                     "DIY vs EIS — One API, Every Model",
+                     font_size=28, color=TEXT_WHITE, bold=True)
+        slide.shapes.add_picture(str(eis_img), Inches(0.8), Inches(2.0),
+                                  width=Inches(11.7))
 
     # =========================================================================
     # SLIDE 12: Where Available
