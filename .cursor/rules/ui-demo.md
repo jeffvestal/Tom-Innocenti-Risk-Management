@@ -1,5 +1,22 @@
 # Innocenti Risk Management - Project Context
 
+## Current Status (2026-03-17)
+
+**Recent accomplishments:**
+- Themed presentation fully polished: TL;DR briefing slides, all 6 NB2 diagram images generated and wired in, lightbox/card-focus presenter overlays, 13" screen section splits (29 sections)
+- PPTX export updated with conditional image slides
+- SearchBar `useEffect` fix for `initialQuery` prop sync
+- Project bootstrap skill updated with accurate section counts and new feature docs
+
+**Open items:**
+- Standard presentation version (`index-standard.html`, `export_pptx_standard.py`) needs parity updates (images, section splits, lightbox)
+- No CI workflow for UI tests (only notebooks have CI)
+- `.cursor/rules/ui-demo.md` needs to stay in sync with presentation changes
+
+**Next steps:** See `TODO.md` at project root for the full prioritized list. Priority 1 is standard presentation parity.
+
+---
+
 ## What This Is
 
 A field engineering **enablement kit** for Elastic, demonstrating a "Full Chain" search pipeline using **Jina AI models** on **Elastic Inference Service (EIS)**. The scenario: a fictional law firm ("Innocenti & Associates") needs precision search over the **EU AI Act**.
