@@ -107,24 +107,110 @@ Save generated images to `docs/presentation/assets/` and reference them via `<im
 
 > Create a two-panel comparison diagram on dark background (#0F1117). Sans-serif font. 1000×500px, presentation slide format.
 >
-> **Left panel — "DIY: manage it all yourself"**
-> Show 6 separate provider boxes arranged around a central "Your App" box, each requiring its own setup and ongoing maintenance:
+> **Left panel — title: "Without EIS"**
+> A central orange box labeled "Your App". Around it, a 3×2 grid of 6 muted grey rounded boxes, each with a provider name and a small overhead icon:
+> - "OpenAI" with a key icon
+> - "Anthropic" with a key icon
+> - "Google AI" with a key icon
+> - "Jina AI" with a key icon
+> - "ELSER" with a server/GPU icon (red-tinted border)
+> - "E5" with a server/GPU icon (red-tinted border)
 >
-> | Provider | What you manage |
-> |----------|----------------|
-> | OpenAI | API key, billing account, rate limits |
-> | Anthropic | API key, billing account, usage caps |
-> | Google AI | Service account JSON, project config |
-> | Jina AI | API key, separate billing |
-> | ELSER | Self-hosted ML node, GPU provisioning, scaling |
-> | E5 | Self-hosted ML node, model deployment YAML |
+> Messy connection lines from each box to the center "Your App" — different line styles, crossing each other. Small scattered icons between the lines: keys, dollar signs, config files. The overall feel should be cluttered and heavy.
+> Below: "6 integrations. 2 need ML nodes."
 >
-> Each box in muted grey with connection lines to "Your App." Scattered around the lines: small icons for API keys, billing invoices, config files, monitoring dashboards — the overhead of maintaining 6 separate integrations and 2 self-hosted models. The panel should feel heavy and cluttered — not broken, just exhausting. A lot of work to set up, a lot of work to maintain, and every new model means doing it all again.
+> **Right panel — title: "With EIS"**
+> A single clean blue (#0B64DD) rounded box in the center labeled "Elastic Inference Service". Below it, a small code badge clearly reading: "service": "elastic"
 >
-> **Right panel — "With EIS: one API, every model"**
-> A single clean blue (#0B64DD) "Elastic Inference Service" box at center. Radiating out from it in a neat ring: the same 6 provider names (OpenAI, Anthropic, Google, Jina, ELSER, E5) as small, clean teal (#009191) badges — already connected, already configured. No separate API keys, no self-hosted nodes, no billing chaos. A single code snippet floating nearby: `"service": "elastic"`. Below the ring, a subtle "+1" badge with a dotted outline and the text "New model added? You get it automatically." — reinforcing that when Elastic adds a new provider, it just appears.
+> Radiating out from the EIS box, three labeled rows of small teal (#009191) badges:
+> - Row labeled "LLMs": 3 badges (OpenAI, Anthropic, Google)
+> - Row labeled "Embeddings": 5 badges (Jina v5, ELSER, E5, OpenAI, Google)
+> - Row labeled "Rerankers": 2 badges (Jina v3, Jina v2)
 >
-> The contrast: exhausting maintenance on the left, effortless access on the right. Subtle depth via drop shadows and soft ambient glow.
+> All badges neatly aligned, connected to the central EIS box with clean thin lines. The overall feel should be organized and effortless.
+> Below: "One API. LLMs, embeddings, and rerankers."
+>
+> The contrast between the two panels should be immediately obvious: chaotic overhead on the left, clean simplicity on the right. Dark background with soft ambient glow. Do NOT include Reader or VLM on the right side.
+
+---
+
+## 7. Context Window Visualization
+
+**Filename:** `context-window.png`
+**Used in:** Key Concepts section (paired with Context Window definition)
+
+> Create a diagram on dark background (#0F1117) titled "Context Window: You Choose How to Chunk." The concept: a context window is the maximum text a model can read in one pass. A small window forces aggressive chunking. A large window gives you the choice — chunk when it helps, don't when it doesn't. Show three horizontal document strips stacked vertically, each representing the same long document being processed by models with different context windows:
+>
+> **Row 1 — 512 tokens (ELSER)**
+> A long document strip divided into many small chunks (roughly 20 chunks) separated by visible red (#EB6161) cut lines. Each chunk is a short muted grey segment. Label left: "ELSER". Label above: "512 tokens — ~1 paragraph per chunk." A red tag on the right: "Forced chunking — no choice." The cuts should feel like constraints — hard boundaries imposed by the model's limit.
+>
+> **Row 2 — 8K tokens (typical)**
+> The same document, but now only 4–5 chunks separated by amber (#FEC514) cut lines. Chunks are longer, more substantial. Label left: "Typical". Label above: "8K tokens — ~6 pages per chunk." Amber tag: "Some flexibility."
+>
+> **Row 3 — 32K tokens (Jina v5)**
+> The same document as a single unbroken bright teal (#009191) bar — no cuts. It glows with full intensity. Label left: "Jina v5". Label above: "32K tokens — ~25 pages in one pass." A gold (#FEC514) tag: "Chunk when you want to, not because you have to."
+>
+> Below all three rows, a callout: "Bigger context window = more flexibility. You decide the right chunking strategy for your data." with a subtle arrow pointing down.
+>
+> Visual style: the document strips should feel like luminous data streams on the dark background. The cut lines in rows 1 and 2 should feel like imposed boundaries — clean but clearly limiting. The unbroken row 3 should feel open and unconstrained by contrast. Teal (#009191) for the full-context bar, muted grey for the chunked bars, red (#EB6161) for 512-token cuts, amber (#FEC514) for 8K cuts. Subtle depth via drop shadows. Sans-serif font. 800×500px, presentation slide format.
+
+---
+
+## 8. LoRA Adapters Visualization
+
+**Filename:** `lora-adapters.png`
+**Used in:** Key Concepts section (paired with LoRA Adapters definition)
+
+> Create a diagram on dark background (#0F1117) titled "LoRA Adapters: One Model, Optimized per Task." The concept: a single base model can handle multiple tasks (retrieval, classification, clustering) on its own, but LoRA adapters let you optimize its behavior for each task without deploying separate models. Think of them as lightweight tuning layers you swap at query time.
+>
+> **Center:** A large teal (#009191) rounded rectangle labeled "jina-embeddings-v5" — the base model. It should feel solid, substantial, like a server or engine block. Label below: "677M parameters — one deployment."
+>
+> **Radiating out from the base model**, three smaller adapter modules connected by glowing plug-in connectors (like USB or slot connections). Each adapter is labeled with its task and a brief description of how it optimizes the base model:
+>
+> **Adapter 1 (top-right):** A small blue (#0B64DD) module labeled "retrieval." Tag: "Tuned for finding relevant documents." A subtle search icon.
+>
+> **Adapter 2 (right):** A small gold (#FEC514) module labeled "classification." Tag: "Tuned for sorting into categories." A subtle category/tag icon.
+>
+> **Adapter 3 (bottom-right):** A small teal-green (#02BCB7) module labeled "clustering." Tag: "Tuned for grouping similar items." A subtle cluster/graph icon.
+>
+> **At the bottom**, a single-line callout (not a comparison): "Select the adapter at query time — same model, different optimization. Each adapter adds only ~5M parameters."
+>
+> The adapter modules should feel lightweight — small, with thin borders and a subtle glow. The plug-in connectors should look physical and satisfying, like clicking a module into a slot. The key visual idea: one solid base with small, swappable specializations. Sans-serif font. Subtle depth via drop shadows and soft glow. 800×500px, presentation slide format.
+
+---
+
+## 9. Listwise vs Pointwise Reranking Diagram
+
+**Filename:** `listwise-vs-pointwise.png`
+**Used in:** Rerankers section (replacing the old before/after static image)
+
+> Create a side-by-side comparison diagram on dark background (#0F1117) titled "Pointwise vs Listwise Reranking."
+>
+> **Left panel — "Pointwise (v2)"**
+> Show 5 small processing boxes stacked vertically. Each box contains ONE document paired with the query, producing ONE score. The boxes are independent — no connections between them. Each box is labeled with input (query + doc name) and output (score):
+> - Box 1: Query + Art. 5 → 0.74
+> - Box 2: Query + Art. 52 → 0.68
+> - Box 3: Query + Art. 6 → 0.81
+> - Box 4: Query + Art. 26 → 0.72
+> - Box 5: Query + Art. 9 → 0.65
+>
+> Below: "5 separate passes. Each doc scored in isolation."
+> The boxes should be muted grey, small, repetitive — visually showing the redundancy.
+>
+> **Right panel — "Listwise (v3)"**
+> Show ONE large processing box. Inside it: the query at top AND all 5 documents together. A single output: a ranked list with reordered scores. The output list:
+> 1. Art. 6 — 0.96 (gold highlight)
+> 2. Art. 5 — 0.89
+> 3. Art. 26 — 0.82
+> 4. Art. 9 — 0.85
+> 5. Art. 52 — 0.62
+>
+> Below: "1 pass. All docs compared against each other AND the query."
+> The single box should be larger, teal (#009191), feeling unified and efficient.
+>
+> Key insight this communicates: pointwise asks "is this doc relevant?" 5 separate times. Listwise asks "which of these is MOST relevant?" once. The visual difference should be obvious: 5 small isolated boxes vs 1 big unified box.
+>
+> Dark background (#0F1117). Teal (#009191) for the listwise box. Gold (#FEC514) for the top result. Muted grey for pointwise boxes. Sans-serif font. 900×500px, presentation slide format.
 
 ---
 

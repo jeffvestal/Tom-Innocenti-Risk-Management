@@ -217,12 +217,12 @@ section img:not(.lightbox img){cursor:zoom-in}
     <div class="card" style="text-align:center;border-color:rgba(0,145,145,.3);padding:2rem">
       <div style="font-size:1.5rem;font-weight:700;color:var(--jina-teal);margin-bottom:.35rem">Jina AI</div>
       <div style="color:var(--text);font-size:.95rem;font-weight:500">The <strong>models</strong> that make your search powerful</div>
-      <div style="color:var(--text-muted);font-size:.8rem;margin-top:.35rem">Best-in-class multilingual embeddings,<br>Built into Elastic<br>Out-of-the-box</div>
+      <div style="color:var(--text-muted);font-size:.8rem;margin-top:.35rem">State-of-the-art multilingual search models &mdash;<br>119+ languages. Part of Elastic.</div>
     </div>
     <div class="card" style="text-align:center;border-color:rgba(11,100,221,.3);padding:2rem">
       <div style="font-size:1.5rem;font-weight:700;color:var(--elastic-light-blue);margin-bottom:.35rem">Elastic Inference Service</div>
       <div style="color:var(--text);font-size:.95rem;font-weight:500">The <strong>service</strong> that runs them</div>
-      <div style="color:var(--text-muted);font-size:.8rem;margin-top:.35rem">On Serverless,<br>Models deployed and ready<br>Just use it</div>
+      <div style="color:var(--text-muted);font-size:.8rem;margin-top:.35rem">No external providers. No GPU management.<br>The models are just there &mdash;<br>pre-configured and ready.</div>
     </div>
   </div>
   <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-top:2rem;text-align:center">Next two slides break each one down. Then we go deep.</p>
@@ -231,19 +231,19 @@ section img:not(.lightbox img){cursor:zoom-in}
 <section data-nav="TL;DR" data-group="title">
   <div class="section-label jina" style="margin-bottom:.5rem">The Models</div>
   <h2 class="fade-up">Jina AI &mdash; What to Tell a Customer</h2>
+  <div class="callout fade-up" style="max-width:800px;margin-bottom:1.25rem">
+    <strong>Elastic already had semantic search.</strong> Jina is the next generation &mdash; multilingual, higher quality, and part of Elastic. Not a third-party integration.
+  </div>
   <div class="fade-up" style="max-width:800px">
     <div class="card" style="border-color:rgba(0,145,145,.3);padding:2rem">
       <ul class="bullet-list jina" style="gap:1rem">
-        <li>Jina AI builds <strong>state-of-the-art search models</strong> &mdash; the AI that makes search understand <em>meaning</em>, not just keywords.</li>
-        <li>The one model to remember: <strong style="color:var(--elastic-gold);font-size:1.05rem">jina-embeddings-v5-text-small</strong>. It&rsquo;s the <strong>new default embedding model</strong> &mdash; <strong>119+ languages</strong> out of the box.</li>
-        <li><strong>Rerankers</strong> &mdash; re-order search results for precision</li>
-        <li><strong>Reader</strong> &mdash; converts messy HTML and PDFs into clean text</li>
-        <li><strong>Vision model</strong> &mdash; understands images and diagrams</li>
-        <li>All models run in <strong>Elastic Inference Service</strong> &mdash; fully managed, nothing to deploy or maintain.</li>
+        <li>Embeddings, rerankers, content cleanup, and vision models. Part of Elastic.</li>
+        <li>One model to remember: <strong style="color:var(--elastic-gold);font-size:1.05rem">jina-embeddings-v5-text-small</strong>. Replaces ELSER as the default. <strong>119+ languages</strong>, <strong>32K token context</strong>.</li>
+        <li>Runs inside <strong>Elastic Inference Service</strong> &mdash; nothing to deploy, data never leaves Elastic.</li>
       </ul>
     </div>
     <div class="callout fade-up" style="margin-top:1.25rem">
-      <strong>The short version:</strong><br>Jina builds the models.<br>You use them in Elastic.<br>Data never leaves the cluster.
+      <strong>The short version:</strong><br>Jina builds the models. They&rsquo;re part of Elastic.<br>You use them. Data never leaves Elastic.
     </div>
   </div>
 </section>
@@ -251,20 +251,32 @@ section img:not(.lightbox img){cursor:zoom-in}
 <section data-nav="TL;DR" data-group="title">
   <div class="section-label eis" style="margin-bottom:.5rem">The Service</div>
   <h2 class="fade-up">Elastic Inference Service &mdash; What to Tell a Customer</h2>
+  <div class="callout blue fade-up" style="max-width:800px;margin-bottom:1.25rem">
+    <strong>Before:</strong> wire up external providers or run your own GPU nodes. <strong>Now:</strong> the models are just part of Elastic. Pre-configured, ready to go.
+  </div>
   <div class="fade-up" style="max-width:800px">
     <div class="card" style="border-color:rgba(11,100,221,.3);padding:2rem">
       <ul class="bullet-list eis" style="gap:1rem">
-        <li><strong>Managed inference service</strong> built into Elasticsearch. No ML nodes to provision, no GPUs to manage.</li>
-        <li>On Serverless: <strong style="color:var(--elastic-gold);font-size:1.05rem">already on and running, zero setup</strong>. Pre-configured endpoints are ready to use out of the box.</li>
-        <li>What&rsquo;s available: <strong>Jina embeddings + rerankers</strong>, plus <strong>LLMs from OpenAI, Anthropic, and Google</strong> &mdash; all through the same API.</li>
-        <li>How it works: map a <code>semantic_text</code> field &rarr; index your data &rarr; search. Embedding happens <strong>automatically</strong> at ingest.</li>
-        <li>Billed <strong>per million tokens</strong>, not by infrastructure. No surprise GPU bills.</li>
+        <li>Jina, OpenAI, Anthropic, Google &mdash; all available through one Inference API. Built into Elastic, fully managed.</li>
+        <li>On Serverless and Cloud Hosted: <strong style="color:var(--elastic-gold);font-size:1.05rem">pre-configured endpoints already running, zero setup</strong>.</li>
+        <li>One field type: <code>semantic_text</code>. Map it &rarr; index your data &rarr; search. Embedding happens <strong>automatically</strong> at ingest.</li>
       </ul>
     </div>
     <div class="callout blue fade-up" style="margin-top:1.25rem">
-      <strong>The short version:</strong><br>Elastic Inference Service runs all these models for you.<br>On Serverless, it&rsquo;s already there.<br>You just use it.
+      <strong>The short version:</strong><br>Embeddings, rerankers, and LLMs &mdash; all managed through one API.<br>Start with <code>semantic_text</code> and you&rsquo;re up and running.
     </div>
   </div>
+</section>
+
+<section data-nav="TL;DR" data-group="title">
+  <h2 class="fade-up">Your 30-Second Customer Pitch</h2>
+  <div class="hero-card fade-up" style="max-width:800px">
+    <p style="font-size:1.1rem;line-height:1.7;color:var(--text);font-style:italic">&ldquo;Your users search for one thing, the document says it differently, zero results. Elastic&rsquo;s search models just got a major upgrade &mdash; 119 languages, 64&times; more context, and nothing to deploy. One field type change and it just works.&rdquo;</p>
+  </div>
+  <div class="callout gold fade-up" style="max-width:800px;margin-top:1.25rem">
+    <strong>Then ask:</strong> &ldquo;Are you doing any semantic search today? What&rsquo;s your embedding model?&rdquo; &mdash; and listen.
+  </div>
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-top:2rem;text-align:center">That&rsquo;s the TL;DR. Now let&rsquo;s go deep.</p>
 </section>
 
 <!-- ================================================================ -->
@@ -290,9 +302,9 @@ section img:not(.lightbox img){cursor:zoom-in}
         <div class="card-stats" style="flex-direction:column;gap:.6rem">
           <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">Embeddings</span> <span style="color:var(--text-muted);font-size:.85rem">Text &amp; images &rarr; vectors for semantic search</span></div>
           <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">Rerankers</span> <span style="color:var(--text-muted);font-size:.85rem">Re-score and re-order results for precision</span></div>
-          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">Reader</span> <span style="color:var(--text-muted);font-size:.85rem">Full service &mdash; URL/PDF &rarr; clean markdown or JSON</span></div>
+          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">Reader</span> <span style="color:var(--text-muted);font-size:.85rem">Full service &mdash; URL/PDF &rarr; clean markdown or JSON</span><span style="color:var(--text-dim);font-size:.75rem;margin-left:.35rem">(Jina API)</span></div>
           <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">CLIP</span> <span style="color:var(--text-muted);font-size:.85rem">Cross-modal: find images with text, text with images</span></div>
-          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">VLM</span> <span style="color:var(--text-muted);font-size:.85rem">Vision language model &mdash; look at an image, answer questions</span></div>
+          <div style="display:flex;gap:.5rem;align-items:baseline"><span style="color:var(--jina-teal);font-weight:700;width:110px;flex-shrink:0">VLM</span> <span style="color:var(--text-muted);font-size:.85rem">Vision language model &mdash; look at an image, answer questions</span><span style="color:var(--text-dim);font-size:.75rem;margin-left:.35rem">(Jina API)</span></div>
         </div>
       </div>
     </div>
@@ -304,88 +316,6 @@ section img:not(.lightbox img){cursor:zoom-in}
   <h2 class="fade-up">Search Pipeline Architecture</h2>
   <div class="fade-up">
     <img src="assets/pipeline-architecture.png" alt="Search pipeline architecture — EU AI Act compliance tool" style="width:100%;border-radius:8px">
-  </div>
-</section>
-
-<!-- ================================================================ -->
-<!-- KEY CONCEPTS -->
-<!-- ================================================================ -->
-<section data-nav="Key Concepts" data-group="jina">
-  <div class="section-label jina">Jina AI</div>
-  <div class="scenario-intro fade-up">Before you can build anything, the PM wants to know what an &ldquo;embedding&rdquo; is. Fair enough &mdash; you had to Google it too.</div>
-  <h2 class="fade-up">Key Concepts &mdash; Quick Primer</h2>
-  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Before diving into models, here are the foundational ideas you&rsquo;ll need when talking to customers. If someone asks &ldquo;what is an embedding?&rdquo; &mdash; you&rsquo;ll find the answer here.</p>
-  <div class="concept-grid fade-up">
-    <div class="concept">
-      <div class="concept-term">What Is an Embedding?</div>
-      <div class="concept-def">When an AI model reads text, it converts it into a list of numbers &mdash; a <strong style="color:var(--text)">vector</strong>. The key insight: <em>similar meanings produce similar numbers</em>. A search for &ldquo;how to fix a leaky faucet&rdquo; will match a document about &ldquo;repairing dripping taps&rdquo; even though the exact words are completely different. This is how semantic search works.</div>
-    </div>
-    <div class="concept">
-      <div class="concept-term">What Is a Context Window?</div>
-      <div class="concept-def">The maximum amount of text a model can process in a single pass, measured in tokens (~1 token &asymp; 1 word). A 512-token window handles about one paragraph. <strong style="color:var(--text)">8K tokens &asymp; 6 pages. 32K tokens &asymp; 25 pages.</strong> Longer context = fewer chunks, less lost meaning at boundaries, better search quality for long documents.</div>
-    </div>
-    <div class="concept">
-      <div class="concept-term">What Is Matryoshka Representation Learning?</div>
-      <div class="concept-def">Named after Russian nesting dolls. The model <strong style="color:var(--text)">front-loads the most important information into the first dimensions</strong> of the embedding. You can truncate from 1,024 down to 256 dimensions and keep 90%+ of search quality. This lets customers trade a tiny accuracy reduction for major storage savings and faster searches.</div>
-    </div>
-    <div class="concept">
-      <div class="concept-term">What Are LoRA Adapters?</div>
-      <div class="concept-def">Small, lightweight plugin modules (a few million extra parameters) attached to one base model. Instead of deploying separate models for retrieval, classification, and clustering, customers <strong style="color:var(--text)">deploy one model and switch tasks by selecting the adapter at query time</strong>. One deployment, not three. Simpler infrastructure, lower cost.</div>
-    </div>
-  </div>
-</section>
-
-<section data-nav="Key Concepts" data-group="jina">
-  <div class="section-label jina">Jina AI</div>
-  <h2 class="fade-up">Visualizing Embeddings &amp; Matryoshka</h2>
-  <div class="fade-up" style="display:flex;gap:1.5rem;flex-wrap:wrap">
-    <div style="flex:1;min-width:300px">
-      <img src="assets/embedding-vector-space.png" alt="Embedding vector space — semantic clusters" style="width:100%;border-radius:8px">
-    </div>
-    <div style="flex:1;min-width:300px">
-      <img src="assets/matryoshka-dimensions.png" alt="Matryoshka representation learning — dimension truncation" style="width:100%;border-radius:8px">
-    </div>
-  </div>
-</section>
-
-<section data-nav="Key Concepts" data-group="jina">
-  <div class="section-label jina">Jina AI</div>
-  <h2 class="fade-up">Try It: Embedding Similarity</h2>
-  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">This is why &ldquo;facial recognition&rdquo; finds &ldquo;biometric identification&rdquo; &mdash; same neighborhood in vector space. See how similar meanings cluster together, even with completely different words.</p>
-  <div class="fade-up" id="embeddingDemo" style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
-    <div style="flex:1;min-width:280px">
-      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem" id="embPhrases">
-        <span class="emb-tag" data-idx="0" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;fix a leaky faucet&rdquo;</span>
-        <span class="emb-tag" data-idx="1" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;repairing dripping taps&rdquo;</span>
-        <span class="emb-tag" data-idx="2" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;plumbing repair guide&rdquo;</span>
-        <span class="emb-tag" data-idx="3" style="background:rgba(254,197,20,.2);border:1px solid rgba(254,197,20,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;quantum physics research&rdquo;</span>
-        <span class="emb-tag" data-idx="4" style="background:rgba(11,100,221,.2);border:1px solid rgba(11,100,221,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;train a neural network&rdquo;</span>
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:.72rem;font-family:var(--mono)" id="simMatrix">
-        <thead>
-          <tr>
-            <th style="padding:.35rem .5rem;text-align:left;border-bottom:1px solid var(--border);color:var(--text-dim)">Cosine Similarity</th>
-            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="fix a leaky faucet">Faucet</th>
-            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="repairing dripping taps">Taps</th>
-            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="plumbing repair guide">Plumbing</th>
-            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:#FEC514" title="quantum physics research">Quantum</th>
-            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--elastic-blue)" title="train a neural network">Neural</th>
-          </tr>
-        </thead>
-        <tbody id="simBody"></tbody>
-      </table>
-    </div>
-    <div style="flex:0 0 260px;min-width:200px">
-      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center">
-        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">2D Vector Space</div>
-        <svg id="embSvg" viewBox="0 0 240 200" style="width:100%;height:auto"></svg>
-        <div style="display:flex;justify-content:center;gap:.75rem;margin-top:.5rem;font-size:.65rem;color:var(--text-dim)">
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--jina-teal);vertical-align:middle"></span> Plumbing</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FEC514;vertical-align:middle"></span> Physics</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--elastic-blue);vertical-align:middle"></span> ML</span>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -443,6 +373,47 @@ section img:not(.lightbox img){cursor:zoom-in}
   </div>
 </section>
 
+<section data-nav="Key Concepts" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Embedding Similarity &mdash; Why It Finds What You Mean</h2>
+  <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">This is why &ldquo;facial recognition&rdquo; finds &ldquo;biometric identification&rdquo; &mdash; same neighborhood in vector space. See how similar meanings cluster together, even with completely different words.</p>
+  <div class="fade-up" id="embeddingDemo" style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1;min-width:280px">
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem" id="embPhrases">
+        <span class="emb-tag" data-idx="0" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;fix a leaky faucet&rdquo;</span>
+        <span class="emb-tag" data-idx="1" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;repairing dripping taps&rdquo;</span>
+        <span class="emb-tag" data-idx="2" style="background:rgba(0,145,145,.2);border:1px solid rgba(0,145,145,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;plumbing repair guide&rdquo;</span>
+        <span class="emb-tag" data-idx="3" style="background:rgba(254,197,20,.2);border:1px solid rgba(254,197,20,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;quantum physics research&rdquo;</span>
+        <span class="emb-tag" data-idx="4" style="background:rgba(11,100,221,.2);border:1px solid rgba(11,100,221,.5);padding:.3rem .7rem;border-radius:20px;font-size:.78rem;cursor:default;transition:all .3s">&ldquo;train a neural network&rdquo;</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:.72rem;font-family:var(--mono)" id="simMatrix">
+        <thead>
+          <tr>
+            <th style="padding:.35rem .5rem;text-align:left;border-bottom:1px solid var(--border);color:var(--text-dim)">Cosine Similarity</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="fix a leaky faucet">Faucet</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="repairing dripping taps">Taps</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--jina-teal)" title="plumbing repair guide">Plumbing</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:#FEC514" title="quantum physics research">Quantum</th>
+            <th style="padding:.35rem .4rem;text-align:center;border-bottom:1px solid var(--border);color:var(--elastic-blue)" title="train a neural network">Neural</th>
+          </tr>
+        </thead>
+        <tbody id="simBody"></tbody>
+      </table>
+    </div>
+    <div style="flex:0 0 260px;min-width:200px">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center">
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:600">2D Vector Space</div>
+        <svg id="embSvg" viewBox="0 0 240 200" style="width:100%;height:auto"></svg>
+        <div style="display:flex;justify-content:center;gap:.75rem;margin-top:.5rem;font-size:.65rem;color:var(--text-dim)">
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--jina-teal);vertical-align:middle"></span> Plumbing</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FEC514;vertical-align:middle"></span> Physics</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--elastic-blue);vertical-align:middle"></span> ML</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================================================================ -->
 <!-- v5 vs ELSER -->
 <!-- ================================================================ -->
@@ -467,7 +438,7 @@ section img:not(.lightbox img){cursor:zoom-in}
     </table>
   </div>
   <div class="callout gold fade-up" style="max-width:900px">
-    <strong>Bottom line:</strong> ELSER = English keyword expansion. v5-text-small = true multilingual semantic understanding with 64&times; more context. For new deployments, always recommend v5-text-small.
+    <strong>Bottom line:</strong> ELSER = English keyword expansion. v5-text-small = true multilingual semantic understanding with 64&times; more context. For new deployments, lead with v5-text-small.
   </div>
 </section>
 
@@ -503,9 +474,10 @@ section img:not(.lightbox img){cursor:zoom-in}
   <div class="callout fade-up">
     <strong>The analogy:</strong> Embedding search is scanning a library catalog to find the right shelf. The reranker is a librarian who reads the actual pages and tells you which books best answer your specific question.
   </div>
-
-  <div class="fade-up" style="margin-top:1.5rem">
-    <img src="assets/reranker-before-after.png" alt="Reranker before and after — result reordering" style="width:100%;max-width:900px;border-radius:8px">
+  <div class="callout blue fade-up">
+    <strong>Two things FEs get wrong:</strong>
+    <br>(1) The first stage doesn&rsquo;t have to be semantic &mdash; keyword/BM25 works too. The reranker doesn&rsquo;t care how you found the candidates.
+    <br>(2) The reranker reads the <strong>raw text</strong>, not the embeddings. It re-processes each document alongside the query from scratch. First-stage embeddings (if any) are not reused.
   </div>
 </section>
 
@@ -590,41 +562,10 @@ section img:not(.lightbox img){cursor:zoom-in}
   </div>
 </section>
 
-<!-- ================================================================ -->
-<!-- JINA READER SERVICE -->
-<!-- ================================================================ -->
-<section data-nav="Reader" data-group="jina">
-  <div class="section-label jina">Jina AI</div>
-  <div class="scenario-intro fade-up">Step one: be able to read the regulation. The EU published it as an HTML page with 200 lines of navigation, cookie banners, and a sidebar. Reader fixes that.</div>
-  <h2 class="fade-up">Jina Reader &mdash; Content Pipeline Service</h2>
-  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Before documents can be embedded, indexed, or searched, they need to be clean and structured. Raw web pages are full of JavaScript, CSS, ads, and navigation noise. Jina Reader is a <strong style="color:var(--text)">full service</strong> (not just a model) that handles this preprocessing.</p>
-
-  <div class="card-grid three fade-up">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Reader API</span></div>
-      <div class="card-desc">Prepend <code>r.jina.ai/</code> to any URL and get clean Markdown back. Handles HTML, PDFs, dynamic JavaScript pages. The simplest integration path.</div>
-      <div class="code-block" style="font-size:.78rem;padding:.75rem 1rem;margin-top:.5rem">r.jina.ai/https://example.com
-<span class="cc"># returns clean Markdown</span></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Search Mode</span></div>
-      <div class="card-desc">Prepend <code>s.jina.ai/</code> to a search query. Searches the web and returns top 5 results already converted to clean Markdown.</div>
-      <div class="code-block" style="font-size:.78rem;padding:.75rem 1rem;margin-top:.5rem">s.jina.ai/EU AI Act biometric
-<span class="cc"># web search → clean results</span></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">ReaderLM v2 (Model)</span></div>
-      <div class="card-desc">The underlying 1.5B-param model. Deploy locally for private use. HTML &rarr; Markdown <em>and</em> HTML &rarr; structured JSON extraction using predefined schemas. 29 languages, 512K context.</div>
-    </div>
-  </div>
-  <div class="callout fade-up">
-    <strong>Why it matters:</strong> Every RAG pipeline starts with clean data. Jina Reader is the preprocessing step that ensures AI models get high-quality input instead of noisy HTML. Outperforms models 20&times; its size on HTML-to-Markdown quality benchmarks.
-  </div>
-</section>
-
 <section data-nav="Reader" data-group="jina">
   <div class="section-label jina">Jina AI</div>
   <h2 class="fade-up">See It: Before &amp; After Jina Reader</h2>
+  <p class="fade-up" style="color:var(--text-muted);font-size:.9rem;margin-bottom:.75rem;max-width:800px">Jina Reader converts any URL or PDF into clean, structured Markdown &mdash; prepend <code>r.jina.ai/</code> to any URL. Accessed via the Jina API, not EIS.</p>
   <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">What a web page looks like before and after processing with <code>r.jina.ai/</code></p>
     <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
       <button id="readerBtn" onclick="runReader()" style="background:var(--jina-teal);color:#fff;border:none;padding:.4rem 1rem;border-radius:6px;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s">Process with Reader</button>
@@ -703,23 +644,20 @@ section img:not(.lightbox img){cursor:zoom-in}
         <li>Lighter than v4 &mdash; choose for speed/cost when you don&rsquo;t need document understanding</li>
       </ul>
     </div>
-    <div class="compare-box elastic-accent">
+    <div class="compare-box jina-accent">
       <h3>VLM &mdash; Vision Language Model</h3>
       <div class="card-desc">A <strong style="color:var(--text)">generative</strong> model: it looks at an image and produces text answers to questions about it. Not retrieval &mdash; understanding. &ldquo;What does this chart show?&rdquo; &ldquo;What text is in this scanned document?&rdquo;</div>
-      <ul class="bullet-list eis" style="margin-top:.75rem">
+      <ul class="bullet-list jina" style="margin-top:.75rem">
         <li><strong>2.4B</strong> params, <strong>29 languages</strong></li>
         <li>Best multilingual VQA among open 2B models</li>
         <li>Strong OCR (778/1000 OCRBench)</li>
         <li>Lowest hallucination rate (90.3 POPE) in its class</li>
+        <li style="color:var(--text-dim);font-style:italic">Available via Jina API &mdash; not on EIS</li>
       </ul>
     </div>
   </div>
   <div class="callout fade-up">
-    <strong>CLIP vs VLM vs v4:</strong> CLIP v2 embeds images for <em>search</em> (lightweight, fast). v4 embeds images + text together for <em>multimodal search</em> (heavier, handles complex visual docs). VLM <em>generates text</em> about images (answers questions, extracts info). They can be used together in a pipeline.
-  </div>
-
-  <div class="fade-up" style="margin-top:1.5rem">
-    <img src="assets/vlm-analysis-flow.png" alt="VLM analysis flow — image upload to semantic search" style="width:100%;border-radius:8px">
+    <strong>CLIP vs VLM vs v4:</strong> CLIP v2 embeds images for <em>search</em> (lightweight, fast). v4 embeds images + text together for <em>multimodal search</em> (heavier, handles complex visual docs). VLM <em>generates text</em> about images (answers questions, extracts info). They can be used together in a pipeline. Reader and VLM are accessed via the Jina API directly &mdash; they are not available through EIS.
   </div>
 </section>
 
@@ -727,6 +665,9 @@ section img:not(.lightbox img){cursor:zoom-in}
   <div class="section-label jina">Jina AI</div>
   <h2 class="fade-up">VLM in Action: Image &rarr; Text Analysis</h2>
   <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">The CTO&rsquo;s Slack message: &ldquo;Are we using any of these banned AI services?&rdquo; Upload an architecture diagram and the VLM tells you what it sees.</p>
+  <div class="fade-up" style="margin-top:1rem;margin-bottom:1rem">
+    <img src="assets/vlm-analysis-flow.png" alt="VLM analysis flow — image upload to semantic search" style="width:100%;border-radius:8px">
+  </div>
     <div style="display:flex;gap:1.25rem;flex-wrap:wrap">
       <div style="flex:0 0 260px;min-width:220px">
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
@@ -774,129 +715,11 @@ section img:not(.lightbox img){cursor:zoom-in}
 </section>
 
 <!-- ================================================================ -->
-<!-- QUICK REFERENCE TABLE -->
-<!-- ================================================================ -->
-<section class="full-bleed" data-nav="Quick Reference" data-group="jina">
-  <div style="max-width:1200px;margin:0 auto">
-    <div class="section-label jina">Jina AI</div>
-    <div class="scenario-intro fade-up">Your team&rsquo;s cheat sheet. Bookmark this one &mdash; you&rsquo;ll need it during the hands-on.</div>
-    <h2 class="fade-up">Quick Reference &mdash; Every Current Model</h2>
-    <div class="table-wrap fade-up">
-      <table>
-        <thead><tr><th>Model</th><th>Type</th><th>Params</th><th>Context</th><th>Languages</th><th>On EIS?</th><th>Best For</th></tr></thead>
-        <tbody>
-          <tr class="highlight-row"><td><strong>v5-text-small</strong></td><td>Embedding</td><td>677M</td><td>32K</td><td>119+</td><td>Yes</td><td>Default for text search &amp; RAG</td></tr>
-          <tr class="highlight-row"><td><strong>v5-text-nano</strong></td><td>Embedding</td><td>239M</td><td>32K</td><td>Multi</td><td>Yes</td><td>Edge, low-latency, budget</td></tr>
-          <tr><td>v4</td><td>Embedding</td><td>3.8B</td><td>32K</td><td>30+</td><td>No</td><td>Visual documents, multimodal search</td></tr>
-          <tr><td>jina-clip-v2</td><td>CLIP</td><td>865M</td><td>8K</td><td>89</td><td>No</td><td>Cross-modal text &harr; image</td></tr>
-          <tr class="highlight-row"><td><strong>jina-reranker-v3</strong></td><td>Reranker</td><td>600M</td><td>131K</td><td>100+</td><td>Yes</td><td>Best accuracy, listwise scoring</td></tr>
-          <tr class="highlight-row"><td><strong>jina-reranker-v2</strong></td><td>Reranker</td><td>278M</td><td>1K</td><td>100+</td><td>Yes</td><td>Fast, compact, function-calling</td></tr>
-          <tr><td>ReaderLM v2</td><td>SLM</td><td>1.5B</td><td>512K</td><td>29</td><td>No</td><td>HTML/PDF to Markdown/JSON</td></tr>
-          <tr><td>jina-vlm</td><td>VLM</td><td>2.4B</td><td>Multi-img</td><td>29</td><td>No</td><td>Visual QA, OCR, doc understanding</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- ================================================================ -->
-<!-- WHY IT MATTERS -->
-<!-- ================================================================ -->
-<section data-nav="Why It Matters" data-group="jina">
-  <div class="section-label jina">Jina AI</div>
-  <div class="scenario-intro fade-up">Legal says the regulation text can&rsquo;t leave the cluster. So no, you can&rsquo;t just call OpenAI.</div>
-  <h2 class="fade-up">Why This Matters</h2>
-  <div class="two-col fade-up">
-    <div>
-      <h3>For Customer Conversations</h3>
-      <ul class="bullet-list jina">
-        <li><strong>Pure text search?</strong> &rarr; v5-text-small on EIS. Done.</li>
-        <li><strong>Documents with images/charts?</strong> &rarr; v4.</li>
-        <li><strong>Tight on budget/latency?</strong> &rarr; v5-text-nano.</li>
-        <li><strong>Need reranking precision?</strong> &rarr; Add Reranker v3.</li>
-        <li><strong>Quick PoC?</strong> &rarr; v5-text-small on EIS. One API call, one field type change. Working prototype in under an hour.</li>
-      </ul>
-    </div>
-    <div>
-      <h3>vs. OpenAI / Cohere Embeddings</h3>
-      <div class="card" style="border-color:rgba(0,145,145,.3)">
-        <ul class="bullet-list jina" style="gap:.6rem">
-          <li><strong>No external API calls</strong> &mdash; Jina on EIS runs inside Elasticsearch</li>
-          <li><strong>No data leaving the cluster</strong> &mdash; text sent to EIS only, discarded after processing</li>
-          <li><strong>Predictable costs</strong> &mdash; part of Elastic Cloud subscription, not per-token third-party pricing</li>
-          <li><strong>Equal or better quality</strong> &mdash; v5-text-small matches/exceeds OpenAI on standard benchmarks</li>
-          <li><strong>OpenAI-compatible API schema</strong> &mdash; straightforward migration</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================================================================ -->
-<!-- JINA API SERVICE -->
-<!-- ================================================================ -->
-<section data-nav="Jina API" data-group="jina">
-  <div class="section-label jina">Jina AI</div>
-  <div class="scenario-intro fade-up">But first &mdash; you prototype with the Jina API to prove the approach works before touching production. No cluster needed.</div>
-  <h2 class="fade-up">Jina API Service &mdash; jina.ai</h2>
-  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">All Jina models are available directly via a REST API at <strong style="color:var(--text)">jina.ai</strong> &mdash; no Elastic cluster required. Instant access, no credit card or registration needed. SOC 2 Type 1 &amp; 2 compliant. Useful for quick prototyping, evaluation, or integrating into non-Elastic workflows.</p>
-
-  <div class="card-grid three fade-up">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Reader</span><span class="card-badge badge-eis">r.jina.ai</span></div>
-      <div class="card-desc">Prepend <code>r.jina.ai/</code> to any URL to get clean Markdown. Or use <code>s.jina.ai/</code> to search the web and get results already converted.</div>
-      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl "https://r.jina.ai/https://example.com"
-<span class="cc"># → clean Markdown</span>
-
-curl "https://s.jina.ai/EU AI Act biometric"
-<span class="cc"># → web search → clean results</span></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Embeddings</span><span class="card-badge badge-active">api.jina.ai</span></div>
-      <div class="card-desc">Generate embeddings via REST. Supports all Jina embedding models (v3, v5, CLIP). Pass text or images, get vectors back.</div>
-      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl https://api.jina.ai/v1/embeddings \
-  -H "Authorization: Bearer &lt;KEY&gt;" \
-  -d '{
-    <span class="cp">"model"</span>: <span class="cs">"jina-embeddings-v3"</span>,
-    <span class="cp">"input"</span>: [<span class="cs">"Your text here"</span>]
-  }'</div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Reranker</span><span class="card-badge badge-active">api.jina.ai</span></div>
-      <div class="card-desc">Pass a query + documents, get them re-scored and re-ordered by relevance. Same v2/v3 models available on EIS.</div>
-      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl https://api.jina.ai/v1/rerank \
-  -H "Authorization: Bearer &lt;KEY&gt;" \
-  -d '{
-    <span class="cp">"model"</span>: <span class="cs">"jina-reranker-v3"</span>,
-    <span class="cp">"query"</span>: <span class="cs">"AI regulation"</span>,
-    <span class="cp">"documents"</span>: [<span class="cs">"..."</span>]
-  }'</div>
-    </div>
-  </div>
-</section>
-
-<section data-nav="Jina API" data-group="jina">
-  <div class="section-label jina">Jina AI</div>
-  <h2 class="fade-up">Jina API &mdash; Tips &amp; Integration</h2>
-  <div class="compare-row fade-up">
-    <div class="callout">
-      <strong>MCP Server:</strong> Add <code>mcp.jina.ai</code> as an MCP server to access Reader, Embeddings, and Reranker directly from LLMs and AI agents. No custom integration code required.
-    </div>
-    <div class="callout gold">
-      <strong>Getting an API Key:</strong> Go to <strong>jina.ai</strong> &rarr; click &ldquo;How to get my API key?&rdquo; &rarr; key appears in the <strong>API Key &amp; Billing</strong> tab. Free tier with rate limits; add your key to requests for higher throughput.
-    </div>
-  </div>
-  <div class="callout blue fade-up" style="max-width:900px">
-    <strong>Jina API vs EIS:</strong> The Jina API at jina.ai is great for prototyping and non-Elastic use cases. For production Elastic deployments, use <strong>EIS</strong> (next section) &mdash; same models, but managed inside Elasticsearch with no external calls, no data leaving the cluster, and integrated billing.
-  </div>
-</section>
-
-<!-- ================================================================ -->
 <!-- WHAT IS EIS -->
 <!-- ================================================================ -->
 <section data-nav="What Is EIS" data-group="eis">
   <div class="section-label eis">Part 2 &mdash; Elastic Inference Service</div>
-  <div class="scenario-intro fade-up">Prototype works. Now make it production-ready without provisioning GPU nodes at 2am.</div>
+  <div class="scenario-intro fade-up">OK, you know the models. How does your customer actually use them? They don&rsquo;t connect to an external provider or spin up GPU nodes. The models are just there. That&rsquo;s EIS.</div>
   <h2 class="fade-up">What Is EIS?</h2>
   <div class="two-col fade-up">
     <div>
@@ -914,30 +737,80 @@ curl "https://s.jina.ai/EU AI Act biometric"
       </div>
     </div>
   </div>
-  <div class="fade-up" style="margin-top:2rem">
-    <img src="assets/eis-before-after.png" alt="EIS before and after — DIY vs managed inference" style="width:100%;border-radius:8px">
-  </div>
 </section>
 
-<!-- ================================================================ -->
-<!-- WHERE AVAILABLE -->
-<!-- ================================================================ -->
-<section data-nav="Where Available" data-group="eis">
+<section data-nav="What Is EIS" data-group="eis">
   <div class="section-label eis">EIS</div>
-  <div class="scenario-intro fade-up">Good news: your customer&rsquo;s cluster already has access. Here&rsquo;s the deployment map.</div>
-  <h2 class="fade-up">Where Is EIS Available?</h2>
-  <div class="table-wrap fade-up" style="max-width:900px">
-    <table>
-      <thead><tr><th>Deployment Type</th><th>Availability</th><th>Setup Required</th><th>Version</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Elastic Cloud Serverless</strong></td><td>Built-in, zero setup</td><td>None &mdash; pre-configured endpoints ready to use</td><td>GA</td></tr>
-        <tr><td><strong>Elastic Cloud Hosted</strong></td><td>Built-in, zero setup</td><td>None &mdash; pre-configured endpoints ready to use</td><td>GA</td></tr>
-        <tr><td><strong>Self-managed (ECE, ECK, standalone)</strong></td><td>Via Cloud Connect</td><td>Connect cluster to Elastic Cloud, enable EIS</td><td>9.3+</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="callout blue fade-up" style="max-width:900px;margin-top:1.5rem">
-    <strong>Cloud Connect for self-managed:</strong> Bridges your cluster to Elastic Cloud services without hosting them locally. After enabling, Elasticsearch <strong>automatically creates</strong> inference endpoints and Kibana AI connectors. Requires Enterprise license or active trial. Stack 9.3+.
+  <div class="compare-row fade-up" style="gap:2rem;align-items:stretch">
+    <!-- LEFT: Without EIS -->
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#e57373,var(--jina-red))"></div>
+      <h3 style="font-size:1.1rem;margin-bottom:1rem;color:var(--text)">Without EIS: you manage everything</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:1rem">
+        <div style="background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:6px;padding:.5rem;text-align:center">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text-muted)">OpenAI</div>
+          <div style="font-size:.6rem;color:var(--text-dim)">&#128273; API key, billing</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:6px;padding:.5rem;text-align:center">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text-muted)">Anthropic</div>
+          <div style="font-size:.6rem;color:var(--text-dim)">&#128273; API key, caps</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:6px;padding:.5rem;text-align:center">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text-muted)">Google AI</div>
+          <div style="font-size:.6rem;color:var(--text-dim)">&#128273; Service acct, config</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:6px;padding:.5rem;text-align:center">
+          <div style="font-size:.75rem;font-weight:600;color:var(--text-muted)">Jina AI</div>
+          <div style="font-size:.6rem;color:var(--text-dim)">&#128273; API key, billing</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(235,97,97,.3);border-radius:6px;padding:.5rem;text-align:center">
+          <div style="font-size:.75rem;font-weight:600;color:var(--jina-red)">ELSER</div>
+          <div style="font-size:.6rem;color:var(--text-dim)">Dedicated ML node</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(235,97,97,.3);border-radius:6px;padding:.5rem;text-align:center">
+          <div style="font-size:.75rem;font-weight:600;color:var(--jina-red)">E5</div>
+          <div style="font-size:.6rem;color:var(--text-dim)">Dedicated ML node</div>
+        </div>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:.8rem;font-style:italic">6 integrations. 2 need dedicated ML nodes.<br>Every new model = start over.</div>
+    </div>
+    <!-- RIGHT: With EIS -->
+    <div style="background:var(--bg-card);border:1px solid rgba(11,100,221,.3);border-radius:12px;padding:1.5rem;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--elastic-blue),var(--elastic-teal))"></div>
+      <h3 style="font-size:1.1rem;margin-bottom:1rem;color:var(--text)">With EIS: one Inference API</h3>
+      <div style="background:rgba(11,100,221,.12);border:1px solid rgba(11,100,221,.3);border-radius:8px;padding:.75rem;text-align:center;margin-bottom:1rem">
+        <div style="font-size:.9rem;font-weight:700;color:var(--elastic-light-blue)">Elastic Inference Service</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem">
+        <div>
+          <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.3rem;font-weight:600">LLMs</div>
+          <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">OpenAI</span>
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">Anthropic</span>
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">Google</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.3rem;font-weight:600">Embeddings</div>
+          <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">Jina v5</span>
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">ELSER</span>
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">E5</span>
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">OpenAI</span>
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">Google</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.3rem;font-weight:600">Rerankers</div>
+          <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">Jina v3</span>
+            <span style="background:rgba(0,145,145,.15);color:var(--jina-teal);border:1px solid rgba(0,145,145,.25);padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:500">Jina v2</span>
+          </div>
+        </div>
+      </div>
+      <div class="code-block" style="font-size:.72rem;padding:.5rem .75rem;margin-bottom:.75rem"><span class="cp">"service"</span>: <span class="cs">"elastic"</span></div>
+      <div style="text-align:center;color:var(--text-muted);font-size:.8rem">One API. LLMs, embeddings, and rerankers<br>from multiple providers.</div>
+    </div>
   </div>
 </section>
 
@@ -990,90 +863,16 @@ curl "https://s.jina.ai/EU AI Act biometric"
 </section>
 
 <!-- ================================================================ -->
-<!-- MODELS ON EIS — UPDATED FROM LIVE DATA -->
-<!-- ================================================================ -->
-<section class="full-bleed" data-nav="Models on EIS" data-group="eis">
-  <div style="max-width:1200px;margin:0 auto">
-    <div class="section-label eis">EIS</div>
-    <div class="scenario-intro fade-up">The full menu. For our compliance tool we need embeddings, a reranker, and an LLM for the agent. All here.</div>
-    <h2 class="fade-up">What&rsquo;s Available on EIS?</h2>
-
-    <h3 class="fade-up" style="margin-top:1.5rem;color:var(--elastic-light-blue)">LLM Chat Models (Elastic Managed)</h3>
-    <div class="table-wrap fade-up" style="margin-bottom:2rem">
-      <table>
-        <thead><tr><th>Author</th><th>Model</th><th>ID</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td>Anthropic</td><td>Claude Opus 4.6</td><td><code>anthropic-claude-4.6-opus</code></td><td>GA</td></tr>
-          <tr class="new-row"><td>Anthropic</td><td>Claude Sonnet 4.6</td><td><code>anthropic-claude-4.6-sonnet</code></td><td>Beta</td></tr>
-          <tr><td>Anthropic</td><td>Claude Opus 4.5</td><td><code>anthropic-claude-4.5-opus</code></td><td>GA</td></tr>
-          <tr><td>Anthropic</td><td>Claude Sonnet 4.5</td><td><code>anthropic-claude-4.5-sonnet</code></td><td>GA</td></tr>
-          <tr class="new-row"><td>Anthropic</td><td>Claude Haiku 4.5</td><td><code>anthropic-claude-4.5-haiku</code></td><td>Beta</td></tr>
-          <tr><td>Anthropic</td><td>Claude Sonnet 3.7</td><td><code>rainbow-sprinkles</code></td><td>GA (legacy)</td></tr>
-          <tr><td>Google</td><td>Gemini 2.5 Pro</td><td><code>google-gemini-2.5-pro</code></td><td>GA</td></tr>
-          <tr><td>Google</td><td>Gemini 2.5 Flash</td><td><code>google-gemini-2.5-flash</code></td><td>GA</td></tr>
-          <tr class="new-row"><td>Google</td><td>Gemini 2.5 Flash Lite</td><td><code>google-gemini-2.5-flash-lite</code></td><td>Beta</td></tr>
-          <tr><td>OpenAI</td><td>GPT-5.2</td><td><code>openai-gpt-5.2</code></td><td>GA</td></tr>
-          <tr><td>OpenAI</td><td>GPT-4.1</td><td><code>openai-gpt-4.1</code></td><td>GA</td></tr>
-          <tr><td>OpenAI</td><td>GPT-4.1 Mini</td><td><code>openai-gpt-4.1-mini</code></td><td>GA</td></tr>
-          <tr><td>OpenAI</td><td>GPT-OSS 120B</td><td><code>openai-gpt-oss-120b</code></td><td>GA</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section class="full-bleed" data-nav="Models on EIS" data-group="eis">
-  <div style="max-width:1200px;margin:0 auto">
-    <div class="section-label eis">EIS</div>
-    <h2 class="fade-up">EIS Embedding &amp; Reranker Models</h2>
-    <div class="compare-row fade-up">
-      <div>
-        <h3 style="color:var(--jina-teal)">Embedding Models</h3>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Model</th><th>ID</th><th>Dims</th><th>Service</th></tr></thead>
-            <tbody>
-              <tr class="highlight-row"><td><strong>Jina v5 Small</strong></td><td><code>jina-embeddings-v5-text-small</code></td><td>1,024</td><td>EIS</td></tr>
-              <tr class="highlight-row"><td><strong>Jina v5 Nano</strong></td><td><code>jina-embeddings-v5-text-nano</code></td><td>768</td><td>EIS</td></tr>
-              <tr class="highlight-row"><td>Jina v3</td><td><code>jina-embeddings-v3</code></td><td>1,024</td><td>EIS</td></tr>
-              <tr><td>ELSER v2 (EIS)</td><td><code>elser_model_2</code></td><td>sparse</td><td>EIS</td></tr>
-              <tr><td>ELSER v2 (ML node)</td><td><code>.elser_model_2_linux-x86_64</code></td><td>sparse</td><td>ES</td></tr>
-              <tr class="new-row"><td>E5 Large</td><td><code>microsoft-multilingual-e5-large</code></td><td>1,024</td><td>EIS (Beta)</td></tr>
-              <tr><td>E5 Small (ML node)</td><td><code>.multilingual-e5-small_linux-x86_64</code></td><td>&mdash;</td><td>ES</td></tr>
-              <tr><td>Gemini Emb 001</td><td><code>google-gemini-embedding-001</code></td><td>768</td><td>EIS</td></tr>
-              <tr><td>OpenAI Emb 3 Large</td><td><code>openai-text-embedding-3-large</code></td><td>3,072</td><td>EIS</td></tr>
-              <tr><td>OpenAI Emb 3 Small</td><td><code>openai-text-embedding-3-small</code></td><td>1,536</td><td>EIS</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div>
-        <h3 style="color:var(--jina-teal)">Rerankers</h3>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Model</th><th>ID</th><th>Service</th></tr></thead>
-            <tbody>
-              <tr class="highlight-row"><td><strong>Jina Reranker v3</strong></td><td><code>jina-reranker-v3</code></td><td>EIS</td></tr>
-              <tr class="highlight-row"><td><strong>Jina Reranker v2</strong></td><td><code>jina-reranker-v2-base-multilingual</code></td><td>EIS</td></tr>
-              <tr><td>Rerank v1 (ML node)</td><td><code>.rerank-v1</code></td><td>ES</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="callout blue" style="margin-top:1rem;font-size:.85rem">
-          All LLMs: <strong>0-day data retention</strong>, data NOT used to train models, inference in US region. <span style="color:var(--elastic-green)">Green rows</span> = newly added (Beta).
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================================================================ -->
 <!-- HOW IT WORKS -->
 <!-- ================================================================ -->
 <section data-nav="How It Works" data-group="eis">
   <div class="section-label eis">EIS</div>
   <div class="scenario-intro fade-up">Three API calls. That&rsquo;s it. Map a field, search it, rerank the results. This is what you&rsquo;re about to build.</div>
   <h2 class="fade-up">How It Works &mdash; End to End</h2>
+
+  <div class="hero-card fade-up" style="margin-bottom:1.5rem;padding:1.25rem 1.5rem">
+    <p style="font-size:1rem;line-height:1.6;color:var(--text)">One thing to remember: <code style="font-size:1.1rem;color:var(--elastic-gold);background:rgba(254,197,20,.12);padding:.15rem .5rem;border-radius:4px">semantic_text</code>. It handles embedding, chunking, and storage for you. Map the field, index your data, search with a normal <code>match</code> query. Done.</p>
+  </div>
 
   <div class="pipeline fade-up">
     <div class="pipe-step"><div class="step-num">Step 1</div><div class="step-title">Map</div><div class="step-detail"><code>semantic_text</code> field</div></div>
@@ -1147,6 +946,58 @@ curl "https://s.jina.ai/EU AI Act biometric"
   </div>
 </section>
 
+
+<!-- ================================================================ -->
+<!-- EIS PRICING -->
+<!-- ================================================================ -->
+<section data-nav="Pricing" data-group="eis">
+  <div class="section-label eis">EIS</div>
+  <div class="scenario-intro fade-up">The question you&rsquo;ll get on every call. Here&rsquo;s what you can say &mdash; and what you can&rsquo;t yet.</div>
+  <h2 class="fade-up">EIS Pricing &mdash; What to Tell Customers</h2>
+  <div class="table-wrap fade-up" style="max-width:900px">
+    <table>
+      <thead><tr><th>Category</th><th>Price</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr class="highlight-row"><td><strong>Embeddings &amp; Rerankers</strong></td><td>From <strong style="color:var(--elastic-gold)">$0.08 / M tokens</strong></td><td>Input tokens only &mdash; no output billing</td></tr>
+        <tr><td><strong>Chat / LLM</strong> (managed)</td><td><strong>$4.50 / M input</strong>, <strong>$21 / M output</strong></td><td>AI Playground, Agent Builder, AI Assistant</td></tr>
+        <tr><td><strong>ML VCUs</strong> (self-hosted models)</td><td><strong>$0.07 / VCU / hr</strong></td><td>ELSER on ML nodes, custom models</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="compare-row fade-up" style="margin-top:1.25rem">
+    <div class="callout blue">
+      <strong>What you can say:</strong>
+      <ul class="bullet-list eis" style="gap:.4rem;font-size:.85rem;margin-top:.5rem">
+        <li>Per-token billing, not compute costs &mdash; no idle ML node bills</li>
+        <li>Embeddings are cheap: $0.08/M tokens means millions of docs for dollars</li>
+        <li>Chat is pricier but replaces external LLM API costs + data stays in Elastic</li>
+      </ul>
+    </div>
+    <div class="callout gold">
+      <strong>What you can&rsquo;t estimate yet:</strong>
+      <ul class="bullet-list jina" style="gap:.4rem;font-size:.85rem;margin-top:.5rem">
+        <li>Per-model breakdown within the &ldquo;from $0.08&rdquo; range isn&rsquo;t public</li>
+        <li>Total cost depends on doc count &times; chunk size &times; reindex frequency</li>
+        <li>Point them to sales contact or Cloud Console billing for actuals</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout fade-up" style="max-width:900px;margin-top:1rem">
+    <strong>Rate limits:</strong> Jina Embeddings 6K req/min, 6M ingest tokens/min &bull; Jina Rerankers 600 req/min &bull; Chat/LLM 2K req/min *<br>
+    <strong>Regions:</strong> AWS us-east-1 &bull; GCP us-east4 (new) &mdash; Europe and Asia regions coming soon<br>
+    <span style="font-size:.8rem;color:var(--text-dim)">* Limits can be raised &mdash; work with the Elastic inference team with a business justification.</span>
+  </div>
+</section>
+
+
+<section data-nav="Pricing" data-group="eis">
+  <div class="hero-card fade-up" style="max-width:900px;margin:0 auto">
+    <p style="font-size:1.05rem;line-height:1.9;color:var(--text)"><strong>You know the models.</strong> Two ways to use them:<br><br><strong style="color:var(--jina-teal)">(1)</strong> Jina API at jina.ai &mdash; great for prototyping, no cluster needed. Reader and VLM are Jina API only.<br><br><strong style="color:var(--elastic-light-blue)">(2)</strong> EIS &mdash; same models, built into Elastic, no external calls.<br><br><em>Now let&rsquo;s build something.</em></p>
+  </div>
+</section>
+
 <!-- ================================================================ -->
 <!-- HANDS-ON -->
 <!-- ================================================================ -->
@@ -1161,27 +1012,529 @@ curl "https://s.jina.ai/EU AI Act biometric"
       <div class="handson-num">01</div>
       <h3>Ingest</h3>
       <p style="color:var(--text-muted);font-size:.85rem">Jina Reader converts the EU AI Act PDF into clean, structured markdown. Chunked by article for legal context preservation.</p>
+      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; EU AI Act as clean markdown chunks</p>
     </div>
     <div class="handson-card">
       <div class="handson-num">02</div>
       <h3>Index</h3>
       <p style="color:var(--text-muted);font-size:.85rem">Jina Embeddings v5 on EIS. <code>semantic_text</code> field type &mdash; zero-config vector search. One mapping change, done.</p>
+      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; Working semantic search index with v5 on EIS</p>
     </div>
     <div class="handson-card">
       <div class="handson-num">03</div>
       <h3>Rerank</h3>
       <p style="color:var(--text-muted);font-size:.85rem">Jina Reranker via <code>text_similarity_reranker</code> retriever. Side-by-side before vs. after &mdash; see the precision difference.</p>
+      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; Before/after showing reranker precision lift</p>
     </div>
   </div>
 
-  <div class="section-divider fade-up"></div>
+  <div class="callout fade-up" style="max-width:700px;margin-top:1.25rem">
+    <strong>Prerequisites:</strong> Elastic Cloud account (Serverless or Hosted), Jina API key from jina.ai (free tier works), Python 3.10+ Then explore the interactive demo app.
+  </div>
+</section>
 
-  <div class="card fade-up" style="max-width:700px;margin-top:1rem">
-    <div class="card-header"><span class="card-title">Then: The Interactive Demo App</span></div>
-    <div class="card-desc" style="margin-bottom:0">
-      <strong>Search tab:</strong> Semantic search + Deep Analysis (reranking with before/after) &bull;
-      <strong>Agent tab:</strong> AI agent with EU AI Act expertise + VLM architecture diagram analysis &bull;
-      <strong>Data Lab:</strong> Watch the full ingestion pipeline execute live
+
+<!-- ================================================================ -->
+<!-- REFERENCE APPENDIX -->
+<!-- ================================================================ -->
+<section data-nav="Reference" data-group="reference">
+  <div class="section-label" style="color:var(--text-dim)">Appendix</div>
+  <h2>Reference &mdash; Deep Dives &amp; Details</h2>
+  <p style="color:var(--text-muted);font-size:1rem">Everything below is supplementary material. Browse at your own pace after the session.</p>
+</section>
+
+<!-- ================================================================ -->
+<!-- KEY CONCEPTS -->
+<!-- ================================================================ -->
+<section data-nav="Key Concepts" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Before you can build anything, the PM wants to know what an &ldquo;embedding&rdquo; is. Fair enough &mdash; you had to Google it too.</div>
+  <h2 class="fade-up">What Is an Embedding?</h2>
+  <div class="two-col fade-up" style="align-items:center">
+    <div>
+      <div class="concept" style="padding:2rem">
+        <div class="concept-def" style="font-size:1.05rem;line-height:1.8">
+          When an AI model reads text, it converts it into a list of numbers &mdash; a <strong style="color:var(--text)">vector</strong>.
+          <br><br>
+          The key insight: <em>similar meanings produce similar numbers</em>.
+          <br><br>
+          A search for &ldquo;how to fix a leaky faucet&rdquo; will match a document about &ldquo;repairing dripping taps&rdquo; &mdash; even though the words are completely different.
+          <br><br>
+          This is how semantic search works.
+        </div>
+      </div>
+    </div>
+    <div>
+      <img src="assets/embedding-vector-space.png" alt="Embedding vector space — semantic clusters" style="width:100%;border-radius:8px">
+    </div>
+  </div>
+</section>
+
+<section data-nav="Key Concepts" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">What Is a Context Window?</h2>
+  <div class="two-col fade-up" style="align-items:center">
+    <div>
+      <div class="concept" style="padding:2rem">
+        <div class="concept-def" style="font-size:1.05rem;line-height:1.8">
+          The maximum text a model can process in one pass.
+          <br><br>
+          <strong style="color:var(--text)">512 tokens &asymp; 1 paragraph.</strong><br>
+          <strong style="color:var(--text)">8K tokens &asymp; 6 pages.</strong><br>
+          <strong style="color:var(--text)">32K tokens &asymp; 25 pages.</strong>
+          <br><br>
+          A bigger window doesn&rsquo;t automatically mean better results &mdash; it means <strong style="color:var(--text)">more flexibility</strong>.
+          <br><br>
+          You choose how to chunk your data instead of the model forcing you to.
+        </div>
+      </div>
+    </div>
+    <div>
+      <img src="assets/context-window.png" alt="Context window — chunking flexibility across model sizes" style="width:100%;border-radius:8px">
+    </div>
+  </div>
+</section>
+
+<section data-nav="Key Concepts" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">What Is Matryoshka Representation Learning?</h2>
+  <div class="two-col fade-up" style="align-items:center">
+    <div>
+      <div class="concept" style="padding:2rem">
+        <div class="concept-def" style="font-size:1.05rem;line-height:1.8">
+          Named after Russian nesting dolls.
+          <br><br>
+          The model <strong style="color:var(--text)">front-loads the most important information into the first dimensions</strong> of the embedding.
+          <br><br>
+          Truncate from 1,024 down to 256 dimensions and keep <strong style="color:var(--text)">90%+ of search quality</strong>.
+          <br><br>
+          Trade a tiny accuracy reduction for major storage savings and faster searches.
+        </div>
+      </div>
+    </div>
+    <div>
+      <img src="assets/matryoshka-dimensions.png" alt="Matryoshka representation learning — dimension truncation" style="width:100%;border-radius:8px">
+    </div>
+  </div>
+</section>
+
+<section data-nav="Key Concepts" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">What Are LoRA Adapters?</h2>
+  <div class="two-col fade-up" style="align-items:center">
+    <div>
+      <div class="concept" style="padding:2rem">
+        <div class="concept-def" style="font-size:1.05rem;line-height:1.8">
+          Small, lightweight tuning layers (~5M parameters each) attached to one base model.
+          <br><br>
+          The base model already handles retrieval, classification, and clustering on its own &mdash; but adapters <strong style="color:var(--text)">optimize it for each task</strong>.
+          <br><br>
+          Select the adapter at query time.
+          <br><br>
+          One deployment, multiple specializations.
+        </div>
+      </div>
+    </div>
+    <div>
+      <img src="assets/lora-adapters.png" alt="LoRA adapters — one model, optimized per task" style="width:100%;border-radius:8px">
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- JINA READER SERVICE -->
+<!-- ================================================================ -->
+<section data-nav="Reader" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Step one: be able to read the regulation. The EU published it as an HTML page with 200 lines of navigation, cookie banners, and a sidebar. Reader fixes that.</div>
+  <h2 class="fade-up">Jina Reader &mdash; Content Pipeline Service</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Before documents can be embedded, indexed, or searched, they need to be clean and structured. Raw web pages are full of JavaScript, CSS, ads, and navigation noise. Jina Reader is a <strong style="color:var(--text)">full service</strong> (not just a model) that handles this preprocessing. Accessed directly via the Jina API at <code>r.jina.ai</code> &mdash; not part of EIS.</p>
+
+  <div class="card-grid three fade-up">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Reader API</span></div>
+      <div class="card-desc">Prepend <code>r.jina.ai/</code> to any URL and get clean Markdown back. Handles HTML, PDFs, dynamic JavaScript pages. The simplest integration path.</div>
+      <div class="code-block" style="font-size:.78rem;padding:.75rem 1rem;margin-top:.5rem">r.jina.ai/https://example.com
+<span class="cc"># returns clean Markdown</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Search Mode</span></div>
+      <div class="card-desc">Prepend <code>s.jina.ai/</code> to a search query. Searches the web and returns top 5 results already converted to clean Markdown.</div>
+      <div class="code-block" style="font-size:.78rem;padding:.75rem 1rem;margin-top:.5rem">s.jina.ai/EU AI Act biometric
+<span class="cc"># web search → clean results</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">ReaderLM v2 (Model)</span></div>
+      <div class="card-desc">The underlying 1.5B-param model. Deploy locally for private use. HTML &rarr; Markdown <em>and</em> HTML &rarr; structured JSON extraction using predefined schemas. 29 languages, 512K context.</div>
+    </div>
+  </div>
+  <div class="callout fade-up">
+    <strong>Why it matters:</strong> Every RAG pipeline starts with clean data. Jina Reader is the preprocessing step that ensures AI models get high-quality input instead of noisy HTML. Outperforms models 20&times; its size on HTML-to-Markdown quality benchmarks.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- QUICK REFERENCE TABLE -->
+<!-- ================================================================ -->
+<section class="full-bleed" data-nav="Quick Reference" data-group="reference">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-label jina">Jina AI</div>
+    <div class="scenario-intro fade-up">Your team&rsquo;s cheat sheet. Bookmark this one &mdash; you&rsquo;ll need it during the hands-on.</div>
+    <h2 class="fade-up">Quick Reference &mdash; Every Current Model</h2>
+    <div class="table-wrap fade-up">
+      <table>
+        <thead><tr><th>Model</th><th>Type</th><th>Params</th><th>Context</th><th>Languages</th><th>On EIS?</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr class="highlight-row"><td><strong>v5-text-small</strong></td><td>Embedding</td><td>677M</td><td>32K</td><td>119+</td><td>Yes</td><td>Default for text search &amp; RAG</td></tr>
+          <tr class="highlight-row"><td><strong>v5-text-nano</strong></td><td>Embedding</td><td>239M</td><td>32K</td><td>Multi</td><td>Yes</td><td>Edge, low-latency, budget</td></tr>
+          <tr><td>v4</td><td>Embedding</td><td>3.8B</td><td>32K</td><td>30+</td><td>No</td><td>Visual documents, multimodal search</td></tr>
+          <tr><td>jina-clip-v2</td><td>CLIP</td><td>865M</td><td>8K</td><td>89</td><td>No</td><td>Cross-modal text &harr; image</td></tr>
+          <tr class="highlight-row"><td><strong>jina-reranker-v3</strong></td><td>Reranker</td><td>600M</td><td>131K</td><td>100+</td><td>Yes</td><td>Best accuracy, listwise scoring</td></tr>
+          <tr class="highlight-row"><td><strong>jina-reranker-v2</strong></td><td>Reranker</td><td>278M</td><td>1K</td><td>100+</td><td>Yes</td><td>Fast, compact, function-calling</td></tr>
+          <tr><td>ReaderLM v2</td><td>SLM</td><td>1.5B</td><td>512K</td><td>29</td><td>No</td><td>HTML/PDF to Markdown/JSON</td></tr>
+          <tr><td>jina-vlm</td><td>VLM</td><td>2.4B</td><td>Multi-img</td><td>29</td><td>No</td><td>Visual QA, OCR, doc understanding</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- WHY IT MATTERS -->
+<!-- ================================================================ -->
+<section data-nav="Why It Matters" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Legal says the regulation text can&rsquo;t leave the cluster. So no, you can&rsquo;t just call OpenAI.</div>
+  <h2 class="fade-up">Why This Matters</h2>
+  <div class="two-col fade-up">
+    <div>
+      <h3>Customer Conversation Playbook</h3>
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <div class="card" style="padding:1rem 1.25rem">
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">They say</div>
+          <div style="font-size:.9rem;font-weight:500;margin-bottom:.5rem">&ldquo;We&rsquo;re happy with keyword search&rdquo;</div>
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">You say</div>
+          <div style="font-size:.85rem;color:var(--text-muted)">Search for &ldquo;remote biometric identification&rdquo; when the doc says &ldquo;facial recognition.&rdquo; That&rsquo;s the gap semantic search closes.</div>
+        </div>
+        <div class="card" style="padding:1rem 1.25rem">
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">They say</div>
+          <div style="font-size:.9rem;font-weight:500;margin-bottom:.5rem">&ldquo;We already use OpenAI embeddings&rdquo;</div>
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">You say</div>
+          <div style="font-size:.85rem;color:var(--text-muted)">Equal-or-better quality, zero external API calls, data never leaves Elastic, and it&rsquo;s included in your subscription.</div>
+        </div>
+        <div class="card" style="padding:1rem 1.25rem">
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">They say</div>
+          <div style="font-size:.9rem;font-weight:500;margin-bottom:.5rem">&ldquo;We have ELSER deployed&rdquo;</div>
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">You say</div>
+          <div style="font-size:.85rem;color:var(--text-muted)">Great foundation. v5-text-small is the upgrade: 119 languages instead of English-only, 64&times; longer context, and it&rsquo;s a pre-configured endpoint.</div>
+        </div>
+        <div class="card" style="padding:1rem 1.25rem">
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">They say</div>
+          <div style="font-size:.9rem;font-weight:500;margin-bottom:.5rem">&ldquo;We don&rsquo;t have budget for ML nodes&rdquo;</div>
+          <div style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem">You say</div>
+          <div style="font-size:.85rem;color:var(--text-muted)">EIS runs on Elastic&rsquo;s infrastructure. No ML nodes to provision. Per-token billing, not compute costs.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>vs. OpenAI / Cohere Embeddings</h3>
+      <div class="card" style="border-color:rgba(0,145,145,.3)">
+        <ul class="bullet-list jina" style="gap:.6rem">
+          <li><strong>No external API calls</strong> &mdash; Jina on EIS runs inside Elasticsearch</li>
+          <li><strong>Data never leaves Elastic</strong> &mdash; text sent to EIS, processed, and discarded immediately</li>
+          <li><strong>Predictable costs</strong> &mdash; part of Elastic Cloud subscription, not per-token third-party pricing</li>
+          <li><strong>Equal or better quality</strong> &mdash; v5-text-small matches/exceeds OpenAI on standard benchmarks</li>
+          <li><strong>OpenAI-compatible API schema</strong> &mdash; straightforward migration</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- WHAT DOES THIS REPLACE -->
+<!-- ================================================================ -->
+<section data-nav="Why It Matters" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">Your customer is somewhere on this spectrum. Know which card they are and you know how to help them.</div>
+  <h2 class="fade-up">What Does This Replace?</h2>
+  <div class="card-grid three fade-up">
+    <div class="card">
+      <div class="card-header"><span class="card-title">From Keyword-Only</span><span class="card-badge badge-new">Easiest</span></div>
+      <div class="card-desc">Customer has no semantic search today.</div>
+      <ul class="bullet-list jina" style="gap:.5rem;font-size:.85rem">
+        <li>Add a <code>semantic_text</code> field alongside existing keyword fields</li>
+        <li>Hybrid search from day one &mdash; semantic + keyword together</li>
+        <li>No reindex of existing data needed to start</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">From ELSER</span><span class="card-badge badge-active">Upgrade</span></div>
+      <div class="card-desc">Customer already has ELSER configured.</div>
+      <ul class="bullet-list jina" style="gap:.5rem;font-size:.85rem">
+        <li>Create new index with v5-text-small, reindex data</li>
+        <li>Key gains: multilingual + 64&times; context window</li>
+        <li>Keep ELSER running during migration &mdash; no downtime</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">From OpenAI / Cohere</span><span class="card-badge badge-rec">Consolidate</span></div>
+      <div class="card-desc">Customer calls external embedding APIs.</div>
+      <ul class="bullet-list jina" style="gap:.5rem;font-size:.85rem">
+        <li>Switch inference endpoint service from <code>openai</code> to <code>elastic</code></li>
+        <li>Same Inference API shape &mdash; minimal code changes</li>
+        <li>Data stays in cluster, no external calls</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- COST STORY -->
+<!-- ================================================================ -->
+<section data-nav="Why It Matters" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Cost &amp; Operational Model</h2>
+  <div class="card-grid three fade-up">
+    <div class="compare-box" style="border-color:var(--border)">
+      <h3 style="font-size:1rem">Self-Managed ML Nodes</h3>
+      <ul class="bullet-list jina" style="gap:.4rem;font-size:.85rem">
+        <li>Fixed cost &mdash; always-on compute</li>
+        <li>You manage scaling, GPU memory, model versions</li>
+        <li>Pay even when idle</li>
+      </ul>
+    </div>
+    <div class="compare-box jina-accent">
+      <h3 style="font-size:1rem">EIS (Elastic Managed)</h3>
+      <ul class="bullet-list jina" style="gap:.4rem;font-size:.85rem">
+        <li>Pay per use &mdash; per million tokens</li>
+        <li>No idle capacity, no infrastructure</li>
+        <li>Pre-configured models, zero ops</li>
+      </ul>
+    </div>
+    <div class="compare-box" style="border-color:var(--border)">
+      <h3 style="font-size:1rem">External APIs (OpenAI, etc.)</h3>
+      <ul class="bullet-list jina" style="gap:.4rem;font-size:.85rem">
+        <li>Per-token pricing + network costs</li>
+        <li>Data leaves your environment</li>
+        <li>Separate vendor, separate billing</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout gold fade-up" style="max-width:900px;margin-top:1.25rem">
+    <strong>For current pricing,</strong> talk to your Elastic sales contact or check the Cloud pricing page. The key message: no surprise GPU bills, no idle ML node costs, and data never leaves Elastic.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- JINA API SERVICE -->
+<!-- ================================================================ -->
+<section data-nav="Jina API" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <div class="scenario-intro fade-up">But first &mdash; you prototype with the Jina API to prove the approach works before touching production. No cluster needed.</div>
+  <h2 class="fade-up">Jina API Service &mdash; jina.ai</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">All Jina models are available directly via a REST API at <strong style="color:var(--text)">jina.ai</strong> &mdash; no Elastic cluster required. Instant access, no credit card or registration needed. SOC 2 Type 1 &amp; 2 compliant. Useful for quick prototyping, evaluation, or integrating into non-Elastic workflows.</p>
+
+  <div class="card-grid three fade-up">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Reader</span><span class="card-badge badge-eis">r.jina.ai</span></div>
+      <div class="card-desc">Prepend <code>r.jina.ai/</code> to any URL to get clean Markdown. Or use <code>s.jina.ai/</code> to search the web and get results already converted.</div>
+      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl "https://r.jina.ai/https://example.com"
+<span class="cc"># → clean Markdown</span>
+
+curl "https://s.jina.ai/EU AI Act biometric"
+<span class="cc"># → web search → clean results</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Embeddings</span><span class="card-badge badge-active">api.jina.ai</span></div>
+      <div class="card-desc">Generate embeddings via REST. Supports all Jina embedding models (v3, v5, CLIP). Pass text or images, get vectors back.</div>
+      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl https://api.jina.ai/v1/embeddings \
+  -H "Authorization: Bearer &lt;KEY&gt;" \
+  -d '{
+    <span class="cp">"model"</span>: <span class="cs">"jina-embeddings-v3"</span>,
+    <span class="cp">"input"</span>: [<span class="cs">"Your text here"</span>]
+  }'</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Reranker</span><span class="card-badge badge-active">api.jina.ai</span></div>
+      <div class="card-desc">Pass a query + documents, get them re-scored and re-ordered by relevance. Same v2/v3 models available on EIS.</div>
+      <div class="code-block" style="font-size:.75rem;padding:.75rem 1rem;margin-top:.5rem">curl https://api.jina.ai/v1/rerank \
+  -H "Authorization: Bearer &lt;KEY&gt;" \
+  -d '{
+    <span class="cp">"model"</span>: <span class="cs">"jina-reranker-v3"</span>,
+    <span class="cp">"query"</span>: <span class="cs">"AI regulation"</span>,
+    <span class="cp">"documents"</span>: [<span class="cs">"..."</span>]
+  }'</div>
+    </div>
+  </div>
+</section>
+
+<section data-nav="Jina API" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Jina API &mdash; Tips &amp; Integration</h2>
+  <div class="compare-row fade-up">
+    <div class="callout">
+      <strong>MCP Server:</strong> Add <code>mcp.jina.ai</code> as an MCP server to access Reader, Embeddings, and Reranker directly from LLMs and AI agents. No custom integration code required.
+    </div>
+    <div class="callout gold">
+      <strong>Getting an API Key:</strong> Go to <strong>jina.ai</strong> &rarr; click &ldquo;How to get my API key?&rdquo; &rarr; key appears in the <strong>API Key &amp; Billing</strong> tab. Free tier with rate limits; add your key to requests for higher throughput.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- WHERE AVAILABLE -->
+<!-- ================================================================ -->
+<section data-nav="Where Available" data-group="reference">
+  <div class="section-label eis">EIS</div>
+  <div class="scenario-intro fade-up">Good news: your customer&rsquo;s cluster already has access. Here&rsquo;s the deployment map.</div>
+  <h2 class="fade-up">Where Is EIS Available?</h2>
+  <div class="table-wrap fade-up" style="max-width:900px">
+    <table>
+      <thead><tr><th>Deployment Type</th><th>Availability</th><th>Setup Required</th><th>Version</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Elastic Cloud Serverless</strong></td><td>Built-in, zero setup</td><td>None &mdash; pre-configured endpoints ready to use</td><td>GA</td></tr>
+        <tr><td><strong>Elastic Cloud Hosted</strong></td><td>Built-in, zero setup</td><td>None &mdash; pre-configured endpoints ready to use</td><td>GA</td></tr>
+        <tr><td><strong>Self-managed (ECE, ECK, standalone)</strong></td><td>Via Cloud Connect</td><td>Connect cluster to Elastic Cloud, enable EIS</td><td>9.3+</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout blue fade-up" style="max-width:900px;margin-top:1.5rem">
+    <strong>Cloud Connect for self-managed:</strong> Bridges your cluster to Elastic Cloud services without hosting them locally. After enabling, Elasticsearch <strong>automatically creates</strong> inference endpoints and Kibana AI connectors. Requires Enterprise license or active trial. Stack 9.3+.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- MODELS ON EIS — UPDATED FROM LIVE DATA -->
+<!-- ================================================================ -->
+<section class="full-bleed" data-nav="Models on EIS" data-group="reference">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-label eis">EIS</div>
+    <div class="scenario-intro fade-up">The full menu. For our compliance tool we need embeddings, a reranker, and an LLM for the agent. All here.</div>
+    <h2 class="fade-up">What&rsquo;s Available on EIS?</h2>
+
+    <h3 class="fade-up" style="margin-top:1.5rem;color:var(--elastic-light-blue)">LLM Chat Models (Elastic Managed)</h3>
+    <div class="table-wrap fade-up" style="margin-bottom:2rem">
+      <table>
+        <thead><tr><th>Author</th><th>Model</th><th>ID</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Anthropic</td><td>Claude Opus 4.6</td><td><code>anthropic-claude-4.6-opus</code></td><td>GA</td></tr>
+          <tr class="new-row"><td>Anthropic</td><td>Claude Sonnet 4.6</td><td><code>anthropic-claude-4.6-sonnet</code></td><td>Beta</td></tr>
+          <tr><td>Anthropic</td><td>Claude Opus 4.5</td><td><code>anthropic-claude-4.5-opus</code></td><td>GA</td></tr>
+          <tr><td>Anthropic</td><td>Claude Sonnet 4.5</td><td><code>anthropic-claude-4.5-sonnet</code></td><td>GA</td></tr>
+          <tr class="new-row"><td>Anthropic</td><td>Claude Haiku 4.5</td><td><code>anthropic-claude-4.5-haiku</code></td><td>Beta</td></tr>
+          <tr><td>Anthropic</td><td>Claude Sonnet 3.7</td><td><code>rainbow-sprinkles</code></td><td>GA (legacy)</td></tr>
+          <tr><td>Google</td><td>Gemini 2.5 Pro</td><td><code>google-gemini-2.5-pro</code></td><td>GA</td></tr>
+          <tr><td>Google</td><td>Gemini 2.5 Flash</td><td><code>google-gemini-2.5-flash</code></td><td>GA</td></tr>
+          <tr class="new-row"><td>Google</td><td>Gemini 2.5 Flash Lite</td><td><code>google-gemini-2.5-flash-lite</code></td><td>Beta</td></tr>
+          <tr><td>OpenAI</td><td>GPT-5.2</td><td><code>openai-gpt-5.2</code></td><td>GA</td></tr>
+          <tr><td>OpenAI</td><td>GPT-4.1</td><td><code>openai-gpt-4.1</code></td><td>GA</td></tr>
+          <tr><td>OpenAI</td><td>GPT-4.1 Mini</td><td><code>openai-gpt-4.1-mini</code></td><td>GA</td></tr>
+          <tr><td>OpenAI</td><td>GPT-OSS 120B</td><td><code>openai-gpt-oss-120b</code></td><td>GA</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="full-bleed" data-nav="Models on EIS" data-group="reference">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-label eis">EIS</div>
+    <h2 class="fade-up">EIS Embedding &amp; Reranker Models</h2>
+    <div class="compare-row fade-up">
+      <div>
+        <h3 style="color:var(--jina-teal)">Embedding Models</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>ID</th><th>Dims</th><th>Service</th></tr></thead>
+            <tbody>
+              <tr class="highlight-row"><td><strong>Jina v5 Small</strong></td><td><code>jina-embeddings-v5-text-small</code></td><td>1,024</td><td>EIS</td></tr>
+              <tr class="highlight-row"><td><strong>Jina v5 Nano</strong></td><td><code>jina-embeddings-v5-text-nano</code></td><td>768</td><td>EIS</td></tr>
+              <tr class="highlight-row"><td>Jina v3</td><td><code>jina-embeddings-v3</code></td><td>1,024</td><td>EIS</td></tr>
+              <tr><td>ELSER v2 (EIS)</td><td><code>elser_model_2</code></td><td>sparse</td><td>EIS</td></tr>
+              <tr><td>ELSER v2 (ML node)</td><td><code>.elser_model_2_linux-x86_64</code></td><td>sparse</td><td>ES</td></tr>
+              <tr class="new-row"><td>E5 Large</td><td><code>microsoft-multilingual-e5-large</code></td><td>1,024</td><td>EIS (Beta)</td></tr>
+              <tr><td>E5 Small (ML node)</td><td><code>.multilingual-e5-small_linux-x86_64</code></td><td>&mdash;</td><td>ES</td></tr>
+              <tr><td>Gemini Emb 001</td><td><code>google-gemini-embedding-001</code></td><td>768</td><td>EIS</td></tr>
+              <tr><td>OpenAI Emb 3 Large</td><td><code>openai-text-embedding-3-large</code></td><td>3,072</td><td>EIS</td></tr>
+              <tr><td>OpenAI Emb 3 Small</td><td><code>openai-text-embedding-3-small</code></td><td>1,536</td><td>EIS</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 style="color:var(--jina-teal)">Rerankers</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Model</th><th>ID</th><th>Service</th></tr></thead>
+            <tbody>
+              <tr class="highlight-row"><td><strong>Jina Reranker v3</strong></td><td><code>jina-reranker-v3</code></td><td>EIS</td></tr>
+              <tr class="highlight-row"><td><strong>Jina Reranker v2</strong></td><td><code>jina-reranker-v2-base-multilingual</code></td><td>EIS</td></tr>
+              <tr><td>Rerank v1 (ML node)</td><td><code>.rerank-v1</code></td><td>ES</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout blue" style="margin-top:1rem;font-size:.85rem">
+          All LLMs: <strong>0-day data retention</strong>, data NOT used to train models, inference in US region. <span style="color:var(--elastic-green)">Green rows</span> = newly added (Beta).
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- COMMON CUSTOMER QUESTIONS -->
+<!-- ================================================================ -->
+<section data-nav="FAQ" data-group="reference">
+  <div class="section-label eis">EIS</div>
+  <div class="scenario-intro fade-up">The questions you&rsquo;ll get on the first call. Have answers ready.</div>
+  <h2 class="fade-up">Common Customer Questions</h2>
+  <div class="concept-grid fade-up">
+    <div class="concept">
+      <div class="concept-term">&ldquo;What about latency?&rdquo;</div>
+      <div class="concept-def">EIS inference runs on Elastic&rsquo;s infrastructure, co-located with your cluster. Typical embedding latency is low single-digit milliseconds per document. Reranking adds ~50&ndash;100ms for a batch of 50 docs. Compare that to an external API round-trip.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">&ldquo;What about our existing ELSER?&rdquo;</div>
+      <div class="concept-def">It keeps working. ELSER is still a supported pre-configured endpoint. For <strong style="color:var(--text)">new</strong> deployments, recommend v5-text-small. Migration is a reindex operation, not a breaking change.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">&ldquo;We&rsquo;re self-managed. Can we use this?&rdquo;</div>
+      <div class="concept-def">Yes, via <strong style="color:var(--text)">Cloud Connect</strong> (Stack 9.3+). It bridges your cluster to Elastic Cloud services. Requires Enterprise license or active trial.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">&ldquo;Does data leave the cluster?&rdquo;</div>
+      <div class="concept-def">For EIS-managed models (Modes 1 &amp; 2): text is sent to Elastic&rsquo;s inference infrastructure, processed, and <strong style="color:var(--text)">immediately discarded</strong>. 0-day retention. Not used for model training.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">&ldquo;Non-English content?&rdquo;</div>
+      <div class="concept-def">v5-text-small supports <strong style="color:var(--text)">119+ languages</strong> out of the box. No language-specific configuration needed. Cross-lingual search (query in English, find German docs) works automatically.</div>
+    </div>
+    <div class="concept">
+      <div class="concept-term">&ldquo;Can we fine-tune the models?&rdquo;</div>
+      <div class="concept-def">v5 supports <strong style="color:var(--text)">LoRA adapters</strong> for task-specific tuning (retrieval, classification, clustering, STS). Select the adapter at query time &mdash; one model, multiple tasks.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- GOTCHAS -->
+<!-- ================================================================ -->
+<section data-nav="FAQ" data-group="reference">
+  <div class="section-label eis">EIS</div>
+  <h2 class="fade-up">Gotchas &amp; Anti-Patterns</h2>
+  <div class="card-grid fade-up" style="max-width:900px">
+    <div class="callout gold">
+      <strong>Don&rsquo;t <code>PUT _inference</code> for pre-configured endpoints.</strong><br>They start with a dot (<code>.jina-embeddings-v5-text-small</code>) and already exist. Calling PUT on them will error. Just reference the dot-prefixed ID in your mapping.
+    </div>
+    <div class="callout gold">
+      <strong>Don&rsquo;t recommend Gemini 2.5 Pro for agents.</strong><br>Tends to time out on complex agent loops. Recommend GPT-4.1 Mini (fastest) or Claude Sonnet 4.5 (best balance) for agent connectors.
+    </div>
+    <div class="callout gold">
+      <strong>VLM &ne; CLIP replacement.</strong><br>CLIP searches images (cross-modal retrieval). VLM answers questions about images (generative). They&rsquo;re complementary &mdash; don&rsquo;t position one as replacing the other.
+    </div>
+    <div class="callout gold">
+      <strong>Don&rsquo;t double-chunk.</strong><br><code>semantic_text</code> handles chunking automatically. If a customer is manually chunking AND using <code>semantic_text</code>, they&rsquo;re chunking twice. Use one or the other.
     </div>
   </div>
 </section>
@@ -1329,7 +1682,7 @@ function runRerank() {
         el.querySelector('.rerank-pos').textContent = '#' + (i + 1);
         el.querySelector('.rerank-score').textContent = r.score.toFixed(2);
         el.querySelector('.rerank-score').style.color = r.score > 0.85 ? 'var(--jina-teal)' : 'var(--text-muted)';
-        const titleDiv = el.querySelectorAll('div')[1];
+        const titleDiv = el.querySelector('div[style*="flex:1"]');
         titleDiv.children[0].textContent = r.title;
         titleDiv.children[1].textContent = r.desc;
         const moveSpan = el.querySelector('.rerank-move');
@@ -1361,7 +1714,7 @@ function resetRerank() {
     el.querySelector('.rerank-pos').textContent = '#' + (i + 1);
     el.querySelector('.rerank-score').textContent = '—';
     el.querySelector('.rerank-score').style.color = 'var(--text-muted)';
-    const titleDiv = el.querySelectorAll('div')[1];
+    const titleDiv = el.querySelector('div[style*="flex:1"]');
     titleDiv.children[0].innerHTML = i === 0 ? 'Waiting for rerank\u2026' : '&nbsp;';
     titleDiv.children[1].innerHTML = '&nbsp;';
     el.querySelector('.rerank-move').innerHTML = '&nbsp;';
@@ -1536,7 +1889,7 @@ const vlmResponseLines = [
   '4. Lambda writes results to DynamoDB',
   '5. SNS notifies subscribed services of completion',
   '',
-  '⚠️ **Compliance note:** If Rekognition is used for facial recognition, this system may be classified as **high-risk AI** under EU AI Act Article 6 / Annex III.'
+  'The system appears designed for automated image analysis at scale, with real-time notification capabilities via SNS.'
 ];
 
 let vlmTimer = null;
