@@ -474,10 +474,20 @@ section img:not(.lightbox img){cursor:zoom-in}
   <div class="callout fade-up">
     <strong>The analogy:</strong> Embedding search is scanning a library catalog to find the right shelf. The reranker is a librarian who reads the actual pages and tells you which books best answer your specific question.
   </div>
-  <div class="callout blue fade-up">
-    <strong>Two things FEs get wrong:</strong>
-    <br>(1) The first stage doesn&rsquo;t have to be semantic &mdash; keyword/BM25 works too. The reranker doesn&rsquo;t care how you found the candidates.
-    <br>(2) The reranker reads the <strong>raw text</strong>, not the embeddings. It re-processes each document alongside the query from scratch. First-stage embeddings (if any) are not reused.
+</section>
+
+<section data-nav="Rerankers" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Two Things FEs Get Wrong About Rerankers</h2>
+  <div class="card-grid fade-up" style="max-width:900px">
+    <div class="callout blue">
+      <strong>(1) The first stage doesn&rsquo;t have to be semantic.</strong><br>
+      Keyword/BM25 works too. The reranker doesn&rsquo;t care how you found the candidates &mdash; it just needs a list of documents to re-score.
+    </div>
+    <div class="callout blue">
+      <strong>(2) The reranker reads the raw text, not the embeddings.</strong><br>
+      It re-processes each document alongside the query from scratch. First-stage embeddings (if any) are not reused. Even if your first stage was keyword-only, the reranker still works.
+    </div>
   </div>
 </section>
 
@@ -886,8 +896,19 @@ section img:not(.lightbox img){cursor:zoom-in}
     <div class="pipe-step"><div class="step-num">Step 5</div><div class="step-title">Results</div><div class="step-detail">Precision-ranked hits</div></div>
   </div>
 
-  <div class="fade-up">
-    <div class="code-block" style="max-width:600px"><span class="lang">Create index</span>
+  <div class="compare-row fade-up" style="gap:1.25rem">
+    <div class="code-block"><span class="lang">Simplest — uses default (v5-text-small)</span>
+<span class="ck">PUT</span> my-index
+{
+  <span class="cp">"mappings"</span>: {
+    <span class="cp">"properties"</span>: {
+      <span class="cp">"text"</span>: {
+        <span class="cp">"type"</span>: <span class="cs">"semantic_text"</span>
+      }
+    }
+  }
+}</div>
+    <div class="code-block"><span class="lang">Explicit — specify a model</span>
 <span class="ck">PUT</span> my-index
 {
   <span class="cp">"mappings"</span>: {
@@ -899,6 +920,9 @@ section img:not(.lightbox img){cursor:zoom-in}
     }
   }
 }</div>
+  </div>
+  <div class="callout blue fade-up" style="max-width:900px;margin-top:.75rem">
+    <strong>v5-text-small is the default.</strong> If you omit <code>inference_id</code>, Elastic uses it automatically. Only specify it when you want a different model.
   </div>
 </section>
 
@@ -958,7 +982,7 @@ section img:not(.lightbox img){cursor:zoom-in}
     <table>
       <thead><tr><th>Category</th><th>Price</th><th>Notes</th></tr></thead>
       <tbody>
-        <tr class="highlight-row"><td><strong>Embeddings &amp; Rerankers</strong></td><td>From <strong style="color:var(--elastic-gold)">$0.08 / M tokens</strong></td><td>Input tokens only &mdash; no output billing</td></tr>
+        <tr class="highlight-row"><td><strong>Embeddings &amp; Rerankers</strong></td><td>From <strong style="color:var(--elastic-gold)">$0.08 / M tokens</strong> <a href="https://cloud.elastic.co/cloud-pricing-table?productType=serverless" target="_blank" style="color:var(--elastic-light-blue);font-size:.75rem;text-decoration:none">[pricing &nearr;]</a></td><td>Input tokens only &mdash; no output billing</td></tr>
         <tr><td><strong>Chat / LLM</strong> (managed)</td><td><strong>$4.50 / M input</strong>, <strong>$21 / M output</strong></td><td>AI Playground, Agent Builder, AI Assistant</td></tr>
         <tr><td><strong>ML VCUs</strong> (self-hosted models)</td><td><strong>$0.07 / VCU / hr</strong></td><td>ELSER on ML nodes, custom models</td></tr>
       </tbody>
