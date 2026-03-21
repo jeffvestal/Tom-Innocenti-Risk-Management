@@ -7,6 +7,7 @@ export type AppMode = 'search' | 'agent' | 'data';
 interface ModeToggleProps {
   mode: AppMode;
   onChange: (mode: AppMode) => void;
+  indexHasData?: boolean | null;
 }
 
 const modes: { id: AppMode; label: string; icon: typeof Search }[] = [

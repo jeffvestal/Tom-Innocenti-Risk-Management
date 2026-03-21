@@ -106,4 +106,6 @@ export interface SearchState {
   isAuditing: boolean;
   vlmAnalysis: string | null;
   auditError: AuditError | null;
+  naiveTook: number | null;
+  rerankedTook: number | null;
 }

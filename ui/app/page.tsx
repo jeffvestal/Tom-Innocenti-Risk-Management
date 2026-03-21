@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { ResultsList } from '@/components/ResultsList';
@@ -28,6 +28,8 @@ const initialState: SearchState = {
   isAuditing: false,
   vlmAnalysis: null,
   auditError: null,
+  naiveTook: null,
+  rerankedTook: null,
 };
 
 export default function Home() {
@@ -37,6 +39,15 @@ export default function Home() {
   const [errorExpanded, setErrorExpanded] = useState(false);
   const [vlmWarming, setVlmWarming] = useState(false);
   const [vlmAttempt, setVlmAttempt] = useState(0);
+  const [indexHasData, setIndexHasData] = useState<boolean | null>(null);
+
+  // Check if index has data on mount
+  useEffect(() => {
+    fetch('/api/ingest')
+      .then(r => r.json())
+      .then(data => setIndexHasData(data.totalDocs > 0))
+      .catch(() => setIndexHasData(false));
+  }, []);
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) return;
@@ -67,6 +78,7 @@ export default function Home() {
       setState(prev => ({
         ...prev,
         naiveResults: data.results,
+        naiveTook: data.took ?? null,
         isSearching: false,
         hasSearched: true,
       }));
@@ -227,6 +239,7 @@ export default function Home() {
       setState(prev => ({
         ...prev,
         rerankedResults: data.results,
+        rerankedTook: data.took ?? null,
         isReranking: false,
         showComparison: true,
       }));
@@ -257,7 +270,7 @@ export default function Home() {
       <Header onReset={handlePageReset} language={language} onLanguageChange={setLanguage} />
       
       <div className="max-w-6xl mx-auto px-6 py-8">
-        <ModeToggle mode={mode} onChange={setMode} />
+        <ModeToggle mode={mode} onChange={setMode} indexHasData={indexHasData} />
 
         {mode === 'search' && (
           <>
@@ -361,6 +374,8 @@ export default function Home() {
                   rerankedResults={state.rerankedResults}
                   showComparison={state.showComparison}
                   isLoading={state.isSearching}
+                  naiveTook={state.naiveTook}
+                  rerankedTook={state.rerankedTook}
                 />
               </div>
             )}
