@@ -14,6 +14,23 @@ This Regulation lays down:
 (f) rules on market monitoring, market surveillance, governance and enforcement;
 (g) measures to support innovation, with a particular focus on SMEs, including start-ups.
 
+## Article 2
+Scope
+
+1. This Regulation applies to providers that place on the market or put into service AI systems in the Union, irrespective of whether those providers are established or located within the Union or in a third country.
+
+## Article 3
+Definitions
+
+For the purposes of this Regulation, the following definitions apply:
+(1) 'artificial intelligence system' (AI system) means a machine-based system that is designed to operate with varying levels of autonomy;
+(2) 'risk' means the combination of the probability of an occurrence of a harm and the severity of that harm.
+
+## Article 4
+AI literacy
+
+Providers and deployers of AI systems shall take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf.
+
 ## Article 5
 Prohibited artificial intelligence practices
 
@@ -29,3 +46,16 @@ Classification rules for high-risk AI systems
 1. Irrespective of whether an AI system is placed on the market or put into service independently from the products referred to in points (a) and (b), that AI system shall be considered high-risk where both of the following conditions are fulfilled:
 (a) the AI system is intended to be used as a safety component of a product, or the AI system is itself a product, covered by the Union harmonisation legislation listed in Annex I;
 (b) the product whose safety component pursuant to point (a) is the AI system, or the AI system itself as a product, is required to undergo a third-party conformity assessment.
+
+## Article 7
+Amendments to Annex III
+
+1. The Commission is empowered to adopt delegated acts to amend the list in Annex III by adding or modifying use-cases for high-risk AI systems where both of the following conditions are fulfilled:
+(a) the AI systems are intended to be used in any of the areas listed in points 1 to 8 of Annex III;
+(b) the AI systems pose a risk of harm to health, safety or fundamental rights of natural persons.
+
+## Article 8
+Compliance with requirements for high-risk AI systems
+
+1. High-risk AI systems shall comply with the requirements laid down in this Section.
+2. The intended purpose of the high-risk AI system and the risk management system shall be taken into account when ensuring compliance with those requirements.
