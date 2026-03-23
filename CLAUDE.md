@@ -122,10 +122,6 @@ Two versions: **themed** ("We Might Be Illegal in Europe" narrative) and **stand
 - 6 generated diagram images in `docs/presentation/assets/`
 - PPTX exporters: `export_pptx.py` (themed), `export_pptx_standard.py` (standard)
 
-## Current Status
-
-See `TODO.md` for the full prioritized backlog. Priority 1 is standard presentation parity.
-
 ## Maintaining This File
 
 Update when changing: project structure, env vars, test infrastructure, naming conventions, architectural patterns, commands, or discovering new gotchas. Keep concise and factual.
