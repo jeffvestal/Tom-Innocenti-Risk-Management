@@ -1179,6 +1179,9 @@ section img:not(.lightbox img){cursor:zoom-in}
       <img src="assets/matryoshka-dimensions.png" alt="Matryoshka representation learning — dimension truncation" style="width:100%;border-radius:8px">
     </div>
   </div>
+  <div class="callout blue fade-up" style="max-width:900px;margin-top:1.25rem">
+    <strong>In Elasticsearch:</strong> Set <code>dimensions</code> when creating a custom inference endpoint. Default is 1,024 (v5-text-small) or 768 (v5-text-nano). Reduce to 256 or 512 for faster search with minimal quality loss. The <code>semantic_text</code> field uses whatever dimensions the endpoint specifies.
+  </div>
 </section>
 
 <section data-nav="Key Concepts" data-group="reference">
@@ -1201,6 +1204,9 @@ section img:not(.lightbox img){cursor:zoom-in}
     <div>
       <img src="assets/lora-adapters.png" alt="LoRA adapters — one model, optimized per task" style="width:100%;border-radius:8px">
     </div>
+  </div>
+  <div class="callout blue fade-up" style="max-width:900px;margin-top:1.25rem">
+    <strong>In Elasticsearch:</strong> Set <code>task_type</code> when creating the inference endpoint &mdash; options: <code>search</code>, <code>ingest</code>, <code>classification</code>, <code>clustering</code>. Elasticsearch automatically selects the right LoRA adapter at inference time. No manual adapter management needed.
   </div>
 </section>
 
@@ -1386,7 +1392,7 @@ section img:not(.lightbox img){cursor:zoom-in}
     </div>
   </div>
   <div class="callout gold fade-up" style="max-width:900px;margin-top:1.25rem">
-    <strong>For current pricing,</strong> talk to your Elastic sales contact or check the Cloud pricing page. The key message: no surprise GPU bills, no idle ML node costs, and data never leaves Elastic.
+    <strong>Estimating cost:</strong> EIS bills per million tokens processed. Volume depends on document count, average length, and re-indexing frequency. No published calculator yet &mdash; size the workload, then check the Cloud pricing page for per-token rates. The key message: no surprise GPU bills, no idle ML node costs, and data never leaves Elastic.
   </div>
 </section>
 
