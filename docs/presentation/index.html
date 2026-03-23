@@ -505,6 +505,15 @@ section img:not(.lightbox img){cursor:zoom-in}
 
 <section data-nav="Rerankers" data-group="jina">
   <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Listwise vs Pointwise Scoring</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Reranker v3 uses <strong style="color:var(--text)">listwise</strong> scoring &mdash; it sees all candidates at once and compares them against each other. v2 uses <strong style="color:var(--text)">pointwise</strong> scoring &mdash; each document is scored independently. The difference matters when several results look similar.</p>
+  <div class="fade-up" style="max-width:900px;margin:0 auto">
+    <img src="assets/listwise-vs-pointwise.png" alt="Listwise vs pointwise reranking — v3 compares documents against each other, v2 scores independently" style="width:100%;border-radius:8px">
+  </div>
+</section>
+
+<section data-nav="Rerankers" data-group="jina">
+  <div class="section-label jina">Jina AI</div>
   <h2 class="fade-up">Live Demo: Before &amp; After Reranking</h2>
   <p class="fade-up" style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">Query: &ldquo;Can law enforcement use facial recognition?&rdquo; &mdash; EU AI Act corpus</p>
     <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
