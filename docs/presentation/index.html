@@ -471,6 +471,7 @@ section img:not(.lightbox img){cursor:zoom-in}
         <li>Compares documents against <strong>each other</strong>, not just against the query. &ldquo;Which of these is <em>most</em> relevant?&rdquo; instead of &ldquo;Is this relevant?&rdquo;</li>
         <li><strong>600M</strong> params, <strong>131K</strong> token context</li>
         <li>100+ languages, outperforms models with 2.5&times; more parameters</li>
+        <li style="color:var(--elastic-gold)"><strong>Best when:</strong> candidates are close in relevance and precision matters</li>
       </ul>
     </div>
     <div class="compare-box" style="border-color:var(--border)">
@@ -480,6 +481,7 @@ section img:not(.lightbox img){cursor:zoom-in}
         <li><strong>278M</strong> params, <strong>1K</strong> token context</li>
         <li>100+ languages, 6&times; faster than v1</li>
         <li>Unique: <strong>function-calling</strong> support (match queries to APIs) + code search</li>
+        <li style="color:var(--text-dim)"><strong>Best when:</strong> high-throughput pipelines where speed matters more than marginal precision</li>
       </ul>
     </div>
   </div>
@@ -506,7 +508,25 @@ section img:not(.lightbox img){cursor:zoom-in}
 <section data-nav="Rerankers" data-group="jina">
   <div class="section-label jina">Jina AI</div>
   <h2 class="fade-up">Listwise vs Pointwise Scoring</h2>
-  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Reranker v3 uses <strong style="color:var(--text)">listwise</strong> scoring &mdash; it sees all candidates at once and compares them against each other. v2 uses <strong style="color:var(--text)">pointwise</strong> scoring &mdash; each document is scored independently. The difference matters when several results look similar.</p>
+
+  <div class="card-grid three fade-up" style="max-width:900px;margin-bottom:1.5rem">
+    <div class="callout" style="border-color:rgba(0,145,145,.3)">
+      <strong style="color:var(--jina-teal)">Why listwise is better</strong><br>
+      Imagine 5 results all mention &ldquo;facial recognition in law enforcement.&rdquo; Pointwise scores each one in isolation &mdash; you get 0.85, 0.83, 0.82, 0.81, 0.80. Nearly identical, no way to distinguish the best answer.<br><br>
+      Listwise reads all 5 <em>together</em> and asks: &ldquo;Which of these best answers the specific question?&rdquo; It can spot that doc&nbsp;#3 discusses the <em>exceptions</em> to the prohibition &mdash; which is what you actually asked about &mdash; while the others just describe the general rule.
+    </div>
+    <div class="callout" style="border-color:var(--border)">
+      <strong>Why pointwise still exists</strong><br>
+      Listwise is computationally heavier &mdash; it has to attend across all candidates simultaneously. Pointwise (v2) is significantly faster, half the parameters (278M vs 600M), and has unique capabilities listwise doesn&rsquo;t: <strong>function-calling</strong> support and <strong>code search</strong>.<br><br>
+      When your candidates are clearly different in quality, pointwise is plenty good &mdash; and faster.
+    </div>
+    <div class="callout" style="border-color:rgba(254,197,20,.3)">
+      <strong style="color:var(--elastic-gold)">The analogy</strong><br>
+      <strong>Pointwise</strong> = each essay graded independently against a rubric. Works fine when quality varies widely.<br><br>
+      <strong>Listwise</strong> = teacher reads all essays, then ranks them. Essential when they&rsquo;re close in quality and you need to pick the <em>best</em> one.
+    </div>
+  </div>
+
   <div class="fade-up" style="max-width:900px;margin:0 auto">
     <img src="assets/listwise-vs-pointwise.png" alt="Listwise vs pointwise reranking — v3 compares documents against each other, v2 scores independently" style="width:100%;border-radius:8px">
   </div>
