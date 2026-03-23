@@ -16,7 +16,7 @@ import type {
 const DEFAULT_STEPS: PipelineStep[] = [
   { id: 'fetch', label: 'Jina Reader', description: 'Jina Reader (r.jina.ai) converts PDF to LLM-ready markdown', status: 'idle' },
   { id: 'parse', label: 'Parse Articles', description: 'Split markdown into articles', status: 'idle' },
-  { id: 'inference', label: 'Jina Inference', description: '.jina-embeddings-v5-text-small + jina-reranker-v2 via ES Inference API', status: 'idle' },
+  { id: 'inference', label: 'Jina Inference', description: '.jina-embeddings-v5-text-small + jina-reranker-v3 via ES Inference API', status: 'idle' },
   { id: 'index', label: 'Index Documents', description: 'Bulk index with Jina Embeddings auto-embedding', status: 'idle' },
   { id: 'complete', label: 'Complete', description: 'Powered by Jina AI — ready to search', status: 'idle' },
 ];

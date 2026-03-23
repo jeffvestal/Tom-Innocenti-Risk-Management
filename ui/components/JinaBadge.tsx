@@ -31,7 +31,7 @@ const SERVICE_INFO = {
   },
   reranker: {
     label: 'Jina Reranker',
-    model: 'jina-reranker-v2-base-multilingual',
+    model: 'jina-reranker-v3',
     description: 'Cross-encoder reranker with listwise attention for relevance tuning.',
     docUrl: 'https://jina.ai/reranker/',
   },

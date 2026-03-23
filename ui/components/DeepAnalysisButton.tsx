@@ -33,7 +33,7 @@ export function DeepAnalysisButton({ onClick, isLoading, disabled }: DeepAnalysi
       <span className="inline-flex items-center gap-1.5 text-[10px] text-slate-500">
         Powered by <JinaLogo className="w-7 h-3" />
         <span className="text-teal-700 dark:text-teal-400 font-medium">Jina Reranker</span>
-        <span className="font-mono text-slate-500 dark:text-slate-600">jina-reranker-v2-base-multilingual</span>
+        <span className="font-mono text-slate-500 dark:text-slate-600">jina-reranker-v3</span>
       </span>
     </div>
   );

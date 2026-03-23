@@ -101,7 +101,7 @@ export function ResultsList({
           </div>
           <p className="text-xs text-slate-500 text-center">
             Results reranked using <span className="text-teal-700 dark:text-teal-400 font-semibold">Jina Reranker</span>{' '}
-            <span className="font-mono text-slate-500 dark:text-slate-600">(jina-reranker-v2-base-multilingual)</span>{' '}
+            <span className="font-mono text-slate-500 dark:text-slate-600">(jina-reranker-v3)</span>{' '}
             with Listwise Attention via <ElasticLogo className="w-3.5 h-3.5 inline align-text-bottom" /> Elasticsearch Inference API
           </p>
         </div>
