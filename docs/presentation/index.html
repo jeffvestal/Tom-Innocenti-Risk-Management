@@ -1074,26 +1074,20 @@ section img:not(.lightbox img){cursor:zoom-in}
   <div class="section-label" style="color:var(--elastic-gold)">Part 3 &mdash; Hands-On</div>
   <div class="scenario-intro fade-up">Your turn. Build the tool that would have saved your team a week of panic.</div>
   <h2 class="fade-up">Let&rsquo;s Build It</h2>
-  <p class="fade-up" style="color:var(--text-muted);font-size:1.05rem;margin-bottom:2rem;max-width:700px">Three notebooks, one full pipeline &mdash; from raw PDF to precision-ranked semantic search. Then we&rsquo;ll explore the interactive UI demo.</p>
+  <p class="fade-up" style="color:var(--text-muted);font-size:1.05rem;margin-bottom:2rem;max-width:700px">Two notebooks &mdash; build the full pipeline, then explore everything EIS has to offer. Plus an interactive UI demo.</p>
 
-  <div class="handson-grid fade-up">
+  <div class="handson-grid fade-up" style="grid-template-columns:repeat(2,1fr)">
     <div class="handson-card">
       <div class="handson-num">01</div>
-      <h3>Ingest</h3>
-      <p style="color:var(--text-muted);font-size:.85rem">Jina Reader converts the EU AI Act PDF into clean, structured markdown. Chunked by article for legal context preservation.</p>
-      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; EU AI Act as clean markdown chunks</p>
+      <h3>Full Chain: PDF to Precision Search</h3>
+      <p style="color:var(--text-muted);font-size:.85rem">Jina Reader ingests the EU AI Act from EUR-Lex into clean markdown. Parse into articles, index with <code>semantic_text</code> (auto-embeds via EIS). Semantic search, then rerank with Jina v3 &mdash; side-by-side before/after.</p>
+      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; Complete pipeline from raw document to precision-ranked results</p>
     </div>
     <div class="handson-card">
       <div class="handson-num">02</div>
-      <h3>Index</h3>
-      <p style="color:var(--text-muted);font-size:.85rem">Jina Embeddings v5 on EIS. <code>semantic_text</code> field type &mdash; zero-config vector search. One mapping change, done.</p>
-      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; Working semantic search index with v5 on EIS</p>
-    </div>
-    <div class="handson-card">
-      <div class="handson-num">03</div>
-      <h3>Rerank</h3>
-      <p style="color:var(--text-muted);font-size:.85rem">Jina Reranker via <code>text_similarity_reranker</code> retriever. Side-by-side before vs. after &mdash; see the precision difference.</p>
-      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; Before/after showing reranker precision lift</p>
+      <h3>EIS Platform: One API, Every Model</h3>
+      <p style="color:var(--text-muted);font-size:.85rem">Explore pre-configured inference endpoints already on your cluster. Compare embedding models (Jina v5 dense vs ELSER sparse). Stream LLM chat via EIS-managed endpoints. Billing, rate limits, and regions.</p>
+      <p style="color:var(--elastic-gold);font-size:.8rem;font-weight:500;margin-top:.5rem">&rarr; Understand what&rsquo;s available and how it all connects</p>
     </div>
   </div>
 
