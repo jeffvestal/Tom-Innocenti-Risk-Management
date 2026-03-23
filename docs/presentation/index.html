@@ -335,7 +335,7 @@ section img:not(.lightbox img){cursor:zoom-in}
           <span class="card-badge badge-new">New Default</span>
           <span class="card-badge badge-eis">On EIS</span>
         </div>
-        <p style="color:var(--text-muted);font-size:.95rem;line-height:1.6;margin-bottom:1rem">The recommended default embedding model for Elastic, <strong style="color:var(--elastic-gold)">replacing ELSER</strong> as the go-to for new deployments. Best search quality of any multilingual model under 1B parameters. If you&rsquo;re recommending ELSER today, recommend v5-text-small instead.</p>
+        <p style="color:var(--text-muted);font-size:.95rem;line-height:1.6;margin-bottom:1rem">The recommended default embedding model for Elastic, <strong style="color:var(--elastic-gold)">replacing ELSER</strong> as the go-to for new deployments. Best search quality of any multilingual model under 1B parameters. Backbone: <strong>Qwen3-0.6B</strong>. If you&rsquo;re recommending ELSER today, recommend v5-text-small instead.</p>
         <div class="card-stats">
           <div class="stat"><span class="stat-value">677M</span><span class="stat-label">Parameters</span></div>
           <div class="stat"><span class="stat-value">1,024</span><span class="stat-label">Dimensions</span></div>
@@ -350,20 +350,32 @@ section img:not(.lightbox img){cursor:zoom-in}
   <div class="card-grid fade-up" style="margin-bottom:1.5rem">
     <div class="card">
       <div class="card-header"><span class="card-title">v5-text-nano</span><span class="card-badge badge-eis">On EIS</span></div>
-      <div class="card-desc">Ultra-compact at just 239M params. Matches models with 2&times; its size. Perfect for edge deployments, latency-sensitive apps, or when GPU memory is limited.</div>
+      <div class="card-desc">Ultra-compact at just 239M params. Matches models with 2&times; its size. Perfect for edge deployments, latency-sensitive apps, or when GPU memory is limited. Backbone: <strong>EuroBERT-210M</strong>. <strong>108+ languages</strong>.</div>
       <div class="card-stats">
         <div class="stat"><span class="stat-value">239M</span><span class="stat-label">Params</span></div>
         <div class="stat"><span class="stat-value">768</span><span class="stat-label">Dims</span></div>
-        <div class="stat"><span class="stat-value">32K</span><span class="stat-label">Context</span></div>
+        <div class="stat"><span class="stat-value">8K</span><span class="stat-label">Context</span></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-header"><span class="card-title">v4 (Multimodal)</span><span class="card-badge badge-active">Active</span></div>
-      <div class="card-desc">Handles both text <em>and</em> images through one unified model. A text query can find relevant images, and an image query can find relevant text. Use for charts, slides, scans, product catalogs.</div>
+      <div class="card-header"><span class="card-title">v4 (Multimodal)</span><span class="card-badge" style="background:rgba(235,97,97,.15);color:var(--jina-red)">Research Only</span></div>
+      <div class="card-desc">Handles both text <em>and</em> images through one unified model. A text query can find relevant images, and an image query can find relevant text. Use for charts, slides, scans, product catalogs. <strong style="color:var(--jina-red)">Research license only &mdash; not for commercial use.</strong> Not on EIS.</div>
       <div class="card-stats">
         <div class="stat"><span class="stat-value">3.8B</span><span class="stat-label">Params</span></div>
         <div class="stat"><span class="stat-value">2,048</span><span class="stat-label">Dims</span></div>
         <div class="stat"><span class="stat-value">32K</span><span class="stat-label">Context</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid fade-up" style="margin-bottom:1.5rem">
+    <div class="card">
+      <div class="card-header"><span class="card-title">v3 (Text)</span><span class="card-badge badge-eis">On EIS</span></div>
+      <div class="card-desc">Still fully supported on EIS. Solid fallback for existing deployments or when v5 isn&rsquo;t available. Backbone: XLM-RoBERTa. <strong>108+ languages</strong>.</div>
+      <div class="card-stats">
+        <div class="stat"><span class="stat-value">572M</span><span class="stat-label">Params</span></div>
+        <div class="stat"><span class="stat-value">1,024</span><span class="stat-label">Dims</span></div>
+        <div class="stat"><span class="stat-value">8K</span><span class="stat-label">Context</span></div>
       </div>
     </div>
   </div>
@@ -438,7 +450,7 @@ section img:not(.lightbox img){cursor:zoom-in}
     </table>
   </div>
   <div class="callout gold fade-up" style="max-width:900px">
-    <strong>Bottom line:</strong> ELSER = English keyword expansion. v5-text-small = true multilingual semantic understanding with 64&times; more context. For new deployments, lead with v5-text-small.
+    <strong>Bottom line:</strong> ELSER = English keyword expansion. v5-text-small = true multilingual semantic understanding with 64&times; more context. For new deployments, lead with v5-text-small. <strong>Jina v3</strong> remains fully supported on EIS as a solid fallback for existing deployments.
   </div>
 </section>
 
@@ -1018,7 +1030,7 @@ section img:not(.lightbox img){cursor:zoom-in}
 
 <section data-nav="Pricing" data-group="eis">
   <div class="hero-card fade-up" style="max-width:900px;margin:0 auto">
-    <p style="font-size:1.05rem;line-height:1.9;color:var(--text)"><strong>You know the models.</strong> Two ways to use them:<br><br><strong style="color:var(--jina-teal)">(1)</strong> Jina API at jina.ai &mdash; great for prototyping, no cluster needed. Reader and VLM are Jina API only.<br><br><strong style="color:var(--elastic-light-blue)">(2)</strong> EIS &mdash; same models, built into Elastic, no external calls.<br><br><em>Now let&rsquo;s build something.</em></p>
+    <p style="font-size:1.05rem;line-height:1.9;color:var(--text)"><strong>You know the models.</strong> Three ways to use them:<br><br><strong style="color:var(--jina-teal)">(1)</strong> Jina API at jina.ai &mdash; great for prototyping, no cluster needed. Reader and VLM are Jina API only.<br><br><strong style="color:var(--elastic-light-blue)">(2)</strong> EIS &mdash; same models, built into Elastic, no external calls.<br><br><strong style="color:var(--elastic-gold)">(3)</strong> Cloud Marketplaces &mdash; AWS SageMaker, Azure (GCP coming soon) for self-managed deployments.<br><br><em>Now let&rsquo;s build something.</em></p>
   </div>
 </section>
 
@@ -1210,8 +1222,9 @@ section img:not(.lightbox img){cursor:zoom-in}
         <thead><tr><th>Model</th><th>Type</th><th>Params</th><th>Context</th><th>Languages</th><th>On EIS?</th><th>Best For</th></tr></thead>
         <tbody>
           <tr class="highlight-row"><td><strong>v5-text-small</strong></td><td>Embedding</td><td>677M</td><td>32K</td><td>119+</td><td>Yes</td><td>Default for text search &amp; RAG</td></tr>
-          <tr class="highlight-row"><td><strong>v5-text-nano</strong></td><td>Embedding</td><td>239M</td><td>32K</td><td>Multi</td><td>Yes</td><td>Edge, low-latency, budget</td></tr>
-          <tr><td>v4</td><td>Embedding</td><td>3.8B</td><td>32K</td><td>30+</td><td>No</td><td>Visual documents, multimodal search</td></tr>
+          <tr class="highlight-row"><td><strong>v5-text-nano</strong></td><td>Embedding</td><td>239M</td><td>8K</td><td>108+</td><td>Yes</td><td>Edge, low-latency, budget</td></tr>
+          <tr><td>v3</td><td>Embedding</td><td>572M</td><td>8K</td><td>108+</td><td>Yes</td><td>Fallback for existing deployments</td></tr>
+          <tr><td>v4 <span style="color:var(--jina-red);font-size:.7rem">(research only)</span></td><td>Embedding</td><td>3.8B</td><td>32K</td><td>30+</td><td>No</td><td>Visual documents, multimodal search</td></tr>
           <tr><td>jina-clip-v2</td><td>CLIP</td><td>865M</td><td>8K</td><td>89</td><td>No</td><td>Cross-modal text &harr; image</td></tr>
           <tr class="highlight-row"><td><strong>jina-reranker-v3</strong></td><td>Reranker</td><td>600M</td><td>131K</td><td>100+</td><td>Yes</td><td>Best accuracy, listwise scoring</td></tr>
           <tr class="highlight-row"><td><strong>jina-reranker-v2</strong></td><td>Reranker</td><td>278M</td><td>1K</td><td>100+</td><td>Yes</td><td>Fast, compact, function-calling</td></tr>
@@ -1426,6 +1439,21 @@ curl "https://s.jina.ai/EU AI Act biometric"
   <div class="callout blue fade-up" style="max-width:900px;margin-top:1.5rem">
     <strong>Cloud Connect for self-managed:</strong> Bridges your cluster to Elastic Cloud services without hosting them locally. After enabling, Elasticsearch <strong>automatically creates</strong> inference endpoints and Kibana AI connectors. Requires Enterprise license or active trial. Stack 9.3+.
   </div>
+
+  <h3 class="fade-up" style="margin-top:2rem;color:var(--jina-teal)">Cloud Marketplace Availability</h3>
+  <div class="table-wrap fade-up" style="max-width:900px">
+    <table>
+      <thead><tr><th>Marketplace</th><th>Models</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><strong>AWS SageMaker</strong></td><td>v3, v5-text-small, v5-text-nano</td><td>Available</td></tr>
+        <tr><td><strong>Azure Marketplace</strong></td><td>v3, v5-text-small, v5-text-nano</td><td>Available</td></tr>
+        <tr><td><strong>GCP Marketplace</strong></td><td>v3, v5</td><td style="color:var(--elastic-gold)">Coming soon</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout fade-up" style="max-width:900px;margin-top:1rem">
+    <strong>Self-deploy option:</strong> Jina models can also be self-deployed using HuggingFace Transformers, ONNX, GGUF, or MLX formats for customers who need full control over infrastructure.
+  </div>
 </section>
 
 <!-- ================================================================ -->
@@ -1503,6 +1531,55 @@ curl "https://s.jina.ai/EU AI Act biometric"
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- CODE EMBEDDINGS (REFERENCE ONLY) -->
+<!-- ================================================================ -->
+<section data-nav="Code Embeddings" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Code Embeddings &mdash; Reference</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">Jina also offers code-specific embedding models. These are <strong style="color:var(--text)">not available on EIS</strong> and are accessed via the Jina API or self-deployed. Included here for completeness &mdash; mention them if a customer specifically asks about code search.</p>
+  <div class="card-grid fade-up" style="max-width:900px">
+    <div class="card">
+      <div class="card-header"><span class="card-title">jina-embeddings-v5-code</span><span class="card-badge" style="background:rgba(0,145,145,.15);color:var(--jina-teal)">Jina API</span></div>
+      <div class="card-desc">Code-focused embedding model trained on programming languages and technical documentation. Supports code search, code-to-doc retrieval, and doc-to-code matching.</div>
+      <div class="card-stats">
+        <div class="stat"><span class="stat-value">Not on EIS</span><span class="stat-label">Availability</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout fade-up" style="max-width:900px;margin-top:1rem">
+    <strong>Note:</strong> For code search within Elastic, customers can use v5-text-small as a general-purpose option. Dedicated code models are better for specialized use cases like code retrieval pipelines.
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- DEPLOYMENT FORMATS (REFERENCE) -->
+<!-- ================================================================ -->
+<section data-nav="Deployment Formats" data-group="reference">
+  <div class="section-label jina">Jina AI</div>
+  <h2 class="fade-up">Deployment Formats &amp; Resources</h2>
+  <p class="fade-up" style="color:var(--text-muted);margin-bottom:1.5rem;max-width:800px">For customers who want to self-host or run Jina models outside of EIS, multiple deployment formats are available.</p>
+  <div class="table-wrap fade-up" style="max-width:900px">
+    <table>
+      <thead><tr><th>Format</th><th>Best For</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>HuggingFace Transformers</strong></td><td>Standard Python deployment</td><td>Full feature support, most flexible</td></tr>
+        <tr><td><strong>ONNX</strong></td><td>Cross-platform, optimized inference</td><td>CPU &amp; GPU acceleration</td></tr>
+        <tr><td><strong>GGUF</strong></td><td>llama.cpp, local/edge</td><td>Quantized, runs on consumer hardware</td></tr>
+        <tr><td><strong>MLX</strong></td><td>Apple Silicon</td><td>Optimized for M-series Macs</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout fade-up" style="max-width:900px;margin-top:1rem">
+    <strong>Resources:</strong>
+    <ul class="bullet-list jina" style="gap:.4rem;font-size:.85rem;margin-top:.5rem">
+      <li><a href="https://www.elastic.co/search-labs/blog/jina-embeddings-v5-text" target="_blank" style="color:var(--elastic-light-blue)">Elastic Search Labs: Jina Embeddings v5 deep dive</a></li>
+      <li><a href="https://huggingface.co/collections/jinaai/jina-embeddings-v5-text" target="_blank" style="color:var(--elastic-light-blue)">HuggingFace: Jina Embeddings v5 model collection</a></li>
+      <li><a href="https://www.elastic.co/docs/explore-analyze/machine-learning/nlp/ml-nlp-jina" target="_blank" style="color:var(--elastic-light-blue)">Elastic Docs: Jina AI integration reference</a></li>
+    </ul>
   </div>
 </section>
 
