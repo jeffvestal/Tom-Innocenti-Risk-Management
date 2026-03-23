@@ -10,23 +10,26 @@ from utils.comparison import build_comparison
 class TestParseArticles:
     def test_parses_expected_count(self, sample_markdown):
         articles = parse_articles(sample_markdown)
-        assert len(articles) == 3
+        assert len(articles) == 8
 
     def test_article_ids(self, sample_markdown):
         articles = parse_articles(sample_markdown)
         ids = [a["id"] for a in articles]
-        assert ids == ["en_art_1", "en_art_5", "en_art_6"]
+        assert ids == [
+            "en_art_1", "en_art_2", "en_art_3", "en_art_4",
+            "en_art_5", "en_art_6", "en_art_7", "en_art_8",
+        ]
 
     def test_article_numbers(self, sample_markdown):
         articles = parse_articles(sample_markdown)
         nums = [a["article_number"] for a in articles]
-        assert nums == ["1", "5", "6"]
+        assert nums == ["1", "2", "3", "4", "5", "6", "7", "8"]
 
     def test_titles_extracted(self, sample_markdown):
         articles = parse_articles(sample_markdown)
         assert articles[0]["title"] == "Subject matter"
-        assert articles[1]["title"] == "Prohibited artificial intelligence practices"
-        assert articles[2]["title"] == "Classification rules for high-risk AI systems"
+        assert articles[4]["title"] == "Prohibited artificial intelligence practices"
+        assert articles[5]["title"] == "Classification rules for high-risk AI systems"
 
     def test_body_text_not_empty(self, sample_markdown):
         articles = parse_articles(sample_markdown)
