@@ -351,11 +351,15 @@ td code{font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.06
         <tr><td>Task Adapters</td><td>None</td><td><strong>4 LoRA adapters</strong></td></tr>
         <tr><td>On EIS</td><td>Yes</td><td>Yes</td></tr>
         <tr><td>Status</td><td>Legacy default</td><td><strong style="color:var(--elastic-gold)">New default</strong></td></tr>
+        <tr><td colspan="3" style="text-align:center;font-weight:700;color:var(--elastic-gold);letter-spacing:.05em;padding-top:1rem">WHY IT MATTERS</td></tr>
+        <tr><td>Search Quality</td><td>Good for English keyword expansion; misses synonyms and cross-language matches</td><td><strong>True semantic understanding</strong> &mdash; &ldquo;facial recognition&rdquo; finds &ldquo;biometric identification&rdquo; even with zero keyword overlap</td></tr>
+        <tr><td>Real-World Retrieval</td><td>Needs chunking + exact-ish term overlap to find results</td><td><strong>Matches 3.8B-param model quality at 1/6 the size</strong> &mdash; same retrieval scores as v4 with 5.6&times; fewer parameters</td></tr>
+        <tr><td>Multilingual Queries</td><td>English only; non-English content = no results</td><td><strong>119 languages, one model</strong> &mdash; a German query finds the French regulation, no translation pipeline needed</td></tr>
       </tbody>
     </table>
   </div>
   <div class="callout gold fade-up" style="max-width:900px">
-    <strong>Bottom line:</strong> ELSER = English keyword expansion. v5-text-small = true multilingual semantic understanding with 64&times; more context. For new deployments, always recommend v5-text-small.
+    <strong>Bottom line:</strong> ELSER finds documents that share your keywords. v5-text-small finds documents that share your <em>meaning</em> &mdash; across 119 languages, across 25 pages of context, with the same retrieval quality as models 6&times; its size. For new deployments, always recommend v5-text-small.
   </div>
 </section>
 
