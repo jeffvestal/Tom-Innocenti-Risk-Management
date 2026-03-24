@@ -120,7 +120,7 @@ Two versions: **themed** ("We Might Be Illegal in Europe" narrative) and **stand
 - Themed: `docs/presentation/index.html` (29 sections, fully polished)
 - Standard: `docs/presentation/index-standard.html` (17 sections, needs parity updates)
 - 6 generated diagram images in `docs/presentation/assets/`
-- PPTX exporters: `export_pptx.py` (themed), `export_pptx_standard.py` (standard)
+- PPTX exporter: `export_pptx_screenshot.py` (Playwright 2x HiDPI screenshots, clicks interactive demos)
 
 ## Maintaining This File
 

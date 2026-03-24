@@ -56,7 +56,8 @@ def export(html_path: Path, output_path: Path, width: int, height: int,
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page(viewport={"width": width, "height": height})
+        page = browser.new_page(viewport={"width": width, "height": height},
+                                device_scale_factor=2)
         page.goto(f"file://{html_path}", wait_until="networkidle")
 
         # Wait for fonts and fade-in animations
@@ -106,6 +107,25 @@ def export(html_path: Path, output_path: Path, width: int, height: int,
                     }}
                 """)
                 page.wait_for_timeout(300)
+
+                # Click interactive demo buttons if present in this section
+                demo_btn = page.evaluate(f"""
+                    () => {{
+                        const sections = document.querySelectorAll('section[data-nav]');
+                        const sec = sections[{sec['index']}];
+                        const btn = sec.querySelector('#rerankBtn, #readerBtn, #vlmBtn');
+                        if (btn && btn.offsetParent !== null) {{
+                            btn.click();
+                            return btn.id;
+                        }}
+                        return null;
+                    }}
+                """)
+                if demo_btn:
+                    # Wait for animation to complete
+                    wait_ms = 4000 if demo_btn == "vlmBtn" else 2500
+                    print(f"    → Clicked {demo_btn}, waiting {wait_ms}ms for output...")
+                    page.wait_for_timeout(wait_ms)
 
                 # Screenshot the viewport (what you'd see on screen)
                 page.screenshot(path=str(img_path), type="png")
